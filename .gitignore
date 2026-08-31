@@ -5,6 +5,9 @@ package-lock.json
 # Environment Configuration
 .env
 
+# Database
+*.sqlite
+
 # Temporary artifacts, logs & test captures
 *.png
 *.webp
