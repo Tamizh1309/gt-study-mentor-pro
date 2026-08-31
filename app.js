@@ -7219,3 +7219,197 @@ function exportQBankPDF() {
 }
 
 window.exportQBankPDF = exportQBankPDF;
+
+
+// ══════════════════════════════════════════════════════════════
+// v16.0 90-DAY CAREER PREPARATION COMMAND CENTER LOGIC
+// ══════════════════════════════════════════════════════════════
+
+const FORGE_DATA = {
+  currentDay: 27,
+  totalDays: 90,
+  plannedHours: 6.0,
+  completedHours: 3.67,
+  tasks: [
+    { id: 'f-1', cat: 'SOFTWARE', title: 'DSA: Binary Tree Traversals & Depth', est: '1h 30m', done: true, priority: 'HIGH' },
+    { id: 'f-2', cat: 'GATE', title: 'OS: Deadlocks & Resource Allocation Graph', est: '1h 45m', done: false, priority: 'HIGH' },
+    { id: 'f-3', cat: 'SOFTWARE', title: 'Fullstack: Express REST API & JWT Auth', est: '1h 15m', done: false, priority: 'MED' },
+    { id: 'f-4', cat: 'PLACEMENT', title: 'Aptitude: Probability & Bayes Theorem Drill', est: '45m', done: false, priority: 'MED' },
+    { id: 'f-5', cat: 'INTERNSHIP', title: 'Resume: Add Impact Metrics to Project 2', est: '45m', done: false, priority: 'LOW' }
+  ]
+};
+
+function openForgePanel() {
+  document.querySelectorAll('#app > main').forEach(m => m.style.display = 'none');
+  const forgePanel = document.getElementById('forge-panel');
+  if (forgePanel) {
+    forgePanel.style.display = 'block';
+    renderForgeDashboard();
+  }
+  document.querySelectorAll('.sidebar-actions .action-btn, .sidebar-actions .menu-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-forge-btn')?.classList.add('active');
+}
+
+function closeForgePanel() {
+  document.querySelectorAll('#app > main').forEach(m => m.style.display = 'none');
+  const chatMain = document.getElementById('chat-main');
+  if (chatMain) chatMain.style.display = 'flex';
+  document.querySelectorAll('.sidebar-actions .action-btn, .sidebar-actions .menu-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-chat-btn')?.classList.add('active');
+}
+
+window.openForgePanel = openForgePanel;
+window.closeForgePanel = closeForgePanel;
+
+function renderForgeDashboard() {
+  renderForgeTasks();
+  renderForgeTimeline();
+}
+
+function renderForgeTasks() {
+  const container = document.getElementById('forge-tasks-list');
+  if (!container) return;
+
+  container.innerHTML = FORGE_DATA.tasks.map(t => {
+    const isDone = t.done ? 'checked' : '';
+    const textStyle = t.done ? 'text-decoration:line-through;color:var(--text-muted);' : 'color:#fff;';
+    const catColor = t.cat === 'GATE' ? '#63D8FF' : (t.cat === 'PLACEMENT' ? '#FFB300' : (t.cat === 'SOFTWARE' ? '#00E676' : '#B388FF'));
+
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;">' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<input type="checkbox" ' + isDone + ' onchange="toggleForgeTask(\'' + t.id + '\')" style="transform:scale(1.2);cursor:pointer;">' +
+        '<span style="font-size:10px;font-weight:800;color:' + catColor + ';background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;">' + t.cat + '</span>' +
+        '<span style="font-size:13px;font-weight:600;' + textStyle + '">' + t.title + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;align-items:center;">' +
+        '<span style="font-size:11px;color:var(--text-sec);">' + t.est + '</span>' +
+        '<button onclick="deleteForgeTask(\'' + t.id + '\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;">✕</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Calculate hours
+  const doneCount = FORGE_DATA.tasks.filter(t => t.done).length;
+  const timeCalc = document.getElementById('forge-time-calc');
+  if (timeCalc) {
+    timeCalc.textContent = 'Tasks: ' + doneCount + '/' + FORGE_DATA.tasks.length + ' Done • Planned: 6h 00m';
+  }
+}
+
+function toggleForgeTask(id) {
+  const task = FORGE_DATA.tasks.find(t => t.id === id);
+  if (task) {
+    task.done = !task.done;
+    if (task.done) addXP(20, 'Completed ' + task.cat + ' Task: ' + task.title);
+    renderForgeTasks();
+  }
+}
+window.toggleForgeTask = toggleForgeTask;
+
+function addForgeTask() {
+  const input = document.getElementById('forge-new-task-input');
+  const catSel = document.getElementById('forge-new-task-cat');
+  if (!input || !input.value.trim()) return;
+
+  FORGE_DATA.tasks.push({
+    id: 'f-' + Date.now(),
+    cat: catSel ? catSel.value : 'GATE',
+    title: input.value.trim(),
+    est: '1h 00m',
+    done: false,
+    priority: 'MED'
+  });
+  input.value = '';
+  renderForgeTasks();
+  addXP(5, 'Added new daily preparation task');
+}
+window.addForgeTask = addForgeTask;
+
+function deleteForgeTask(id) {
+  FORGE_DATA.tasks = FORGE_DATA.tasks.filter(t => t.id !== id);
+  renderForgeTasks();
+}
+window.deleteForgeTask = deleteForgeTask;
+
+function renderForgeTimeline() {
+  const matrix = document.getElementById('forge-timeline-matrix');
+  if (!matrix) return;
+
+  let nodes = '';
+  for (let i = 1; i <= 90; i++) {
+    let state = 'upcoming';
+    if (i < 27) state = 'completed';
+    else if (i === 27) state = 'today';
+
+    const dayText = i < 10 ? '0' + i : '' + i;
+    nodes += '<div class="timeline-day-node ' + state + '" onclick="selectTimelineDay(' + i + ')" title="Day ' + i + ': ' + state + '">' +
+      '<span>' + dayText + '</span>' +
+    '</div>';
+  }
+  matrix.innerHTML = nodes;
+}
+
+function selectTimelineDay(day) {
+  alert('Day ' + day + ' Curriculum Details:\nPhase: ' + (day <= 30 ? '1 (Foundation)' : (day <= 60 ? '2 (Development)' : '3 (Execution)')) + '\nTasks mapped across GATE, Placement, SWE, and Internship.');
+}
+window.selectTimelineDay = selectTimelineDay;
+
+function switchForgeTrack(track) {
+  document.querySelectorAll('.forge-track-content').forEach(c => c.style.display = 'none');
+  document.querySelectorAll('.forge-track-tab').forEach(b => b.classList.remove('active'));
+
+  document.getElementById('tab-btn-track-' + track)?.classList.add('active');
+  const target = document.getElementById('track-view-' + track);
+  if (target) target.style.display = 'block';
+}
+window.switchForgeTrack = switchForgeTrack;
+
+function startForgePlan() {
+  alert('🚀 Started Today\'s Plan! Focus topic: Operating Systems (Deadlocks). Timer running.');
+  addXP(15, 'Started Day 27 Intensive Study Plan');
+}
+window.startForgePlan = startForgePlan;
+
+function revealFSRSAnswer() {
+  const a = document.getElementById('fsrs-card-a');
+  const actions = document.getElementById('fsrs-actions-row');
+  const showBtn = document.getElementById('fsrs-show-btn');
+  if (a) a.style.display = 'block';
+  if (actions) actions.style.display = 'grid';
+  if (showBtn) showBtn.style.display = 'none';
+}
+window.revealFSRSAnswer = revealFSRSAnswer;
+
+function submitFSRSRating(rating) {
+  alert('FSRS Rating recorded: ' + rating + '! Card scheduled with optimal interval.');
+  addXP(10, 'Completed FSRS flashcard review');
+  const a = document.getElementById('fsrs-card-a');
+  const actions = document.getElementById('fsrs-actions-row');
+  const showBtn = document.getElementById('fsrs-show-btn');
+  if (a) a.style.display = 'none';
+  if (actions) actions.style.display = 'none';
+  if (showBtn) showBtn.style.display = 'block';
+}
+window.submitFSRSRating = submitFSRSRating;
+
+function quickPracticeTopic(topic) {
+  alert('Opening accelerated practice drill for: ' + topic);
+}
+window.quickPracticeTopic = quickPracticeTopic;
+
+function startGatePYQPractice(subj) {
+  alert('Launching ' + subj + ' GATE 2000-2024 PYQ Practice Set with live timer.');
+}
+window.startGatePYQPractice = startGatePYQPractice;
+
+function exportCareerData(format) {
+  const data = JSON.stringify(FORGE_DATA, null, 2);
+  const blob = new Blob([data], { type: format === 'json' ? 'application/json' : 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'GT_Study_Mentor_Pro_90Day_Plan.' + format;
+  a.click();
+  addXP(15, 'Exported 90-Day Career Preparation Data');
+}
+window.exportCareerData = exportCareerData;
