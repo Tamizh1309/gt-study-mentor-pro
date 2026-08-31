@@ -1,0 +1,41 @@
+{
+  "id": "/gt-mentor/",
+  "name": "GT Study Mentor Pro",
+  "short_name": "GT Mentor",
+  "description": "Professional AI-powered GATE CS 2027 + Placement Study Mentor. Get daily plans, personalized reminders, interactive Pomodoro timer, and curated study materials.",
+  "start_url": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "minimal-ui"],
+  "background_color": "#07070F",
+  "theme_color": "#6C63FF",
+  "orientation": "portrait-primary",
+  "dir": "ltr",
+  "lang": "en",
+  "categories": ["education", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Plan",
+      "url": "./?action=plan",
+      "description": "View today's GATE schedule"
+    },
+    {
+      "name": "Progress Tracker",
+      "url": "./?action=progress",
+      "description": "Track your daily study progress"
+    }
+  ]
+}
