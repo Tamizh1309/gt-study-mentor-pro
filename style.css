@@ -4042,3 +4042,259 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   GT STUDY MENTOR PRO 2.0 — ENTERPRISE DESIGN SYSTEM & NAVIGATION
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  --bg-primary: #080B18;
+  --surface: #10162A;
+  --surface-elevated: #151D35;
+  --primary: #63D8FF;
+  --primary-glow: rgba(99, 216, 255, 0.25);
+  --success: #4ADE80;
+  --warning: #FBBF24;
+  --danger: #FB7185;
+  --text: #F5F7FF;
+  --text-muted: #9AA5C2;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(99, 216, 255, 0.4);
+}
+
+/* High Contrast Accessibility Mode */
+body.high-contrast {
+  --bg-primary: #000000 !important;
+  --surface: #000000 !important;
+  --surface-elevated: #111111 !important;
+  --primary: #FFFF00 !important;
+  --text: #FFFFFF !important;
+  --text-muted: #E0E0E0 !important;
+  --border-subtle: #FFFFFF !important;
+  --border-active: #FFFF00 !important;
+}
+
+/* Base Body Application Styling */
+body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text) !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* ── Nested Sidebar Navigation Hierarchy (Section 7) ── */
+.sidebar-nav-group {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.sidebar-group-title {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 8px 12px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 40px;
+}
+.sidebar-nav-item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.sidebar-nav-item.active {
+  color: #fff;
+  background: rgba(99, 216, 255, 0.12);
+  border-color: rgba(99, 216, 255, 0.35);
+  font-weight: 700;
+  box-shadow: 0 0 16px rgba(99, 216, 255, 0.15);
+}
+.sidebar-nav-item .nav-icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sidebar-subnav {
+  padding-left: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sidebar-subnav-item {
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+}
+.sidebar-subnav-item:hover {
+  color: var(--primary);
+}
+
+/* ── Panel Display Routing ── */
+.app-view-panel {
+  display: none;
+  padding: 24px;
+  overflow-y: auto;
+  height: 100vh;
+  box-sizing: border-box;
+}
+.app-view-panel.active-view {
+  display: block;
+}
+
+/* ── Section 8 Home Dashboard Refinements ── */
+.v2-home-grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.v2-command-card {
+  background: linear-gradient(135deg, var(--surface) 0%, #0c1022 100%);
+  border: 1px solid var(--border-active);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 24px var(--primary-glow);
+  position: relative;
+  overflow: hidden;
+}
+.v2-command-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Next Action Banner */
+.v2-next-action-strip {
+  background: rgba(99, 216, 255, 0.08);
+  border: 1px solid var(--border-active);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.v2-next-action-strip .action-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 4px 0;
+}
+.v2-next-action-strip .action-why {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Career Readiness Matrix Table */
+.readiness-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+  font-size: 13px;
+}
+.readiness-matrix-table th {
+  text-align: left;
+  padding: 10px 14px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 700;
+}
+.readiness-matrix-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+.readiness-matrix-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+.score-pill {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 11px;
+}
+.score-pill.high { background: rgba(74, 222, 128, 0.15); color: var(--success); }
+.score-pill.med { background: rgba(99, 216, 255, 0.15); color: var(--primary); }
+.score-pill.low { background: rgba(251, 113, 133, 0.15); color: var(--danger); }
+
+/* Mistake Book Card */
+.mistake-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--danger);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mistake-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+}
+.mistake-badge.gap { background: rgba(251, 113, 133, 0.15); color: var(--danger); }
+.mistake-badge.calc { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+.mistake-badge.misread { background: rgba(99, 216, 255, 0.15); color: var(--primary); }
+
+/* CSE Labs Hub Grid */
+.cse-labs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.cse-lab-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: all 0.25s ease;
+}
+.cse-lab-card:hover {
+  border-color: var(--border-active);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}

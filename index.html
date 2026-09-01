@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>GT Study Mentor Pro — GATE 2027 + Placement</title>
+  <title>GT Study Mentor Pro — 90-Day Career Preparation</title>
   <meta name="description" content="AI-powered GATE CS 2027 + Placement mentor. Daily plans, reminders, holiday calendar, study materials, and Tanglish guidance da!" />
 
   <!-- PWA / App -->
@@ -34,6 +34,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="stylesheet" href="style.css" />
+  <script src="prepIntelligence.js"></script>
+  <script src="mistakeBook.js"></script>
 </head>
 <body>
 
@@ -63,395 +65,514 @@
 <!-- ══ Main App ══ -->
 <div id="app">
 
+  
   <!-- ══════════════════════════════════════════════════
-       90-DAY CAREER PREPARATION COMMAND CENTER PANEL
+       1. HOME DASHBOARD (SECTION 8: WHAT SHOULD I DO TODAY?)
        ══════════════════════════════════════════════════ -->
-  <main id="forge-panel" style="display:none; overflow-y: auto; height: 100vh; background: var(--cyber-bg);">
-    <header class="chat-header" style="position: sticky; top:0; z-index:100; background: rgba(8, 11, 24, 0.92); backdrop-filter: blur(20px);">
-      <div class="chat-header-left">
-        <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.toggle('sidebar-closed')">
-          <span></span><span></span><span></span>
-        </button>
-        <div class="mentor-info">
-          <h2 style="display:flex;align-items:center;gap:8px;">
-            <span>GT Study Mentor Pro</span>
-            <span class="badge-pill" style="font-size:10px;background:rgba(99,216,255,0.15);color:#63D8FF;border:1px solid rgba(99,216,255,0.3);">90-Day Career Preparation</span>
-          </h2>
-          <p class="mentor-status">One focused system. Four career goals. 90 days. (Placement • GATE 2027 • SWE • Internship)</p>
+  <main id="view-home" class="app-view-panel active-view">
+    <div class="v2-home-grid">
+      <!-- Title Header Strip -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <h1 style="font-size:1.6rem; font-weight:900; margin:0; font-family:var(--font-display); color:#fff;">
+              GT Study Mentor Pro
+            </h1>
+            <span class="badge-pill" style="background:rgba(99,216,255,0.15); color:var(--primary); border:1px solid rgba(99,216,255,0.3); font-size:11px;">
+              90-Day Career Preparation
+            </span>
+          </div>
+          <p style="margin:4px 0 0; color:var(--text-muted); font-size:13px;">
+            One focused system. Four career goals. 90 days. (Placement • GATE 2027 • Software Engineering • Internship)
+          </p>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="header-badge-pill" onclick="openModal('command-palette-modal')" style="background:rgba(99,216,255,0.1); border:1px solid var(--border-active); color:var(--primary); cursor:pointer;">
+            <span>⚡</span><span>Ctrl + K</span>
+          </button>
+          <button class="header-badge-pill" onclick="navigateToView('chat')" style="background:rgba(255,255,255,0.06); cursor:pointer;">
+            <span>💬</span><span>Ask Mentor</span>
+          </button>
         </div>
       </div>
-      <div class="chat-header-right">
-        <button class="header-badge-pill" onclick="closeForgePanel()" style="background:rgba(255,255,255,0.06);cursor:pointer;">
-          <span>💬</span><span>Back to AI Mentor Chat</span>
-        </button>
-        <button class="header-badge-pill" onclick="exportCareerData('json')" style="background:rgba(0,230,118,0.12);border-color:rgba(0,230,118,0.3);color:var(--success);cursor:pointer;">
-          <span>📤</span><span>Export JSON</span>
-        </button>
-        <button class="header-badge-pill" onclick="exportCareerData('csv')" style="background:rgba(0,212,255,0.12);border-color:rgba(0,212,255,0.3);color:var(--accent);cursor:pointer;">
-          <span>📊</span><span>Export CSV</span>
-        </button>
-      </div>
-    </header>
 
-    <div class="forge-container">
-      <!-- ── SECTION 1: TODAY'S COMMAND CENTER ── -->
-      <div class="forge-hero-card">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+      <!-- Main Command Card -->
+      <div class="v2-command-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
           <div>
-            <div style="font-size:12px;font-weight:700;color:#63D8FF;letter-spacing:1px;text-transform:uppercase;">Day 27 of 90 • Phase 1 (Foundation)</div>
-            <h1 style="font-size:2rem;font-weight:800;margin:6px 0;font-family:var(--font-display);color:#fff;">
-              Good Evening, Tamizh 👋
-            </h1>
-            <p style="color:var(--text-sec);font-size:14px;max-width:600px;line-height:1.5;">
-              "Consistency > Intensity da! Inniku unga target 6 hours. Current focus: OS Deadlocks &amp; Striver Binary Trees."
+            <div style="font-size:11px; font-weight:800; color:var(--primary); letter-spacing:1px; text-transform:uppercase;">
+              Day 27 / 90 • Phase 1 (Foundation)
+            </div>
+            <h2 style="font-size:2rem; font-weight:800; margin:6px 0; color:#fff; font-family:var(--font-display);">
+              Good Morning, Tamizh 👋
+            </h2>
+            <p style="color:var(--text-muted); font-size:14px; margin:0; max-width:640px;">
+              Your personalized 90-day trajectory. What should you focus on right now?
             </p>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:11px;color:var(--text-sec);">Overall 90-Day Readiness</div>
-            <div style="font-size:2.4rem;font-weight:900;color:var(--success);font-family:var(--font-display);">30%</div>
-            <div style="font-size:11px;color:#63D8FF;">27 Days Completed • 63 Remaining</div>
+            <div style="font-size:11px; color:var(--text-muted);">Today's Target</div>
+            <div style="font-size:2.2rem; font-weight:900; color:var(--primary); font-family:var(--font-display);">
+              6 HOURS
+            </div>
+            <div style="font-size:12px; color:var(--success);" id="home-completed-time-label">
+              Completed: 3h 42m • Remaining: 2h 18m
+            </div>
           </div>
         </div>
 
-        <!-- 90-Day Overall Progress Bar -->
-        <div style="width:100%;height:10px;background:rgba(255,255,255,0.08);border-radius:5px;margin:20px 0 8px;overflow:hidden;">
-          <div style="width:30%;height:100%;background:linear-gradient(90deg, #63D8FF, #6C63FF);border-radius:5px;"></div>
-        </div>
-
-        <!-- 4 Target Readiness Indicators -->
-        <div class="forge-stats-grid">
-          <div class="forge-stat-box">
-            <span style="font-size:12px;color:var(--text-sec);">⚡ GATE 2027 Readiness</span>
-            <span class="forge-stat-val" style="color:#63D8FF;">76%</span>
-            <span style="font-size:10px;color:var(--text-muted);">12 Subjects • 64% Avg Accuracy</span>
+        <!-- 90-Day Progress Bar -->
+        <div style="margin:20px 0 10px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:6px;">
+            <span>90-Day Timeline Progress</span>
+            <span style="color:#fff; font-weight:700;">Day 27 / 90 (30%)</span>
           </div>
-          <div class="forge-stat-box">
-            <span style="font-size:12px;color:var(--text-sec);">💼 Placement Readiness</span>
-            <span class="forge-stat-val" style="color:#FFB300;">68%</span>
-            <span style="font-size:10px;color:var(--text-muted);">Aptitude &amp; Reasoning Active</span>
-          </div>
-          <div class="forge-stat-box">
-            <span style="font-size:12px;color:var(--text-sec);">💻 Software Engineering</span>
-            <span class="forge-stat-val" style="color:#00E676;">81%</span>
-            <span style="font-size:10px;color:var(--text-muted);">DSA 17 Patterns + REST APIs</span>
-          </div>
-          <div class="forge-stat-box">
-            <span style="font-size:12px;color:var(--text-sec);">🚀 Internship Pipeline</span>
-            <span class="forge-stat-val" style="color:#B388FF;">61%</span>
-            <span style="font-size:10px;color:var(--text-muted);">Resume Score: 84/100 • 8 Applied</span>
+          <div style="width:100%; height:10px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden;">
+            <div style="width:30%; height:100%; background:linear-gradient(90deg, var(--primary), #6C63FF); border-radius:5px;"></div>
           </div>
         </div>
 
-        <!-- TODAY'S ACTION STRIP -->
-        <div style="margin-top:24px;padding:18px;background:rgba(99,216,255,0.06);border:1px solid rgba(99,216,255,0.25);border-radius:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
-          <div>
-            <span style="font-size:11px;font-weight:700;color:var(--warning);text-transform:uppercase;">🔥 Recommended Next Action</span>
-            <div style="font-size:1.1rem;font-weight:800;color:#fff;margin-top:2px;">Continue: Operating Systems → Deadlocks (Banker's Algorithm PYQs)</div>
-            <div style="font-size:12px;color:var(--text-sec);margin-top:2px;">Reason: Recent accuracy 41% (Weak area detected) + 4 GATE Marks weightage.</div>
+        <!-- Four Preparation Tracks Summary Pills -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:20px;">
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; cursor:pointer;" onclick="navigateToView('prepare', 'gate')">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--text-muted);">⚡ GATE 2027</span>
+              <span class="score-pill med">76%</span>
+            </div>
+            <div style="font-size:11px; color:#fff; font-weight:600; margin-top:4px;">12 Core Subjects Active</div>
           </div>
-          <div style="display:flex;gap:10px;">
-            <button class="action-btn" onclick="startForgePlan()" style="background:#63D8FF;color:#080B18;font-weight:800;padding:10px 22px;border:none;border-radius:8px;cursor:pointer;">
-              🚀 START TODAY'S PLAN
-            </button>
-            <button class="action-btn" onclick="openPomodoroModal()" style="background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:10px 18px;border-radius:8px;cursor:pointer;">
-              ⏱️ 25/5 Pomodoro
-            </button>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; cursor:pointer;" onclick="navigateToView('prepare', 'placement')">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--text-muted);">💼 Placements</span>
+              <span class="score-pill high">78%</span>
+            </div>
+            <div style="font-size:11px; color:#fff; font-weight:600; margin-top:4px;">Aptitude &amp; Reasoning</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; cursor:pointer;" onclick="navigateToView('prepare', 'swe')">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--text-muted);">💻 Software Eng</span>
+              <span class="score-pill high">81%</span>
+            </div>
+            <div style="font-size:11px; color:#fff; font-weight:600; margin-top:4px;">17 DSA Patterns + APIs</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; cursor:pointer;" onclick="navigateToView('prepare', 'internship')">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; color:var(--text-muted);">🚀 Internship</span>
+              <span class="score-pill med">68%</span>
+            </div>
+            <div style="font-size:11px; color:#fff; font-weight:600; margin-top:4px;">Resume: 84/100 • 8 Applied</div>
           </div>
         </div>
       </div>
 
-      <!-- ── SECTION 2: TODAY'S TARGET & TASK ENGINE ── -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <!-- Left: Task Engine -->
+      <!-- NEXT BEST ACTION BANNER -->
+      <div class="v2-next-action-strip">
+        <div>
+          <span style="font-size:10px; font-weight:800; color:var(--warning); letter-spacing:1px; text-transform:uppercase;">
+            💡 NEXT BEST ACTION (PREPARATION INTELLIGENCE)
+          </span>
+          <div class="action-title" id="home-next-action-title">
+            Revise Operating Systems: Deadlocks
+          </div>
+          <div class="action-why" id="home-next-action-why">
+            <strong>WHY?</strong> Your recent accuracy is 48% and the topic is prerequisite-critical. (Contributes to GATE 4 marks + Amazon/Microsoft OS rounds).
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="action-btn" onclick="startTodayPlan()" style="background:var(--primary); color:#080B18; font-weight:800; padding:10px 24px; border:none; border-radius:8px; cursor:pointer;">
+            🚀 START TODAY'S PLAN
+          </button>
+          <button class="action-btn" onclick="openPomodoroModal()" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:10px 16px; border-radius:8px; cursor:pointer;">
+            ⏱️ 25/5 Pomodoro
+          </button>
+        </div>
+      </div>
+
+      <!-- TODAY'S PLAN & WEAK AREAS DUAL COLUMN -->
+      <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:20px;">
+        
+        <!-- Today's Plan -->
         <div class="track-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3 style="margin:0;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:8px;">
-              <span>📋</span> Today's Tasks (Day 27)
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:#fff; display:flex; align-items:center; gap:8px;">
+              <span>📋</span> TODAY'S PLAN
             </h3>
-            <span style="font-size:12px;color:var(--text-sec);" id="forge-time-calc">Planned: 6h 00m • Done: 3h 40m</span>
+            <span style="font-size:12px; color:var(--text-muted);" id="home-tasks-time-indicator">
+              Planned: 2h 45m • 4 Tasks
+            </span>
           </div>
 
-          <div id="forge-tasks-list" style="display:flex;flex-direction:column;gap:10px;margin-top:10px;">
-            <!-- Populated via JS -->
+          <div id="home-today-tasks-container" style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+            <!-- Populated dynamically via prepIntelligence.js -->
           </div>
 
-          <div style="display:flex;gap:8px;margin-top:12px;">
-            <input type="text" id="forge-new-task-input" class="form-input" placeholder="Add custom study task for today..." style="flex:1;font-size:12px;">
-            <select id="forge-new-task-cat" class="form-input" style="width:110px;font-size:12px;">
+          <!-- Add Task Form -->
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <input type="text" id="home-custom-task-input" class="form-input" placeholder="Add study task..." style="flex:1; font-size:12px;">
+            <select id="home-custom-task-track" class="form-input" style="width:105px; font-size:12px;">
               <option value="GATE">GATE</option>
-              <option value="PLACEMENT">Placement</option>
               <option value="SOFTWARE">Software</option>
+              <option value="PLACEMENT">Placement</option>
               <option value="INTERNSHIP">Internship</option>
             </select>
-            <button class="action-btn" onclick="addForgeTask()" style="padding:6px 14px;font-size:12px;">+ Add</button>
+            <button class="action-btn" onclick="addHomePlanTask()" style="padding:6px 14px; font-size:12px;">+ Add</button>
           </div>
         </div>
 
-        <!-- Right: Weakness Engine & FSRS Spaced Repetition -->
+        <!-- Weak Areas & Mistake Book Quick Access -->
         <div class="track-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3 style="margin:0;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:8px;">
-              <span>🧠</span> Weakness Engine &amp; FSRS Review
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.1rem; color:#fff; display:flex; align-items:center; gap:8px;">
+              <span>🧠</span> WEAK AREAS
             </h3>
-            <span class="badge-pill" style="font-size:10px;background:rgba(255,82,82,0.15);color:#ff5252;border:1px solid rgba(255,82,82,0.3);">4 Weak Topics</span>
+            <button class="action-btn" onclick="navigateToView('progress', 'mistakes')" style="font-size:11px; padding:3px 10px;">
+              Open Mistake Book
+            </button>
           </div>
 
-          <!-- Weakness List -->
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
-            <div class="weakness-card">
-              <div>
-                <strong style="color:#ff5252;font-size:13px;">1. OS Deadlocks</strong>
-                <div style="font-size:11px;color:var(--text-sec);">Recent accuracy: 41% • Banker's Algorithm &amp; Resource Allocation</div>
-              </div>
-              <button class="action-btn" onclick="quickPracticeTopic('Deadlocks')" style="font-size:10px;padding:4px 10px;">Revise Now</button>
-            </div>
-            <div class="weakness-card">
-              <div>
-                <strong style="color:#ffb300;font-size:13px;">2. Dynamic Programming (0/1 Knapsack)</strong>
-                <div style="font-size:11px;color:var(--text-sec);">Recent accuracy: 47% • Memoization state transition mistakes</div>
-              </div>
-              <button class="action-btn" onclick="quickPracticeTopic('DP')" style="font-size:10px;padding:4px 10px;">Revise Now</button>
-            </div>
-            <div class="weakness-card">
-              <div>
-                <strong style="color:#ffb300;font-size:13px;">3. Aptitude: Probability &amp; Bayes Theorem</strong>
-                <div style="font-size:11px;color:var(--text-sec);">Recent accuracy: 52% • Placement test frequency: High</div>
-              </div>
-              <button class="action-btn" onclick="quickPracticeTopic('Probability')" style="font-size:10px;padding:4px 10px;">Revise Now</button>
-            </div>
+          <div id="home-weak-areas-container" style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+            <!-- Populated via prepIntelligence.js -->
           </div>
 
-          <!-- FSRS Flashcard Card -->
-          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;margin-top:12px;">
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:#63D8FF;">
-              <span>FSRS Spaced Repetition Card</span>
-              <span id="fsrs-stability-label">Stability: 3.4d • Reps: 2</span>
+          <!-- FSRS Spaced Repetition Card Mini -->
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:14px; margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--primary);">
+              <span>⚡ FSRS Spaced Repetition Due</span>
+              <span id="home-fsrs-status-pill">1 Card Due Today</span>
             </div>
-            <div style="font-size:13px;font-weight:700;color:#fff;margin:6px 0;" id="fsrs-card-q">
-              Q: What are the four necessary conditions for Deadlock to occur in OS?
+            <div style="font-size:13px; font-weight:700; color:#fff; margin:6px 0;" id="home-fsrs-prompt">
+              Q: What are the 4 Coffman conditions for Deadlock in OS?
             </div>
-            <div style="font-size:12px;color:var(--text-sec);display:none;" id="fsrs-card-a">
-              A: 1. Mutual Exclusion 2. Hold and Wait 3. No Preemption 4. Circular Wait (Coffman Conditions).
+            <div style="font-size:12px; color:var(--text-muted); display:none; line-height:1.4;" id="home-fsrs-solution">
+              A: Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait.
             </div>
-            <button class="action-btn" id="fsrs-show-btn" onclick="revealFSRSAnswer()" style="width:100%;margin-top:8px;font-size:11px;padding:4px;">👁️ Show Answer</button>
-            <div class="fsrs-btn-row" id="fsrs-actions-row" style="display:none;">
-              <button class="fsrs-btn again" onclick="submitFSRSRating('Again')">Again (1d)</button>
-              <button class="fsrs-btn hard" onclick="submitFSRSRating('Hard')">Hard (2d)</button>
-              <button class="fsrs-btn good" onclick="submitFSRSRating('Good')">Good (4d)</button>
-              <button class="fsrs-btn easy" onclick="submitFSRSRating('Easy')">Easy (8d)</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── SECTION 3: 90-DAY VISUAL TIMELINE (DAY 01 -> DAY 90) ── -->
-      <div class="track-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-          <div>
-            <h3 style="margin:0;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:8px;">
-              <span>🗓️</span> 90-Day Visual Career Roadmap (Day 01 → Day 90)
-            </h3>
-            <p style="font-size:12px;color:var(--text-sec);margin:4px 0 0;">Click any day to view/manage its 4-track curriculum.</p>
-          </div>
-          <div style="display:flex;gap:10px;font-size:11px;align-items:center;">
-            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#00E676;border-radius:2px;"></span> Completed</span>
-            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:#63D8FF;border-radius:2px;"></span> Today</span>
-            <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:rgba(255,255,255,0.2);border-radius:2px;"></span> Upcoming</span>
-          </div>
-        </div>
-
-        <!-- 3 Phases Summary Strip -->
-        <div class="timeline-phases-bar" style="margin-top:14px;">
-          <div class="timeline-phase-pill active">
-            <strong>PHASE 1 — FOUNDATION (Day 1–30)</strong>
-            <div style="color:var(--text-sec);font-size:11px;margin-top:2px;">C/Data Structures, Striver Basics, Engg Maths, Aptitude Fundamentals</div>
-          </div>
-          <div class="timeline-phase-pill">
-            <strong>PHASE 2 — DEVELOPMENT (Day 31–60)</strong>
-            <div style="color:var(--text-sec);font-size:11px;margin-top:2px;">OS, DBMS, CN, System Design, REST APIs, Striver Intermediate (Trees/Graphs)</div>
-          </div>
-          <div class="timeline-phase-pill">
-            <strong>PHASE 3 — EXECUTION (Day 61–90)</strong>
-            <div style="color:var(--text-sec);font-size:11px;margin-top:2px;">Full Mocks, GATE PYQs, Placement Drives, Resume ATS &amp; Behavioral STAR</div>
-          </div>
-        </div>
-
-        <!-- 90 Days Matrix -->
-        <div class="timeline-days-matrix" id="forge-timeline-matrix">
-          <!-- Populated via JS (90 discrete day nodes) -->
-        </div>
-      </div>
-
-      <!-- ── SECTION 4: THE FOUR CORE PREPARATION TRACKS ── -->
-      <div class="track-card">
-        <div class="forge-track-nav">
-          <button class="forge-track-tab active" id="tab-btn-track-gate" onclick="switchForgeTrack('gate')">
-            <span>⚡</span> Track A: GATE CS 2027 (12 Subjects &amp; PYQs)
-          </button>
-          <button class="forge-track-tab" id="tab-btn-track-placement" onclick="switchForgeTrack('placement')">
-            <span>💼</span> Track B: Placement Preparation
-          </button>
-          <button class="forge-track-tab" id="tab-btn-track-swe" onclick="switchForgeTrack('swe')">
-            <span>💻</span> Track C: Software Engineering &amp; DSA (17 Patterns)
-          </button>
-          <button class="forge-track-tab" id="tab-btn-track-intern" onclick="switchForgeTrack('intern')">
-            <span>🚀</span> Track D: Internship Command Center
-          </button>
-        </div>
-
-        <!-- TRACK A: GATE 2027 -->
-        <div class="forge-track-content" id="track-view-gate" style="display:block;margin-top:16px;">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:14px;">
-            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
-              <div style="display:flex;justify-content:space-between;font-weight:700;color:#63D8FF;">
-                <span>Operating Systems</span>
-                <span>64% Overall</span>
-              </div>
-              <div style="font-size:11px;color:var(--text-sec);margin-top:4px;">Processes 82% • CPU Sched 58% • Deadlocks 41% • Memory 73%</div>
-              <div style="width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:8px 0;">
-                <div style="width:64%;height:100%;background:#63D8FF;border-radius:3px;"></div>
-              </div>
-              <button class="action-btn" onclick="startGatePYQPractice('OS')" style="font-size:10px;padding:3px 10px;margin-top:4px;">Practice OS PYQs</button>
-            </div>
-
-            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
-              <div style="display:flex;justify-content:space-between;font-weight:700;color:#63D8FF;">
-                <span>Data Structures &amp; Algorithms</span>
-                <span>78% Overall</span>
-              </div>
-              <div style="font-size:11px;color:var(--text-sec);margin-top:4px;">Arrays 88% • Trees 72% • Graphs 65% • DP 54%</div>
-              <div style="width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:8px 0;">
-                <div style="width:78%;height:100%;background:#00E676;border-radius:3px;"></div>
-              </div>
-              <button class="action-btn" onclick="startGatePYQPractice('DSA')" style="font-size:10px;padding:3px 10px;margin-top:4px;">Practice DSA PYQs</button>
-            </div>
-
-            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
-              <div style="display:flex;justify-content:space-between;font-weight:700;color:#63D8FF;">
-                <span>Database Management (DBMS)</span>
-                <span>72% Overall</span>
-              </div>
-              <div style="font-size:11px;color:var(--text-sec);margin-top:4px;">ER Model 85% • Normalization 58% • Transactions/ACID 74%</div>
-              <div style="width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:8px 0;">
-                <div style="width:72%;height:100%;background:#63D8FF;border-radius:3px;"></div>
-              </div>
-              <button class="action-btn" onclick="startGatePYQPractice('DBMS')" style="font-size:10px;padding:3px 10px;margin-top:4px;">Practice DBMS PYQs</button>
-            </div>
-
-            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
-              <div style="display:flex;justify-content:space-between;font-weight:700;color:#63D8FF;">
-                <span>Computer Networks (CN)</span>
-                <span>69% Overall</span>
-              </div>
-              <div style="font-size:11px;color:var(--text-sec);margin-top:4px;">Subnetting 81% • TCP/UDP 68% • Flow/Congestion Control 59%</div>
-              <div style="width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:8px 0;">
-                <div style="width:69%;height:100%;background:#63D8FF;border-radius:3px;"></div>
-              </div>
-              <button class="action-btn" onclick="startGatePYQPractice('CN')" style="font-size:10px;padding:3px 10px;margin-top:4px;">Practice CN PYQs</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- TRACK B: PLACEMENT PREPARATION -->
-        <div class="forge-track-content" id="track-view-placement" style="display:none;margin-top:16px;">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:14px;">
-            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;">
-              <strong style="color:#FFB300;">📊 Quantitative Aptitude (12 Core Topics)</strong>
-              <p style="font-size:11px;color:var(--text-sec);margin:4px 0;">Percentages, Time &amp; Work, TSD, Profit &amp; Loss, Ratio, Probability, P&amp;C</p>
-              <div style="font-size:11px;color:var(--success);font-weight:700;">Solved: 142 / 240 problems (Accuracy: 74%)</div>
-              <button class="action-btn" onclick="quickPracticeTopic('Aptitude')" style="font-size:10px;padding:3px 10px;margin-top:6px;">Start Aptitude Drill</button>
-            </div>
-            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;">
-              <strong style="color:#FFB300;">🧩 Logical Reasoning (9 Core Topics)</strong>
-              <p style="font-size:11px;color:var(--text-sec);margin:4px 0;">Number Series, Blood Relations, Seating Arrangements, Syllogisms, Coding-Decoding</p>
-              <div style="font-size:11px;color:var(--success);font-weight:700;">Solved: 96 / 150 problems (Accuracy: 81%)</div>
-              <button class="action-btn" onclick="quickPracticeTopic('Reasoning')" style="font-size:10px;padding:3px 10px;margin-top:6px;">Start Reasoning Drill</button>
-            </div>
-            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;">
-              <strong style="color:#FFB300;">🤝 HR Behavioral &amp; STAR Studio</strong>
-              <p style="font-size:11px;color:var(--text-sec);margin:4px 0;">Amazon 16 LPs, Google Googliness, Zoho craftsmanship frameworks</p>
-              <div style="font-size:11px;color:#63D8FF;font-weight:700;">18 STAR Stories Drafted &amp; Reviewed</div>
-              <button class="action-btn" onclick="openModal('master-question-bank-modal');switchQBankTab('hr');" style="font-size:10px;padding:3px 10px;margin-top:6px;">Open STAR Studio</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- TRACK C: SOFTWARE ENGINEERING & DSA -->
-        <div class="forge-track-content" id="track-view-swe" style="display:none;margin-top:16px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-            <div>
-              <strong style="color:#00E676;font-size:14px;">Striver A2Z DSA Tracker (17 Patterns)</strong>
-              <div style="font-size:11px;color:var(--text-sec);">Total Solved: 148 / 455 • Easy: 74, Medium: 61, Hard: 13 • Streak: 12 Days</div>
-            </div>
-            <div style="display:flex;gap:6px;">
-              <span class="company-tag-pill">C++</span>
-              <span class="company-tag-pill">Java</span>
-              <span class="company-tag-pill">Python</span>
-              <span class="company-tag-pill">JavaScript</span>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
-            <div style="background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
-              <span style="font-size:12px;font-weight:700;color:#fff;">Binary Trees &amp; BST</span>
-              <div style="font-size:10px;color:var(--text-sec);">24 / 35 Solved (68%)</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
-              <span style="font-size:12px;font-weight:700;color:#fff;">Graphs &amp; BFS/DFS</span>
-              <div style="font-size:10px;color:var(--text-sec);">18 / 38 Solved (47%)</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
-              <span style="font-size:12px;font-weight:700;color:#fff;">Dynamic Programming</span>
-              <div style="font-size:10px;color:var(--text-sec);">14 / 52 Solved (27%)</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);">
-              <span style="font-size:12px;font-weight:700;color:#fff;">Sliding Window</span>
-              <div style="font-size:10px;color:var(--text-sec);">12 / 16 Solved (75%)</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- TRACK D: INTERNSHIP COMMAND CENTER -->
-        <div class="forge-track-content" id="track-view-intern" style="display:none;margin-top:16px;">
-          <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                <strong style="color:#B388FF;">Internship Application Pipeline</strong>
-                <span style="font-size:11px;color:var(--text-sec);">8 Applied • 3 OA • 1 Technical Interview</span>
-              </div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <div style="background:rgba(255,255,255,0.03);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
-                  <div>
-                    <strong style="color:#fff;font-size:13px;">Amazon SDE Intern (Summer 2027)</strong>
-                    <div style="font-size:11px;color:var(--text-sec);">Bangalore / Chennai • Applied: 14 Aug • Deadline: 15 Sep</div>
-                  </div>
-                  <span class="badge-pill" style="font-size:10px;background:rgba(255,179,0,0.15);color:#FFB300;">Online Assessment</span>
-                </div>
-                <div style="background:rgba(255,255,255,0.03);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
-                  <div>
-                    <strong style="color:#fff;font-size:13px;">Zoho Software Developer Trainee</strong>
-                    <div style="font-size:11px;color:var(--text-sec);">Chennai HQ • Applied: 18 Aug • In-Person Round 2</div>
-                  </div>
-                  <span class="badge-pill" style="font-size:10px;background:rgba(0,212,255,0.15);color:#00D4FF;">Technical Interview</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Resume ATS Readiness Card -->
-            <div style="background:rgba(255,255,255,0.03);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);">
-              <strong style="color:#00E676;">Resume Readiness: 84/100</strong>
-              <div style="font-size:11px;color:var(--text-sec);margin:4px 0 10px;">Transparent heuristic checklist score</div>
-              <div style="font-size:11px;color:#fff;line-height:1.6;">
-                ✓ GitHub &amp; Live Demo links verified<br>
-                ✓ Quantifiable STAR metrics included<br>
-                ✓ Core CS concepts keywords present<br>
-                ⚠️ Add Redis / Docker to Skills section
-              </div>
+            <button class="action-btn" id="home-fsrs-toggle-btn" onclick="toggleHomeFSRS()" style="width:100%; margin-top:8px; font-size:11px; padding:4px;">
+              👁️ Reveal Answer
+            </button>
+            <div class="fsrs-btn-row" id="home-fsrs-actions-row" style="display:none;">
+              <button class="fsrs-btn again" onclick="rateHomeFSRS('Again')">Again (1d)</button>
+              <button class="fsrs-btn hard" onclick="rateHomeFSRS('Hard')">Hard (2d)</button>
+              <button class="fsrs-btn good" onclick="rateHomeFSRS('Good')">Good (4d)</button>
+              <button class="fsrs-btn easy" onclick="rateHomeFSRS('Easy')">Easy (8d)</button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- ══════════════════════════════════════════════════
+       2. PREPARE HUB (GATE 2027 | PLACEMENTS | SWE | INTERNSHIP)
+       ══════════════════════════════════════════════════ -->
+  <main id="view-prepare" class="app-view-panel">
+    <div class="v2-home-grid">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">🎯 Comprehensive Preparation Hub</h2>
+          <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Unified syllabus, topic trackers, and roadmaps across the 4 career targets.</p>
+        </div>
+        <div class="forge-track-nav">
+          <button class="forge-track-tab active" id="btn-preptab-gate" onclick="switchPrepareTab('gate')">⚡ GATE 2027</button>
+          <button class="forge-track-tab" id="btn-preptab-placement" onclick="switchPrepareTab('placement')">💼 Placements</button>
+          <button class="forge-track-tab" id="btn-preptab-swe" onclick="switchPrepareTab('swe')">💻 Software Eng</button>
+          <button class="forge-track-tab" id="btn-preptab-internship" onclick="switchPrepareTab('internship')">🚀 Internship</button>
+        </div>
+      </div>
+
+      <!-- GATE 2027 Tab View -->
+      <div id="subview-prep-gate" style="display:block;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;" id="prepare-gate-subjects-list">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Placements Tab View -->
+      <div id="subview-prep-placement" style="display:none;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;" id="prepare-placement-sections-list">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- SWE Tab View -->
+      <div id="subview-prep-swe" style="display:none;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;" id="prepare-swe-sections-list">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Internship Tab View -->
+      <div id="subview-prep-internship" style="display:none;">
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px;" id="prepare-internship-sections-list">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════
+       3. PROGRESS & MASTERY HUB (READINESS MATRIX, MISTAKE BOOK, FSRS)
+       ══════════════════════════════════════════════════ -->
+  <main id="view-progress" class="app-view-panel">
+    <div class="v2-home-grid">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">📈 Progress, Mastery &amp; Mistake Book</h2>
+          <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Actual tracked competency matrix, error taxonomy, and FSRS spaced repetition.</p>
+        </div>
+        <div class="forge-track-nav">
+          <button class="forge-track-tab active" id="btn-progtab-mastery" onclick="switchProgressTab('mastery')">🏆 Mastery Matrix</button>
+          <button class="forge-track-tab" id="btn-progtab-mistakes" onclick="switchProgressTab('mistakes')">📕 Mistake Book</button>
+          <button class="forge-track-tab" id="btn-progtab-revision" onclick="switchProgressTab('revision')">🔄 FSRS Revision</button>
+          <button class="forge-track-tab" id="btn-progtab-weekly" onclick="switchProgressTab('weekly')">📋 Weekly Report</button>
+        </div>
+      </div>
+
+      <!-- Subview: Mastery Matrix -->
+      <div id="subview-prog-mastery" style="display:block;">
+        <div class="track-card">
+          <h3 style="margin:0 0 4px; color:#fff; font-size:1.15rem;">Cross-Goal Career Readiness Matrix</h3>
+          <p style="font-size:12px; color:var(--text-muted); margin:0 0 14px;">Real tracked scores across the 4 preparation goals. Highlights cross-goal high-leverage topics.</p>
+          <div style="overflow-x:auto;">
+            <table class="readiness-matrix-table" id="progress-readiness-table">
+              <!-- Populated via JS from prepIntelligence.js -->
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subview: Mistake Book -->
+      <div id="subview-prog-mistakes" style="display:none;">
+        <div class="track-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h3 style="margin:0; color:#fff; font-size:1.15rem;">📕 My Mistakes Book</h3>
+              <p style="font-size:12px; color:var(--text-muted); margin:2px 0 0;">Categorized error taxonomy to turn missed questions into permanent mastery.</p>
+            </div>
+            <button class="action-btn" onclick="reattemptMistakes()" style="background:var(--danger); color:#fff; font-weight:700; border:none; padding:8px 18px; border-radius:8px; cursor:pointer;">
+              🎯 [ REATTEMPT MY MISTAKES ]
+            </button>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:16px;" id="progress-mistakes-list">
+            <!-- Populated via mistakeBook.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Subview: FSRS Revision -->
+      <div id="subview-prog-revision" style="display:none;">
+        <div class="track-card" id="progress-fsrs-deck-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+      <!-- Subview: Weekly Report -->
+      <div id="subview-prog-weekly" style="display:none;">
+        <div class="track-card" id="progress-weekly-report-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════
+       4. PRACTICE HUB (DSA 17 PATTERNS, GATE PYQ, APTITUDE, MOCKS)
+       ══════════════════════════════════════════════════ -->
+  <main id="view-practice" class="app-view-panel">
+    <div class="v2-home-grid">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">💻 Practice Command Center</h2>
+          <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Striver 17 Patterns DSA, 2000–Present GATE PYQ engine, and aptitude speed drills.</p>
+        </div>
+        <div class="forge-track-nav">
+          <button class="forge-track-tab active" id="btn-practab-dsa" onclick="switchPracticeTab('dsa')">🔣 DSA (17 Patterns)</button>
+          <button class="forge-track-tab" id="btn-practab-pyq" onclick="switchPracticeTab('pyq')">📜 GATE PYQ</button>
+          <button class="forge-track-tab" id="btn-practab-aptitude" onclick="switchPracticeTab('aptitude')">📊 Aptitude</button>
+          <button class="forge-track-tab" id="btn-practab-mocks" onclick="switchPracticeTab('mocks')">📝 Mock Tests</button>
+        </div>
+      </div>
+
+      <!-- Practice Views -->
+      <div id="subview-prac-dsa" style="display:block;">
+        <div class="track-card" id="practice-dsa-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div id="subview-prac-pyq" style="display:none;">
+        <div class="track-card" id="practice-pyq-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div id="subview-prac-aptitude" style="display:none;">
+        <div class="track-card" id="practice-aptitude-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div id="subview-prac-mocks" style="display:none;">
+        <div class="track-card" id="practice-mocks-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════
+       5. CAREER HUB (PROJECTS, RESUME, APPLICATIONS, INTERVIEWS, COMPANIES)
+       ══════════════════════════════════════════════════ -->
+  <main id="view-career" class="app-view-panel">
+    <div class="v2-home-grid">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">💼 Career &amp; Opportunity Hub</h2>
+          <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">8-stage application tracking, transparent ATS resume scorer, and 1,024 companies directory.</p>
+        </div>
+        <div class="forge-track-nav">
+          <button class="forge-track-tab active" id="btn-careertab-apps" onclick="switchCareerTab('apps')">📬 Applications</button>
+          <button class="forge-track-tab" id="btn-careertab-resume" onclick="switchCareerTab('resume')">📄 Resume Readiness</button>
+          <button class="forge-track-tab" id="btn-careertab-projects" onclick="switchCareerTab('projects')">📦 Projects</button>
+          <button class="forge-track-tab" id="btn-careertab-companies" onclick="switchCareerTab('companies')">🏢 Companies (1,024)</button>
+        </div>
+      </div>
+
+      <!-- Career Views -->
+      <div id="subview-car-apps" style="display:block;">
+        <div class="track-card" id="career-apps-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div id="subview-car-resume" style="display:none;">
+        <div class="track-card" id="career-resume-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div id="subview-car-projects" style="display:none;">
+        <div class="track-card" id="career-projects-container">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+      <div id="subview-car-companies" style="display:none;">
+        <div class="track-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0; color:#fff;">🏢 1,024 Verified Placement Companies</h3>
+            <button class="action-btn" onclick="openModal('placement-directory-modal');renderMasterCompanies();">Open Full Directory &amp; Maps</button>
+          </div>
+          <div id="career-companies-preview">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════
+       6. CSE LABS CONSOLIDATED HUB (SECTION 45)
+       ══════════════════════════════════════════════════ -->
+  <main id="view-cselabs" class="app-view-panel">
+    <div class="v2-home-grid">
+      <div>
+        <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">🧪 CSE Interactive Labs Hub</h2>
+        <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Hands-on simulation studios for core Computer Science Engineering concepts.</p>
+      </div>
+
+      <div class="cse-labs-grid">
+        <div class="cse-lab-card">
+          <div>
+            <div style="font-size:2rem; margin-bottom:6px;">🔍</div>
+            <strong style="color:#fff; font-size:1.1rem;">Algorithm Lab</strong>
+            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">Interactive two-pointer step-through, sorting visualizer, and array algorithms.</p>
+          </div>
+          <button class="action-btn" onclick="openModal('algo-visualizer-modal')" style="width:100%;">Launch Algorithm Lab</button>
+        </div>
+
+        <div class="cse-lab-card">
+          <div>
+            <div style="font-size:2rem; margin-bottom:6px;">🗄️</div>
+            <strong style="color:#fff; font-size:1.1rem;">SQL Query Playground</strong>
+            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">In-browser SQLite sandbox with live schema, sample tables, and query execution.</p>
+          </div>
+          <button class="action-btn" onclick="openModal('sql-playground-modal')" style="width:100%;">Launch SQL Lab</button>
+        </div>
+
+        <div class="cse-lab-card">
+          <div>
+            <div style="font-size:2rem; margin-bottom:6px;">🔤</div>
+            <strong style="color:#fff; font-size:1.1rem;">TOC Automata Validator</strong>
+            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">Test regular expressions, DFA state machines, and context-free grammar strings.</p>
+          </div>
+          <button class="action-btn" onclick="openModal('toc-validator-modal')" style="width:100%;">Launch TOC Lab</button>
+        </div>
+
+        <div class="cse-lab-card">
+          <div>
+            <div style="font-size:2rem; margin-bottom:6px;">🌐</div>
+            <strong style="color:#fff; font-size:1.1rem;">Network &amp; CIDR Lab</strong>
+            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">IPv4/CIDR subnet calculations, usable hosts, broadcast address, and packet simulation.</p>
+          </div>
+          <button class="action-btn" onclick="openModal('subnet-calc-modal')" style="width:100%;">Launch Network Lab</button>
+        </div>
+
+        <div class="cse-lab-card">
+          <div>
+            <div style="font-size:2rem; margin-bottom:6px;">🏗️</div>
+            <strong style="color:#fff; font-size:1.1rem;">System Design Studio</strong>
+            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">Design distributed architectures, Redis caching, message queues, and load balancers.</p>
+          </div>
+          <button class="action-btn" onclick="openModal('sysdesign-modal')" style="width:100%;">Launch System Design</button>
+        </div>
+
+        <div class="cse-lab-card">
+          <div>
+            <div style="font-size:2rem; margin-bottom:6px;">📐</div>
+            <strong style="color:#fff; font-size:1.1rem;">GATE Calculator &amp; IEEE 754</strong>
+            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">Authentic GATE virtual calculator and 32-bit floating-point bitwise converter.</p>
+          </div>
+          <button class="action-btn" onclick="openModal('calculator-modal')" style="width:100%;">Launch Calculator</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════
+       7. RESOURCES & 8. SETTINGS PANELS
+       ══════════════════════════════════════════════════ -->
+  <main id="view-resources" class="app-view-panel">
+    <div class="v2-home-grid">
+      <div>
+        <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">📚 Curated Resource Library</h2>
+        <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Essential formula sheets, handbooks, and topic cheat sheets for CSE students.</p>
+      </div>
+      <div id="resources-library-list" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </main>
+
+  <main id="view-settings" class="app-view-panel">
+    <div class="v2-home-grid">
+      <div>
+        <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">⚙️ Application Settings &amp; Data</h2>
+        <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Zero monetization. Free student platform. Customize themes, export data, or manage offline storage.</p>
+      </div>
+
+      <div class="track-card" style="max-width:680px;">
+        <h3 style="margin:0 0 12px; color:#fff;">🎨 Visual Appearance</h3>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <button class="action-btn" onclick="setV2Theme('dark')" style="padding:8px 16px;">🌙 Cyber Dark (#080B18)</button>
+          <button class="action-btn" onclick="setV2Theme('light')" style="padding:8px 16px;">☀️ Clean Light</button>
+          <button class="action-btn" onclick="setV2Theme('contrast')" style="padding:8px 16px;">⚡ High Contrast (WCAG 2.2)</button>
+        </div>
+
+        <h3 style="margin:24px 0 12px; color:#fff;">💾 Data Backup &amp; Privacy</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin:0 0 12px;">All your study plans, tasks, mistakes, and application logs are stored locally in your browser.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <button class="action-btn" onclick="exportCareerData('json')">📤 Export All Data (JSON)</button>
+          <button class="action-btn" onclick="exportCareerData('csv')">📊 Export Tasks (CSV)</button>
+          <button class="action-btn" onclick="if(confirm('Reset all demo data to default state?')) { localStorage.clear(); location.reload(); }" style="color:var(--danger); border-color:var(--danger);">🗑️ Reset Data</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
 
 
   <!-- ════════════════════════════════
@@ -513,245 +634,125 @@
     </div>
 
     <!-- ── Main Navigation Menu ── -->
-    <div class="sidebar-actions" style="margin-top:12px;">
-      <button class="action-btn" id="nav-forge-btn" onclick="openForgePanel()" style="background:linear-gradient(135deg, rgba(99, 216, 255, 0.2), rgba(108, 99, 255, 0.2)); border: 1px solid #63D8FF; color:#fff; font-weight:700; margin-bottom:8px;">
-        <span class="btn-icon">🎯</span><span>90-Day Career Forge</span>
-      </button>
-      <button class="action-btn active" id="nav-chat-btn">
-        <span class="btn-icon">💬</span><span>AI Mentor Chat</span>
-      </button>
+    <!-- ══════════════════════════════════════════════════
+         8-SECTION STREAMLINED NAVIGATION HIERARCHY (Section 7)
+         ══════════════════════════════════════════════════ -->
+    <div class="sidebar-actions" style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
       
-      <div class="section-label" style="margin-top:14px;">🎯 Core Portals</div>
-      <button class="menu-item" id="nav-eval-btn">
-        <span class="menu-icon">📊</span>
-        <span>My Dashboard</span>
-      </button>
-      <button class="menu-item" id="nav-map-btn">
-        <span class="menu-icon">🗺️</span>
-        <span>TN Placements</span>
-      </button>
-      <button class="menu-item" id="open-interview-btn" style="border-left: 3px solid var(--warning); background: rgba(255, 179, 0, 0.08);">
-        <span class="menu-icon">🧠</span>
-        <span>AI Mock Interview</span>
-      </button>
+      <!-- 1. HOME -->
+      <div class="sidebar-nav-group" style="margin-top:0;">
+        <button class="sidebar-nav-item active" id="nav-home-btn" onclick="navigateToView('home')">
+          <span class="nav-icon">🏠</span><span>HOME</span>
+        </button>
+      </div>
 
-      <div class="section-label" style="margin-top:14px;">🚀 Expert Tools</div>
-      <button class="action-btn" id="open-bitwise-btn" style="background:linear-gradient(135deg,rgba(255,179,0,0.12),rgba(255,82,82,0.08));border-color:rgba(255,179,0,0.3);">
-        <span class="btn-icon">⚡</span><span>IEEE 754 & Bitwise Studio</span>
-      </button>
-      <button class="action-btn" id="open-sysdesign-btn" style="background:linear-gradient(135deg,rgba(0,230,118,0.1),rgba(0,212,255,0.1));border-color:rgba(0,230,118,0.3);">
-        <span class="btn-icon">🏗️</span><span>System Design Studio</span>
-      </button>
-      <button class="action-btn" id="open-subnet-btn">
-        <span class="btn-icon">🌐</span><span>CIDR & Subnet Calculator</span>
-      </button>
-      <button class="action-btn" id="open-sql-btn" style="background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(108,99,255,0.1));border-color:rgba(0,212,255,0.3);">
-        <span class="btn-icon">🗄️</span><span>SQL Query Playground</span>
-      </button>
-      <button class="action-btn" id="open-toc-btn">
-        <span class="btn-icon">🔤</span><span>TOC Regex & DFA Lab</span>
-      </button>
-      <button class="action-btn" id="open-weightage-btn">
-        <span class="btn-icon">📊</span><span>GATE 100-Mark Weightage</span>
-      </button>
-      <button class="action-btn" id="open-star-btn">
-        <span class="btn-icon">⭐</span><span>STAR Interview Studio</span>
-      </button>
-      <button class="action-btn" id="open-exam-btn" style="background:linear-gradient(135deg,rgba(255,179,0,0.12),rgba(255,82,82,0.08));border-color:rgba(255,179,0,0.3);">
-        <span class="btn-icon">📝</span><span>GATE PYQ Simulator</span>
-      </button>
-      <button class="action-btn" id="open-visualizer-btn" style="background:linear-gradient(135deg,rgba(0,230,118,0.1),rgba(0,212,255,0.1));border-color:rgba(0,230,118,0.3);">
-        <span class="btn-icon">🧪</span><span>Algorithm Visualizer</span>
-      </button>
-      <button class="action-btn" id="open-mock-interview-btn" style="background:linear-gradient(135deg,rgba(0,230,118,0.15),rgba(0,212,255,0.1));border-color:rgba(0,230,118,0.4);">
-        <span class="btn-icon">🎙️</span><span>AI Mock Interviewer</span>
-      </button>
-      <button class="action-btn" id="open-career-map-btn">
-        <span class="btn-icon">🧭</span><span>Visual Career Map</span>
-      </button>
-      <button class="action-btn" id="open-directory-btn">
-        <span class="btn-icon">🏢</span><span>Company Directory</span>
-      </button>
-      <button class="action-btn" id="export-calendar-btn">
-        <span class="btn-icon">📅</span><span>Sync to Google Calendar (.ics)</span>
-      </button>
-      <button class="action-btn" id="open-mastery-btn" style="background:linear-gradient(135deg,rgba(108,99,255,0.12),rgba(0,212,255,0.12));border-color:rgba(108,99,255,0.35);">
-        <span class="btn-icon">🎯</span><span>GATE Mastery Hub</span>
-      </button>
-      <button class="action-btn" id="open-resume-btn" style="background:linear-gradient(135deg,rgba(0,230,118,0.1),rgba(0,212,255,0.1));border-color:rgba(0,230,118,0.3);">
-        <span class="btn-icon">📄</span><span>AI Resume & ATS</span>
-      </button>
-      <button class="action-btn" id="open-formulas-btn">
-        <span class="btn-icon">📖</span><span>Formula & Algo Sheet</span>
-      </button>
-      <button class="action-btn" id="open-flashcard-btn">
-        <span class="btn-icon">🃏</span><span>AI Flashcards</span>
-      </button>
-      <button class="action-btn" id="open-quiz-btn">
-        <span class="btn-icon">🧩</span><span>Daily Quiz</span>
-      </button>
-      <button class="action-btn" id="open-notes-btn">
-        <span class="btn-icon">📒</span><span>Quick Notes</span>
-      </button>
-      <button class="action-btn" id="open-habits-btn">
-        <span class="btn-icon">🎯</span><span>Habit Tracker</span>
-      </button>
+      <!-- 2. PREPARE -->
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-title"><span>🎯 PREPARE</span></div>
+        <button class="sidebar-nav-item" id="nav-prep-gate-btn" onclick="navigateToView('prepare', 'gate')">
+          <span class="nav-icon">⚡</span><span>GATE 2027</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prep-placement-btn" onclick="navigateToView('prepare', 'placement')">
+          <span class="nav-icon">💼</span><span>Placements</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prep-swe-btn" onclick="navigateToView('prepare', 'swe')">
+          <span class="nav-icon">💻</span><span>Software Engineering</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prep-intern-btn" onclick="navigateToView('prepare', 'internship')">
+          <span class="nav-icon">🚀</span><span>Internship</span>
+        </button>
+      </div>
 
-      <div class="section-label" style="margin-top:14px;">📈 Progress & Plan</div>
-      <button class="action-btn" id="open-xp-btn">
-        <span class="btn-icon">⭐</span><span>XP & Ranks</span>
-      </button>
-      <button class="action-btn" id="open-leaderboard-btn" style="color: var(--warning);">
-        <span class="btn-icon">🏆</span><span>Global Leaderboard</span>
-      </button>
-      <button class="action-btn" id="open-progress-btn">
-        <span class="btn-icon">📈</span><span>My Progress</span>
-      </button>
-      <button class="action-btn" id="open-calendar-btn">
-        <span class="btn-icon">📅</span><span>Calendar</span>
-      </button>
-      <button class="action-btn" id="open-dailyplan-btn">
-        <span class="btn-icon">📝</span><span>Daily Plan</span>
-      </button>
-      <button class="action-btn" id="open-roadmap-btn">
-        <span class="btn-icon">🗓️</span><span>3-Month Roadmap</span>
-      </button>
-      <button class="action-btn" id="open-materials-btn">
-        <span class="btn-icon">📚</span><span>Study Materials</span>
-      </button>
-      <button class="action-btn" id="open-reminders-btn">
-        <span class="btn-icon">🔔</span><span>Reminders</span>
-        <span class="btn-badge hidden" id="reminders-badge">ON</span>
-      </button>
-      <button class="action-btn" id="open-apikey-btn">
-        <span class="btn-icon">🔑</span><span>Set Gemini API Key</span>
-      </button>
+      <!-- 3. PRACTICE -->
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-title"><span>💻 PRACTICE</span></div>
+        <button class="sidebar-nav-item" id="nav-prac-dsa-btn" onclick="navigateToView('practice', 'dsa')">
+          <span class="nav-icon">🔣</span><span>DSA (17 Patterns)</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prac-pyq-btn" onclick="navigateToView('practice', 'pyq')">
+          <span class="nav-icon">📜</span><span>GATE PYQ</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prac-aptitude-btn" onclick="navigateToView('practice', 'aptitude')">
+          <span class="nav-icon">📊</span><span>Aptitude</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prac-cscore-btn" onclick="navigateToView('practice', 'cscore')">
+          <span class="nav-icon">🖥️</span><span>CS Core</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prac-mock-btn" onclick="navigateToView('practice', 'mocks')">
+          <span class="nav-icon">📝</span><span>Mock Tests</span>
+        </button>
+      </div>
 
-      <div class="section-label" style="margin-top:14px;">🧠 Expert Intelligence</div>
-      <button class="action-btn" id="open-analytics-btn" style="background:linear-gradient(135deg,rgba(108,99,255,0.15),rgba(0,212,255,0.1));border-color:rgba(108,99,255,0.35);">
-        <span class="btn-icon">📊</span><span>Analytics & Metrics</span>
-      </button>
-      <button class="action-btn" id="open-predictor-btn" style="background:linear-gradient(135deg,rgba(255,179,0,0.12),rgba(255,82,82,0.08));border-color:rgba(255,179,0,0.3);">
-        <span class="btn-icon">🧮</span><span>GATE Score Predictor</span>
-      </button>
-      <button class="action-btn" id="open-sidebar-calc-btn">
-        <span class="btn-icon">📐</span><span>GATE Virtual Calculator</span>
-      </button>
-      <button class="action-btn" id="open-doubt-solver-btn">
-        <span class="btn-icon">💡</span><span>AI Doubt Solver</span>
-      </button>
-      <button class="action-btn" id="open-badges-btn">
-        <span class="btn-icon">🏆</span><span>Achievements & Badges</span>
-        <span class="btn-badge hidden" id="badges-new-badge">NEW</span>
-      </button>
-    </div>
+      <!-- 4. CAREER -->
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-title"><span>💼 CAREER</span></div>
+        <button class="sidebar-nav-item" id="nav-car-projects-btn" onclick="navigateToView('career', 'projects')">
+          <span class="nav-icon">📦</span><span>Projects</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-car-resume-btn" onclick="navigateToView('career', 'resume')">
+          <span class="nav-icon">📄</span><span>Resume Readiness</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-car-apps-btn" onclick="navigateToView('career', 'applications')">
+          <span class="nav-icon">📬</span><span>Applications</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-car-interviews-btn" onclick="navigateToView('career', 'interviews')">
+          <span class="nav-icon">🎙️</span><span>Interviews</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-car-companies-btn" onclick="navigateToView('career', 'companies')">
+          <span class="nav-icon">🏢</span><span>Companies (1,024)</span>
+        </button>
+      </div>
 
+      <!-- 5. PROGRESS -->
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-title"><span>📈 PROGRESS</span></div>
+        <button class="sidebar-nav-item" id="nav-prog-mastery-btn" onclick="navigateToView('progress', 'mastery')">
+          <span class="nav-icon">🏆</span><span>Mastery Matrix</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prog-analytics-btn" onclick="navigateToView('progress', 'analytics')">
+          <span class="nav-icon">📈</span><span>Analytics</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prog-mistakes-btn" onclick="navigateToView('progress', 'mistakes')">
+          <span class="nav-icon">📕</span><span>Mistake Book</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prog-revision-btn" onclick="navigateToView('progress', 'revision')">
+          <span class="nav-icon">🔄</span><span>Revision (FSRS)</span>
+        </button>
+      </div>
 
-    <div class="section-label" style="margin: 16px 0 8px; font-size:10px;">DASHBOARD</div>
+      <!-- 6. CSE LABS (Grouped Utilities) -->
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-title"><span>🧪 CSE LABS</span></div>
+        <button class="sidebar-nav-item" id="nav-lab-algo-btn" onclick="openModal('algo-visualizer-modal')">
+          <span class="nav-icon">🔍</span><span>Algorithm Lab</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-lab-sql-btn" onclick="openModal('sql-playground-modal')">
+          <span class="nav-icon">🗄️</span><span>SQL Lab</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-lab-toc-btn" onclick="openModal('toc-validator-modal')">
+          <span class="nav-icon">🔤</span><span>TOC Lab</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-lab-net-btn" onclick="openModal('subnet-calc-modal')">
+          <span class="nav-icon">🌐</span><span>Network Lab</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-lab-sys-btn" onclick="openModal('sysdesign-modal')">
+          <span class="nav-icon">🏗️</span><span>System Design</span>
+        </button>
+      </div>
 
-    <!-- ── Live Clock ── -->
-    <div class="clock-card">
-      <div class="clock-label">Current Time</div>
-      <div class="clock-time" id="clock-time">--:--:--</div>
-      <div class="clock-date" id="clock-date">Loading...</div>
-      <div class="session-badge">
-        <span class="dot"></span>
-        <span id="session-name">Detecting...</span>
+      <!-- 7. RESOURCES & 8. SETTINGS -->
+      <div class="sidebar-nav-group" style="margin-bottom:18px;">
+        <button class="sidebar-nav-item" id="nav-resources-btn" onclick="navigateToView('resources')">
+          <span class="nav-icon">📚</span><span>RESOURCES</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-settings-btn" onclick="navigateToView('settings')">
+          <span class="nav-icon">⚙️</span><span>SETTINGS</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-ai-mentor-btn" onclick="navigateToView('chat')" style="border:1px dashed rgba(99,216,255,0.4); margin-top:4px;">
+          <span class="nav-icon">🤖</span><span>AI Study Mentor</span>
+        </button>
       </div>
     </div>
-
-    <!-- ── GATE Countdown ── -->
-    <div class="gate-countdown-card" id="gate-countdown-card">
-      <div class="countdown-label">⏳ GATE 2027 Countdown</div>
-      <div class="countdown-value" id="gate-countdown-value">-- days</div>
-      <div class="countdown-sub" id="gate-countdown-sub">Loading...</div>
-      <div class="countdown-progress-wrap">
-        <div class="countdown-progress-bar" id="countdown-progress-bar" style="width:0%"></div>
-      </div>
-    </div>
-
-    <!-- ── Day Type Badge & Live Users ── -->
-    <div class="day-type-row">
-      <div class="day-type-badge" id="day-type-badge">🏫 College Day</div>
-      <div class="day-type-badge" id="live-users-badge" style="background: rgba(0, 230, 118, 0.15); border: 1px solid rgba(0, 230, 118, 0.3); color: var(--success); flex: 0.5;">
-        <span class="dot" style="display:inline-block; width:6px; height:6px; background:var(--success); border-radius:50%; margin-right:4px; animation: pulse 1.5s infinite;"></span>
-        <span id="live-users-count">1</span> Online
-      </div>
-      <button class="mark-today-btn" id="mark-today-btn" title="Mark today in calendar">📅 Mark</button>
-    </div>
-
-    <div id="sleep-alert" class="sleep-alert hidden">🌙 Time to sleep!</div>
-    
-    <div class="section-label" id="schedule-section-label">Today's Schedule</div>
-    <div class="schedule-list" id="schedule-list"></div>
-
-    <!-- ── Now Studying ── -->
-    <div class="now-card">
-      <div class="now-card-header"><span>⚡</span><span>Study Now</span></div>
-      <div class="now-topic" id="now-topic">Loading...</div>
-      <div class="now-desc" id="now-desc">Checking schedule...</div>
-    </div>
-
-    <!-- ── Daily Plan Mini Card ── -->
-    <div class="daily-mini-card" id="daily-mini-card">
-      <div class="daily-mini-header">
-        <span>📋 This Week's Focus</span>
-        <span class="week-badge" id="week-badge">Week 1</span>
-      </div>
-      <div class="daily-mini-topic" id="daily-mini-topic">Loading...</div>
-      <div class="daily-mini-subtopics" id="daily-mini-subtopics"></div>
-    </div>
-
-    <!-- ── Quick Ask Button ── -->
-    <button class="quick-ask-btn" id="quick-ask-btn">
-      <span>💬</span>
-      <span>Ask Mentor About Today's Topic</span>
-    </button>
-
-    <!-- ── Today's Stats ── -->
-    <div class="section-label">Today's Stats</div>
-    <div class="stats-grid">
-      <div class="stat-card" id="dsa-stat-card">
-        <div class="stat-icon">💻</div>
-        <div class="stat-value" id="stat-dsa">0</div>
-        <div class="stat-label">DSA Problems</div>
-      </div>
-      <div class="stat-card" id="chapter-stat-card">
-        <div class="stat-icon">📖</div>
-        <div class="stat-value" id="stat-chapters">0</div>
-        <div class="stat-label">GATE Chapters</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🔥</div>
-        <div class="stat-value" id="stat-streak">0</div>
-        <div class="stat-label">Day Streak</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⏱️</div>
-        <div class="stat-value" id="stat-month">M1</div>
-        <div class="stat-label">Current Phase</div>
-      </div>
-    </div>
-
-    <!-- ── Pomodoro Timer ── -->
-    <div class="section-label">Pomodoro Timer</div>
-    <div class="pomodoro-card">
-      <div class="pomodoro-display" id="pomodoro-display">25:00</div>
-      <div class="pomodoro-label" id="pomodoro-label">Study Session</div>
-      <div class="pomodoro-controls">
-        <button class="pomo-btn" id="pomo-start-btn" title="Start">▶</button>
-        <button class="pomo-btn" id="pomo-reset-btn" title="Reset">↺</button>
-        <button class="pomo-btn" id="pomo-skip-btn" title="Skip">⏭</button>
-      </div>
-    </div>
-
-    <!-- ── Upcoming Holidays ── -->
-    <div class="section-label">Upcoming Holidays</div>
-    <div class="upcoming-holidays" id="upcoming-holidays"></div>
-
-    <!-- ── App Version ── -->
-    <div class="app-version">GT Study Mentor Pro v2.1 · Made with ❤️ for GATE 2027</div>
-
   </aside>
 
   <!-- ════════════════════════════════
@@ -3091,7 +3092,45 @@ WHERE p.package_lpa >= 10.0;</textarea>
   <span id="toast-msg">Saved!</span>
 </div>
 
+<!-- Backward Compatibility Shim Container for Legacy Background Handlers -->
+<div id="legacy-shim" style="display:none;" aria-hidden="true">
+  <div id="stat-month"></div>
+  <div id="stat-dsa"></div>
+  <div id="stat-chapters"></div>
+  <div id="stat-streak"></div>
+  <div id="clock-time"></div>
+  <div id="clock-date"></div>
+  <div id="session-name"></div>
+  <div id="now-topic"></div>
+  <div id="now-desc"></div>
+  <div id="day-type-badge"></div>
+  <div id="sleep-alert"></div>
+  <div id="schedule-list"></div>
+  <div id="upcoming-holidays"></div>
+  <div id="week-badge"></div>
+  <div id="daily-mini-topic"></div>
+  <div id="daily-mini-subtopics"></div>
+  <div id="gate-countdown-value"></div>
+  <div id="gate-countdown-sub"></div>
+  <div id="countdown-progress-bar"></div>
+  <div id="pomodoro-display"></div>
+  <button id="pomo-start-btn"></button>
+  <button id="pomo-reset-btn"></button>
+  <button id="pomo-skip-btn"></button>
+  <button id="clear-chat-btn"></button>
+  <button id="quick-ask-btn"></button>
+  <button id="cal-prev"></button>
+  <button id="cal-next"></button>
+  <button id="mark-leave-btn"></button>
+  <button id="mark-exam-btn"></button>
+  <button id="mark-clear-btn"></button>
+  <button id="nav-chat-btn"></button>
+  <button id="nav-eval-btn"></button>
+  <button id="nav-map-btn"></button>
+</div>
+
 <script src="app.js"></script>
+<script src="app_v2.js?v=2.0"></script>
 
 <!-- ═══════════════════════════════════════
      MOBILE BOTTOM NAVIGATION BAR
