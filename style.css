@@ -4298,3 +4298,167 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
+
+
+/* ══════════════════════════════════════════════════
+   MAGICPATTERNS DASHBOARD DESIGN SYSTEM ENHANCEMENTS
+   ══════════════════════════════════════════════════ */
+.magic-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.magic-kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.magic-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  transition: background 0.25s ease;
+}
+
+.magic-kpi-card:hover {
+  border-color: var(--border-active);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.magic-kpi-card:hover::before {
+  background: var(--primary);
+}
+
+.magic-kpi-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.magic-kpi-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.magic-trend-pill {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.magic-trend-pill.pos {
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(74, 222, 128, 0.25);
+}
+
+.magic-kpi-mid {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.magic-kpi-val {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #fff;
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.magic-kpi-sparkline {
+  display: flex;
+  align-items: center;
+}
+
+.magic-kpi-footer {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 8px;
+}
+
+/* Weekly Analytical Bar Chart */
+.weekly-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.weekly-bar-track {
+  width: 100%;
+  max-width: 38px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.weekly-bar-fill {
+  width: 100%;
+  background: linear-gradient(180deg, var(--primary), #6C63FF);
+  border-radius: 4px;
+  transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.weekly-bar-fill.target-met {
+  background: linear-gradient(180deg, var(--success), #059669);
+}
+
+.weekly-bar-fill.current-day {
+  background: linear-gradient(180deg, #38BDF8, #2563EB);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+.weekly-bar-day {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.weekly-bar-day.today {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.weekly-bar-val {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+}

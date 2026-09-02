@@ -40,7 +40,7 @@
 <body>
 
 <!-- ══ PWA Install Banner ══ -->
-<div class="install-banner hidden" id="install-banner">
+<div class="install-banner hidden" id="install-banner" style="display:none !important;" aria-hidden="true">
   <div class="install-banner-content">
     <span class="install-icon">📲</span>
     <div>
@@ -133,34 +133,86 @@
         </div>
 
         <!-- Four Preparation Tracks Summary Pills -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:20px;">
-          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; cursor:pointer;" onclick="navigateToView('prepare', 'gate')">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11px; color:var(--text-muted);">⚡ GATE 2027</span>
-              <span class="score-pill med">76%</span>
+        <!-- Four Preparation Tracks Summary KPI Cards (MagicPatterns Style) -->
+        <div class="magic-kpi-grid">
+          <!-- GATE 2027 -->
+          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'gate')">
+            <div class="magic-kpi-top">
+              <span class="magic-kpi-label">⚡ GATE 2027</span>
+              <span class="magic-trend-pill pos">↑ +4.2%</span>
             </div>
-            <div style="font-size:11px; color:#fff; font-weight:600; margin-top:4px;">12 Core Subjects Active</div>
+            <div class="magic-kpi-mid">
+              <div class="magic-kpi-val" id="kpi-gate-val">76%</div>
+              <div class="magic-kpi-sparkline">
+                <svg width="56" height="22" viewBox="0 0 56 22">
+                  <path d="M2 18 Q 14 15, 26 16 T 44 6 T 54 3" fill="none" stroke="#63D8FF" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="magic-kpi-footer">
+              <span>12 Core Subjects Active</span>
+              <span style="color:var(--primary); font-weight:700;">71% PYQs</span>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; cursor:pointer;" onclick="navigateToView('prepare', 'placement')">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11px; color:var(--text-muted);">💼 Placements</span>
-              <span class="score-pill high">78%</span>
+
+          <!-- Placements -->
+          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'placement')">
+            <div class="magic-kpi-top">
+              <span class="magic-kpi-label">💼 Placements</span>
+              <span class="magic-trend-pill pos">↑ +6.8%</span>
             </div>
-            <div style="font-size:11px; color:#fff; font-weight:600; margin-top:4px;">Aptitude &amp; Reasoning</div>
+            <div class="magic-kpi-mid">
+              <div class="magic-kpi-val" id="kpi-placement-val">78%</div>
+              <div class="magic-kpi-sparkline">
+                <svg width="56" height="22" viewBox="0 0 56 22">
+                  <path d="M2 19 Q 15 17, 28 12 T 46 8 T 54 3" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="magic-kpi-footer">
+              <span>Aptitude &amp; Reasoning</span>
+              <span style="color:var(--success); font-weight:700;">108 Qs</span>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; cursor:pointer;" onclick="navigateToView('prepare', 'swe')">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11px; color:var(--text-muted);">💻 Software Eng</span>
-              <span class="score-pill high">81%</span>
+
+          <!-- Software Eng -->
+          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'swe')">
+            <div class="magic-kpi-top">
+              <span class="magic-kpi-label">💻 Software Eng</span>
+              <span class="magic-trend-pill pos">↑ +5.1%</span>
             </div>
-            <div style="font-size:11px; color:#fff; font-weight:600; margin-top:4px;">17 DSA Patterns + APIs</div>
+            <div class="magic-kpi-mid">
+              <div class="magic-kpi-val" id="kpi-swe-val">81%</div>
+              <div class="magic-kpi-sparkline">
+                <svg width="56" height="22" viewBox="0 0 56 22">
+                  <path d="M2 20 Q 18 17, 30 11 T 44 7 T 54 2" fill="none" stroke="#818CF8" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="magic-kpi-footer">
+              <span>17 DSA Patterns + APIs</span>
+              <span style="color:#818CF8; font-weight:700;">142 Solved</span>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:12px; cursor:pointer;" onclick="navigateToView('prepare', 'internship')">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11px; color:var(--text-muted);">🚀 Internship</span>
-              <span class="score-pill med">68%</span>
+
+          <!-- Internship -->
+          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'internship')">
+            <div class="magic-kpi-top">
+              <span class="magic-kpi-label">🚀 Internship</span>
+              <span class="magic-trend-pill pos">↑ +8.0%</span>
             </div>
-            <div style="font-size:11px; color:#fff; font-weight:600; margin-top:4px;">Resume: 84/100 • 8 Applied</div>
+            <div class="magic-kpi-mid">
+              <div class="magic-kpi-val" id="kpi-intern-val">68%</div>
+              <div class="magic-kpi-sparkline">
+                <svg width="56" height="22" viewBox="0 0 56 22">
+                  <path d="M2 21 Q 14 17, 26 15 T 42 9 T 54 4" fill="none" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="magic-kpi-footer">
+              <span>Resume: 84/100</span>
+              <span style="color:var(--warning); font-weight:700;">8 Applied</span>
+            </div>
           </div>
         </div>
       </div>
@@ -185,6 +237,58 @@
           <button class="action-btn" onclick="openPomodoroModal()" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:10px 16px; border-radius:8px; cursor:pointer;">
             ⏱️ 25/5 Pomodoro
           </button>
+        </div>
+      </div>
+
+      
+      <!-- ── WEEKLY PREPARATION OVERVIEW (MAGICPATTERNS STYLE ANALYTICAL CHART) ── -->
+      <div class="v2-command-card" style="margin-top:4px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+          <div>
+            <div style="font-size:11px; font-weight:800; color:var(--primary); letter-spacing:1px; text-transform:uppercase;">
+              📈 Preparation Overview
+            </div>
+            <h3 style="font-size:1.2rem; font-weight:800; margin:4px 0 0; color:#fff;">
+              Weekly Study Hours vs Target
+            </h3>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+              Daily progress across GATE, SWE, Placement &amp; Internship (6.0h Target/Day)
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="display:flex; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:6px; padding:2px;">
+              <button class="forge-track-tab active" style="font-size:11px; padding:4px 10px; border-radius:4px;" id="btn-chart-thisweek" onclick="toggleWeeklyView('this')">This Week</button>
+              <button class="forge-track-tab" style="font-size:11px; padding:4px 10px; border-radius:4px;" id="btn-chart-lastweek" onclick="toggleWeeklyView('last')">Last Week</button>
+            </div>
+            <div style="font-size:11px; font-weight:700; color:var(--success); background:rgba(74,222,128,0.12); padding:4px 8px; border-radius:6px; border:1px solid rgba(74,222,128,0.3);">
+              ↑ 94% Target Met
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Bar Chart Container -->
+        <div id="weekly-prep-chart-container" style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; height:170px; padding:16px 14px 8px; border-bottom:1px solid var(--border-subtle); background:rgba(0,0,0,0.2); border-radius:8px;">
+          <!-- Dynamically populated via renderWeeklyChart() -->
+        </div>
+
+        <!-- Bottom Chart Metrics Row -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-top:14px; padding-top:4px;">
+          <div>
+            <span style="font-size:11px; color:var(--text-muted);">Total Hours Logged</span>
+            <div style="font-size:1.15rem; font-weight:800; color:#fff;" id="chart-stat-total">39.2 hrs <span style="font-size:11px; color:var(--success); font-weight:600;">(+4.5h)</span></div>
+          </div>
+          <div>
+            <span style="font-size:11px; color:var(--text-muted);">Daily Target Average</span>
+            <div style="font-size:1.15rem; font-weight:800; color:#fff;" id="chart-stat-avg">5.6h / 6.0h</div>
+          </div>
+          <div>
+            <span style="font-size:11px; color:var(--text-muted);">FSRS Flashcards Reviewed</span>
+            <div style="font-size:1.15rem; font-weight:800; color:#fff;">48 Cards <span style="font-size:11px; color:var(--primary); font-weight:600;">(92% recall)</span></div>
+          </div>
+          <div>
+            <span style="font-size:11px; color:var(--text-muted);">Tasks Completed</span>
+            <div style="font-size:1.15rem; font-weight:800; color:#fff;">24 / 28 <span style="font-size:11px; color:var(--success); font-weight:600;">(86%)</span></div>
+          </div>
         </div>
       </div>
 
@@ -578,65 +682,24 @@
   <!-- ════════════════════════════════
        SIDEBAR
        ════════════════════════════════ -->
-  <aside id="sidebar" class="sidebar-closed">
+  <aside id="sidebar" class="sidebar-closed" style="display:flex; flex-direction:column;">
 
-    <div class="sidebar-logo">
-      <img src="logo.png" alt="GT Study Mentor Pro Logo" class="logo-img" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='flex'" />
-      <div class="logo-fallback" id="logo-fallback" style="display:none">
-        <div class="logo-icon">GT</div>
-        <div class="logo-text">
-          <span class="logo-gt">GT</span>
-          <span class="logo-brand"> Study Mentor Pro</span>
-          <p>GATE 2027 + Placement Guide</p>
-        </div>
+    <!-- ── Modern Brand Header (MagicPatterns Style) ── -->
+    <div class="sidebar-brand-header" style="padding:16px 14px 12px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border-subtle); margin-bottom:8px;">
+      <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, var(--primary), #6C63FF); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; color:#fff; box-shadow:0 4px 12px rgba(99,216,255,0.25);">
+        GT
+      </div>
+      <div>
+        <div style="font-weight:800; font-size:14px; color:#fff; line-height:1.2; font-family:var(--font-display);">GT Study Mentor Pro</div>
+        <div style="font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">90-Day Career Prep</div>
       </div>
     </div>
 
-    <!-- ── Notification Banner ── -->
-    <div class="notif-request-banner hidden" id="notif-request-banner">
-      <span>🔔 Enable reminders for study alerts!</span>
-      <button id="enable-notif-btn">Allow</button>
+    <!-- ── Menu Label ── -->
+    <div style="padding:6px 14px 4px; font-size:10px; font-weight:800; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase;">
+      Menu
     </div>
 
-    <!-- ── Student Profile Mini ── -->
-    <div class="profile-mini" id="profile-mini">
-      <div class="profile-summary">
-        <div class="profile-pic">
-          <div id="profile-mini-avatar" class="profile-mini-avatar">🎓</div>
-        </div>
-        <div class="profile-text">
-          <h3 id="profile-mini-name">Guest User</h3>
-          <p id="profile-mini-year" style="margin-bottom:4px;">Target: Dream Company</p>
-          <div class="rank-badge" id="user-rank-badge" style="background: rgba(108,99,255,0.2); border: 1px solid var(--primary); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; display:inline-block; font-weight: 600; color: var(--text);">Novice Coder</div>
-          <div class="xp-bar-container" style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 8px; overflow: hidden;">
-            <div id="user-xp-bar" style="width: 0%; height: 100%; background: var(--accent); transition: width 1s ease-in-out;"></div>
-          </div>
-          <div style="font-size: 0.75rem; color: var(--text-sec); margin-top: 4px; text-align:right;"><span id="user-xp-text">0</span> XP</div>
-        </div>
-      </div>
-      <button class="profile-edit-btn" id="profile-edit-btn" title="Edit Profile">✏️</button>
-    </div>
-
-    <!-- ── Today's Goal Card ── -->
-    <div class="today-goal-card" id="today-goal-card">
-      <div class="today-goal-label">🎯 Today's Target</div>
-      <div class="today-goal-xp">
-        <span id="today-goal-earned">0 XP</span>
-        <span id="today-goal-target">Goal: 100 XP</span>
-      </div>
-      <div class="today-goal-bar">
-        <div class="today-goal-fill" id="today-goal-fill" style="width:0%"></div>
-      </div>
-      <div class="today-streak-row">
-        <span class="streak-pill">🔥 <span id="sidebar-streak-count">0</span>-Day Streak</span>
-        <span class="xp-earned-today" id="today-xp-earned-label">Keep going da!</span>
-      </div>
-    </div>
-
-    <!-- ── Main Navigation Menu ── -->
-    <!-- ══════════════════════════════════════════════════
-         8-SECTION STREAMLINED NAVIGATION HIERARCHY (Section 7)
-         ══════════════════════════════════════════════════ -->
     <div class="sidebar-actions" style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
       
       <!-- 1. HOME -->
@@ -752,6 +815,20 @@
           <span class="nav-icon">🤖</span><span>AI Study Mentor</span>
         </button>
       </div>
+    </div>
+  
+    <!-- ── Modern User Profile Footer (MagicPatterns Style) ── -->
+    <div class="sidebar-user-footer" style="margin-top:auto; padding:12px 14px; border-top:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border-radius:8px; margin:12px 10px 10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:#fff;">
+          T
+        </div>
+        <div>
+          <div style="font-size:12px; font-weight:700; color:#fff; line-height:1.2;">Tamizh</div>
+          <div style="font-size:10px; color:var(--text-muted);">4th Year B.E CSE</div>
+        </div>
+      </div>
+      <span style="font-size:9px; padding:2px 6px; background:rgba(74, 222, 128, 0.15); color:var(--success); border-radius:4px; font-weight:700;">FREE</span>
     </div>
   </aside>
 

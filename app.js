@@ -213,10 +213,10 @@ function loadProfile() {
   });
   
   // Update UI
-  document.getElementById('profile-mini-name').textContent = profileData.name;
-  document.getElementById('profile-mini-year').textContent = profileData.year;
-  document.getElementById('profile-mini-avatar').textContent = profileData.avatar;
-  document.getElementById('header-profile-emoji').textContent = profileData.avatar;
+  const pmn = document.getElementById('profile-mini-name'); if (pmn) pmn.textContent = profileData.name;
+  const pmy = document.getElementById('profile-mini-year'); if (pmy) pmy.textContent = profileData.year;
+  const pma = document.getElementById('profile-mini-avatar'); if (pma) pma.textContent = profileData.avatar;
+  const hpe = document.getElementById('header-profile-emoji'); if (hpe) hpe.textContent = profileData.avatar;
   
   // Update Profile Modal inputs
   document.getElementById('profile-name').value = profileData.name !== 'Student' ? profileData.name : '';
@@ -1846,13 +1846,13 @@ document.getElementById('ask-about-plan-btn').addEventListener('click', () => {
 });
 
 // Reminders config
-document.getElementById('save-reminders-btn').addEventListener('click', () => { scheduleReminders(); showToast('Saved! 🔔', 'success'); closeModal('reminders-modal'); });
-document.getElementById('test-notif-btn').addEventListener('click', async () => {
+document.getElementById('save-reminders-btn')?.addEventListener('click', () => { scheduleReminders(); showToast('Saved! 🔔', 'success'); closeModal('reminders-modal'); });
+document.getElementById('test-notif-btn')?.addEventListener('click', async () => {
   if (Notification.permission !== 'granted') { await requestNotifPermission(); return; }
   new Notification('GT Mentor Pro', { body: 'Reminders working da! 🚀', icon: './icon.svg' });
   showToast('Test sent!', 'success');
 });
-document.getElementById('enable-notif-btn').addEventListener('click', requestNotifPermission);
+document.getElementById('enable-notif-btn')?.addEventListener('click', requestNotifPermission);
 
 // ══════════════════════════════════════════
 //  XP & GAMIFICATION ENGINE
@@ -1911,15 +1911,20 @@ function updateXPBar() {
   const xp = getTotalXP();
   const rank = getCurrentRank(xp);
   const nextRank = XP_RANKS[XP_RANKS.indexOf(rank) + 1];
-  document.getElementById('user-rank-badge').textContent = rank.name;
+  const rankEl = document.getElementById('user-rank-badge');
+  if (rankEl) rankEl.textContent = rank.name;
   
-  if (nextRank) {
-    const progress = ((xp - rank.min) / (nextRank.min - rank.min)) * 100;
-    document.getElementById('user-xp-bar').style.width = Math.min(progress, 100) + '%';
-  } else {
-    document.getElementById('user-xp-bar').style.width = '100%';
+  const barEl = document.getElementById('user-xp-bar');
+  if (barEl) {
+    if (nextRank) {
+      const progress = ((xp - rank.min) / (nextRank.min - rank.min)) * 100;
+      barEl.style.width = Math.min(progress, 100) + '%';
+    } else {
+      barEl.style.width = '100%';
+    }
   }
-  document.getElementById('user-xp-text').textContent = xp;
+  const textEl = document.getElementById('user-xp-text');
+  if (textEl) textEl.textContent = xp;
 }
 
 function renderXPModal() {

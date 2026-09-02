@@ -108,6 +108,7 @@ window.renderHomeDashboard = function () {
 
   // 4. Weak Areas List
   const weakContainer = document.getElementById('home-weak-areas-container');
+  if (typeof renderWeeklyChart === 'function') renderWeeklyChart();
   if (weakContainer) {
     weakContainer.innerHTML = '';
     const weaks = PrepIntelligenceEngine.getWeakTopics();
@@ -816,3 +817,77 @@ document.addEventListener('DOMContentLoaded', () => {
     renderHomeDashboard();
   }
 });
+
+
+// ── WEEKLY PREPARATION CHART LOGIC (MAGICPATTERNS STYLE) ──
+let currentWeeklyMode = 'this';
+
+window.toggleWeeklyView = function (mode) {
+  currentWeeklyMode = mode;
+  const btnThis = document.getElementById('btn-chart-thisweek');
+  const btnLast = document.getElementById('btn-chart-lastweek');
+  if (btnThis && btnLast) {
+    if (mode === 'this') {
+      btnThis.classList.add('active');
+      btnLast.classList.remove('active');
+    } else {
+      btnThis.classList.remove('active');
+      btnLast.classList.add('active');
+    }
+  }
+  renderWeeklyChart();
+};
+
+window.renderWeeklyChart = function () {
+  const container = document.getElementById('weekly-prep-chart-container');
+  if (!container) return;
+
+  const thisWeekData = [
+    { day: 'Mon', hours: 5.5, pct: 92, target: 6.0 },
+    { day: 'Tue', hours: 6.2, pct: 103, target: 6.0 },
+    { day: 'Wed', hours: 4.8, pct: 80, target: 6.0 },
+    { day: 'Thu', hours: 6.5, pct: 108, target: 6.0 },
+    { day: 'Fri', hours: 5.8, pct: 97, target: 6.0 },
+    { day: 'Sat', hours: 7.0, pct: 117, target: 6.0 },
+    { day: 'Sun', hours: 3.7, pct: 62, target: 6.0, isToday: true }
+  ];
+
+  const lastWeekData = [
+    { day: 'Mon', hours: 6.0, pct: 100, target: 6.0 },
+    { day: 'Tue', hours: 5.5, pct: 92, target: 6.0 },
+    { day: 'Wed', hours: 5.0, pct: 83, target: 6.0 },
+    { day: 'Thu', hours: 6.2, pct: 103, target: 6.0 },
+    { day: 'Fri', hours: 6.0, pct: 100, target: 6.0 },
+    { day: 'Sat', hours: 6.5, pct: 108, target: 6.0 },
+    { day: 'Sun', hours: 5.2, pct: 87, target: 6.0 }
+  ];
+
+  const data = currentWeeklyMode === 'this' ? thisWeekData : lastWeekData;
+  const maxHours = 7.5;
+
+  container.innerHTML = data.map(item => {
+    const heightPct = Math.round((item.hours / maxHours) * 100);
+    const isTargetMet = item.hours >= item.target;
+    let fillClass = 'weekly-bar-fill';
+    if (item.isToday) fillClass += ' current-day';
+    else if (isTargetMet) fillClass += ' target-met';
+
+    return `
+      <div class="weekly-bar-col">
+        <span class="weekly-bar-val">${item.hours}h</span>
+        <div class="weekly-bar-track" title="${item.day}: ${item.hours}h (${item.pct}% of target)">
+          <div class="${fillClass}" style="height: ${heightPct}%;"></div>
+        </div>
+        <span class="weekly-bar-day ${item.isToday ? 'today' : ''}">${item.day}${item.isToday ? ' •' : ''}</span>
+      </div>
+    `;
+  }).join('');
+
+  // Update summary stats
+  const totalHours = data.reduce((acc, d) => acc + d.hours, 0);
+  const avgHours = (totalHours / data.length).toFixed(1);
+  const totalEl = document.getElementById('chart-stat-total');
+  const avgEl = document.getElementById('chart-stat-avg');
+  if (totalEl) totalEl.innerHTML = totalHours.toFixed(1) + ' hrs ' + (currentWeeklyMode === 'this' ? '<span style="font-size:11px; color:var(--success); font-weight:600;">(+4.5h)</span>' : '<span style="font-size:11px; color:var(--text-muted); font-weight:600;">(Completed)</span>');
+  if (avgEl) avgEl.textContent = avgHours + 'h / 6.0h';
+};
