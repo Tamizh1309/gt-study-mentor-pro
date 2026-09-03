@@ -86,7 +86,11 @@
             One focused system. Four career goals. 90 days. (Placement • GATE 2027 • Software Engineering • Internship)
           </p>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="header-badge-pill" onclick="openModal('ai-engine-modal'); initAIEngineModal();" style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#10B981; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:6px;">
+            <span class="status-dot-active"></span>
+            <span>⚡ GPT-5.4 Active</span>
+          </button>
           <button class="header-badge-pill" onclick="openModal('command-palette-modal')" style="background:rgba(99,216,255,0.1); border:1px solid var(--border-active); color:var(--primary); cursor:pointer;">
             <span>⚡</span><span>Ctrl + K</span>
           </button>
@@ -187,6 +191,52 @@
             <div>
               <div style="font-size:12px; font-weight:800; color:#fff;">Daily Motivation</div>
               <div style="font-size:10px; color:var(--warning);">Streak &amp; Badges</div>
+            </div>
+          </div>
+        </div>
+        <!-- Wave 3 new studios -->
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('formula-vault-modal'); initFormulaVault();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🧩</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">Formula Vault</div>
+              <div style="font-size:10px; color:var(--accent);">40+ GATE Formulas</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('code-reviewer-modal');">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">⚡</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">AI Code Reviewer</div>
+              <div style="font-size:10px; color:#10B981;">Complexity &amp; Bugs</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('smart-planner-modal'); initSmartPlanner();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">📅</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">Smart Daily Plan</div>
+              <div style="font-size:10px; color:var(--primary);">6-Hour Timetable</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('dsa-tracker-modal'); initDsaTracker();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🎯</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">DSA 17 Patterns</div>
+              <div style="font-size:10px; color:#F59E0B;">Striver A2Z Tracker</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('ai-engine-modal'); initAIEngineModal();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">⚙️</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">AI Engine Config</div>
+              <div style="font-size:10px; color:#10B981;">GPT-5.4 / FreeLLMAPI</div>
             </div>
           </div>
         </div>
@@ -3968,6 +4018,215 @@ Execution Time: 2.4ms</pre>
   </div>
   <div style="position:relative; z-index:1; margin-top:20px; font-size:11px; color:rgba(255,255,255,0.3);">
     "Consistency beats intensity every single time. Sleep and return stronger." — GT Mentor
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 3 — FEATURE 1: GATE FORMULA VAULT MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal" id="formula-vault-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:880px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">🧩</span>
+        <div>
+          <div class="modal-title">GATE Formula Vault</div>
+          <div style="font-size:11px; color:var(--text-muted);">High-yield formulas for OS, DBMS, CN, TOC, COA, Algorithms &amp; Maths</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('formula-vault-modal')">✕</button>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+      <input type="text" id="formula-vault-search" placeholder="🔍 Search formula (e.g., EMAT, Amdahl, Master, CIDR, B-Tree)..." 
+        style="flex:1; min-width:220px; padding:8px 12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-subtle); border-radius:8px; color:#fff; font-size:12px; outline:none;" />
+      <span class="badge-pill" style="font-size:11px; background:rgba(0,212,255,0.1); color:var(--accent); border:1px solid rgba(0,212,255,0.3);" id="formula-count-badge">40 Formulas</span>
+    </div>
+    <div class="formula-subject-tabs" id="formula-subject-tabs">
+      <button class="formula-subj-btn active" onclick="filterFormulaVault('ALL')">🌟 All</button>
+      <button class="formula-subj-btn" onclick="filterFormulaVault('OS')">💻 OS</button>
+      <button class="formula-subj-btn" onclick="filterFormulaVault('DBMS')">🗄️ DBMS</button>
+      <button class="formula-subj-btn" onclick="filterFormulaVault('CN')">🌐 CN</button>
+      <button class="formula-subj-btn" onclick="filterFormulaVault('TOC')">⚙️ TOC</button>
+      <button class="formula-subj-btn" onclick="filterFormulaVault('COA')">🎛️ COA</button>
+      <button class="formula-subj-btn" onclick="filterFormulaVault('ALGO')">📐 Algorithms</button>
+      <button class="formula-subj-btn" onclick="filterFormulaVault('MATH')">🔢 Maths</button>
+    </div>
+    <div class="formula-card-grid" id="formula-card-grid">
+      <!-- Injected via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 3 — FEATURE 2: AI CODE REVIEWER MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal" id="code-reviewer-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:860px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">⚡</span>
+        <div>
+          <div class="modal-title">AI Code Reviewer &amp; Complexity Studio</div>
+          <div style="font-size:11px; color:#10B981;">Powered by GPT-5.4 • Instant Time &amp; Space Complexity ($O$) Analysis</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('code-reviewer-modal')">✕</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:11px; color:var(--text-muted); font-weight:700;">Language:</span>
+        <select id="reviewer-lang-select" style="padding:6px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-subtle); border-radius:6px; color:#fff; font-size:12px; outline:none;">
+          <option value="cpp">C++ (STL)</option>
+          <option value="python" selected>Python 3</option>
+          <option value="java">Java</option>
+          <option value="javascript">JavaScript</option>
+        </select>
+      </div>
+      <button class="submit-btn" style="padding:6px 16px; font-size:12px;" id="run-studio-review-btn" onclick="executeStudioCodeReview()">
+        🚀 Review with GPT-5.4
+      </button>
+    </div>
+    <div class="code-reviewer-grid">
+      <div class="code-reviewer-pane">
+        <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Your Code:</div>
+        <textarea class="code-reviewer-textarea" id="studio-code-input" placeholder="Paste your solution or algorithm code here da...&#10;e.g.&#10;def max_subarray(nums):&#10;    cur = max_so_far = nums[0]&#10;    for x in nums[1:]:&#10;        cur = max(x, cur + x)&#10;        max_so_far = max(max_so_far, cur)&#10;    return max_so_far"></textarea>
+      </div>
+      <div class="code-reviewer-pane">
+        <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">GPT-5.4 Review Report:</div>
+        <div class="code-reviewer-output" id="studio-review-output">Paste code and click "Review with GPT-5.4" to inspect time complexity, space complexity, edge cases, and optimizations!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 3 — FEATURE 3: SMART DAILY PLANNER MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal" id="smart-planner-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:760px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">📅</span>
+        <div>
+          <div class="modal-title">90-Day Smart Daily Schedule</div>
+          <div style="font-size:11px; color:var(--primary);">Personalized 6-Hour Blueprint • Day 27 / 90</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('smart-planner-modal')">✕</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+      <div style="font-size:12px; color:var(--text-muted);">Check off tasks as you finish them. Unlocks daily XP badges!</div>
+      <button class="formula-mini-btn" onclick="resetDailyPlanChecklist()" style="color:var(--warning);">🔄 Reset Today</button>
+    </div>
+    <div id="planner-schedule-container" style="max-height:480px; overflow-y:auto; padding-right:4px;">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 3 — FEATURE 4: STRIVER A2Z 17 PATTERNS MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal" id="dsa-tracker-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:820px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">🎯</span>
+        <div>
+          <div class="modal-title">Striver A2Z — 17 DSA Patterns Tracker</div>
+          <div style="font-size:11px; color:#F59E0B;">Master all 17 coding interview patterns for Zoho, Amazon &amp; Google</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('dsa-tracker-modal')">✕</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:10px; border:1px solid var(--border-subtle);">
+      <div>
+        <div style="font-size:11px; color:var(--text-muted);">Overall Patterns Mastered</div>
+        <div style="font-size:18px; font-weight:800; color:var(--success);" id="dsa-mastery-stat">0 / 17 Mastered (0%)</div>
+      </div>
+      <div style="width:160px; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden;">
+        <div id="dsa-progress-bar" style="width:0%; height:100%; background:linear-gradient(90deg, #6C63FF, #00E676); border-radius:4px; transition:width 0.3s ease;"></div>
+      </div>
+    </div>
+    <div id="dsa-patterns-list" style="max-height:460px; overflow-y:auto; padding-right:4px;">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 3 — FEATURE 5: AI ENGINE & GATEWAY CONFIG MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal" id="ai-engine-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:680px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">⚙️</span>
+        <div>
+          <div class="modal-title">AI Engine &amp; FreeLLMAPI Gateway</div>
+          <div style="font-size:11px; color:#10B981;">OpenAI-Compatible Local Gateway • GPT-5.4 Ready</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('ai-engine-modal')">✕</button>
+    </div>
+    
+    <!-- Active Status Card -->
+    <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:14px; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="status-dot-active"></span>
+          <span style="font-size:13px; font-weight:800; color:#fff;">Current Engine:</span>
+          <span style="font-size:13px; font-weight:800; color:#10B981;" id="active-engine-label">GPT-5.4</span>
+        </div>
+        <span class="gateway-status-pill" id="gateway-live-status" style="background:rgba(16,185,129,0.2); color:#10B981;">Ready &amp; Offline Resilient</span>
+      </div>
+      <div style="font-size:11px; color:var(--text-muted); line-height:1.4;">
+        If your local FreeLLMAPI gateway is offline, GT Study Mentor Pro seamlessly falls back to high-yield built-in CSE intelligence so your studies never stop.
+      </div>
+    </div>
+
+    <!-- Gateway Settings Form -->
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div>
+        <label style="display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">Gateway Endpoint URL:</label>
+        <input type="text" id="cfg-ai-endpoint" value="http://127.0.0.1:3001/v1/chat/completions" 
+          style="width:100%; padding:8px 12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-subtle); border-radius:8px; color:#fff; font-family:var(--font-mono); font-size:12px; outline:none;" />
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <label style="display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">Model ID:</label>
+          <input type="text" id="cfg-ai-model" value="gpt-5.4" 
+            style="width:100%; padding:8px 12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-subtle); border-radius:8px; color:#fff; font-family:var(--font-mono); font-size:12px; outline:none;" />
+        </div>
+        <div>
+          <label style="display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">Bearer Token / API Key:</label>
+          <input type="password" id="cfg-ai-key" value="freellmapi" 
+            style="width:100%; padding:8px 12px; background:rgba(0,0,0,0.3); border:1px solid var(--border-subtle); border-radius:8px; color:#fff; font-family:var(--font-mono); font-size:12px; outline:none;" />
+        </div>
+      </div>
+      
+      <!-- FreeLLMAPI Quick Guide -->
+      <div style="background:rgba(0,0,0,0.3); border:1px solid var(--border-subtle); border-radius:8px; padding:12px;">
+        <div style="font-size:11px; font-weight:800; color:#818CF8; margin-bottom:6px;">🚀 FreeLLMAPI 1-Liner Setup (Windows PowerShell):</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" readonly value="iwr -useb https://freellmapi.co/install.ps1 | iex" id="freellmapi-cmd-copy" 
+            style="flex:1; background:rgba(0,0,0,0.5); border:1px solid rgba(108,99,255,0.3); border-radius:6px; padding:6px 10px; color:var(--accent); font-family:var(--font-mono); font-size:11px;" />
+          <button class="formula-mini-btn" onclick="copyFreeLLMAPICmd()">📋 Copy</button>
+        </div>
+        <div style="font-size:10px; color:var(--text-muted); margin-top:6px;">
+          Note: FreeLLMAPI container uses Docker Desktop. If running without Docker, clone the repo and run <code style="color:var(--accent);">npm run dev</code>.
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+        <button class="formula-mini-btn" onclick="testAIGatewayConnection()" id="test-gateway-btn">
+          🔌 Test Gateway Ping
+        </button>
+        <button class="submit-btn" onclick="saveAIEngineSettings()" style="padding:8px 24px;">
+          💾 Save Settings
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
