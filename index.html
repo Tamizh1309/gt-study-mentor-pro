@@ -144,7 +144,54 @@
             </div>
           </div>
         </div>
+        <!-- Wave 2 new studios -->
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('pomodoro-modal'); initPomoTimer();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">⏱️</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">Pomodoro Timer</div>
+              <div style="font-size:10px; color:#9B94FF;">Deep Focus Engine</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('notes-vault-modal'); initNotesVault();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">📓</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">Notes Vault</div>
+              <div style="font-size:10px; color:var(--warning);">9 GATE Subjects</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('battle-board-modal'); renderBattleBoard();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🏆</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">Company Board</div>
+              <div style="font-size:10px; color:var(--success);">Kanban Pipeline</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('weekly-report-modal'); renderWeeklyReport();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">📊</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">Weekly Report</div>
+              <div style="font-size:10px; color:var(--primary);">PDF Export</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('motivation-modal'); renderMotivationEngine();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🔥</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">Daily Motivation</div>
+              <div style="font-size:10px; color:var(--warning);">Streak &amp; Badges</div>
+            </div>
+          </div>
+        </div>
       </div>
+
 
       <!-- Main Command Card -->
       <div class="v2-command-card">
@@ -3593,6 +3640,334 @@ Execution Time: 2.4ms</pre>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 2 — FEATURE 1: POMODORO FOCUS TIMER STUDIO
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="pomodoro-modal">
+  <div class="modal" style="max-width:540px;">
+    <button class="modal-close" data-close="pomodoro-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; gap:10px;">
+      <span>⏱️</span> Pomodoro Focus Timer Studio
+      <span class="badge-pill" style="font-size:10px; background:rgba(108,99,255,0.15); color:var(--primary); border:1px solid rgba(108,99,255,0.3);">Deep Work Engine</span>
+    </div>
+    <div class="modal-subtitle">Stay in flow, track your deep work sessions, and hear a Tanglish break alert da!</div>
+
+    <!-- Mode Selector -->
+    <div class="pomo-mode-row" id="pomo-mode-row">
+      <button class="pomo-mode-btn active" id="pomo-mode-25" onclick="setPomoMode(25,5,'Classic 25/5')">⚡ 25 / 5 Classic</button>
+      <button class="pomo-mode-btn" id="pomo-mode-50" onclick="setPomoMode(50,10,'Deep Work 50/10')">🧠 50 / 10 Deep Work</button>
+      <button class="pomo-mode-btn" id="pomo-mode-90" onclick="setPomoMode(90,20,'Ultra 90/20')">🚀 90 / 20 Ultra</button>
+    </div>
+
+    <!-- Circular Timer Ring -->
+    <div class="pomo-ring-container" id="pomo-ring-container">
+      <svg class="pomo-ring-svg" viewBox="0 0 170 170">
+        <circle class="pomo-ring-bg" cx="85" cy="85" r="80"/>
+        <circle class="pomo-ring-progress" id="pomo-ring-arc" cx="85" cy="85" r="80" stroke-dasharray="502" stroke-dashoffset="0"/>
+      </svg>
+      <div class="pomo-ring-inner">
+        <div class="pomo-timer-digits" id="pomo-digits">25:00</div>
+        <div class="pomo-timer-label" id="pomo-phase-label">FOCUS</div>
+      </div>
+    </div>
+
+    <!-- Session Dots -->
+    <div class="pomo-session-bar" id="pomo-session-dots">
+      <div class="pomo-session-dot" id="pomo-dot-0"></div>
+      <div class="pomo-session-dot" id="pomo-dot-1"></div>
+      <div class="pomo-session-dot" id="pomo-dot-2"></div>
+      <div class="pomo-session-dot" id="pomo-dot-3"></div>
+    </div>
+
+    <!-- Task Tag Selector -->
+    <div style="display:flex; gap:8px; align-items:center; justify-content:center; margin-bottom:10px; flex-wrap:wrap;">
+      <span style="font-size:11px; color:var(--text-muted);">Tag session:</span>
+      <select id="pomo-track-select" class="form-input" style="width:160px; font-size:12px; padding:4px 8px;">
+        <option value="GATE">⚡ GATE 2027</option>
+        <option value="SWE">💻 Software Eng (DSA)</option>
+        <option value="PLACEMENT">💼 Placement Prep</option>
+        <option value="INTERNSHIP">🚀 Internship</option>
+      </select>
+    </div>
+
+    <!-- Control Buttons -->
+    <div class="pomo-controls">
+      <button class="pomo-btn pomo-btn-start" id="pomo-start-btn" onclick="togglePomoTimer()">▶ Start Focus</button>
+      <button class="pomo-btn pomo-btn-reset" onclick="resetPomoTimer()">↺ Reset</button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="pomo-stats-row">
+      <div class="pomo-stat-cell">
+        <div class="pomo-stat-val" id="pomo-stat-sessions">0</div>
+        <div class="pomo-stat-lbl">Sessions Today</div>
+      </div>
+      <div class="pomo-stat-cell">
+        <div class="pomo-stat-val" id="pomo-stat-focus-time">0h 0m</div>
+        <div class="pomo-stat-lbl">Total Focus Time</div>
+      </div>
+      <div class="pomo-stat-cell">
+        <div class="pomo-stat-val" id="pomo-stat-streak">7🔥</div>
+        <div class="pomo-stat-lbl">Day Streak</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 2 — FEATURE 2: SUBJECT NOTES VAULT
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="notes-vault-modal">
+  <div class="modal modal-tall" style="max-width:860px;">
+    <button class="modal-close" data-close="notes-vault-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span>📓</span> Subject Notes Vault
+        <span class="notes-autosave-pill" id="notes-autosave-indicator">✓ Auto-Saved</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="action-btn" onclick="exportCurrentNote()" style="font-size:12px; padding:6px 12px;">⬇ Export .txt</button>
+        <button class="action-btn" onclick="clearCurrentNote()" style="font-size:12px; padding:6px 12px; color:var(--danger);">🗑 Clear</button>
+      </div>
+    </div>
+    <div class="modal-subtitle">Quick-capture notes organized by GATE subject. Saved to your browser, always available.</div>
+
+    <!-- Subject Tabs -->
+    <div class="notes-subject-tabs" id="notes-subject-tabs">
+      <button class="notes-subj-tab active" onclick="switchNoteSubject('os')" id="ntab-os">🖥️ OS</button>
+      <button class="notes-subj-tab" onclick="switchNoteSubject('dbms')" id="ntab-dbms">🗄️ DBMS</button>
+      <button class="notes-subj-tab" onclick="switchNoteSubject('cn')" id="ntab-cn">🌐 Networks</button>
+      <button class="notes-subj-tab" onclick="switchNoteSubject('toc')" id="ntab-toc">🤖 TOC</button>
+      <button class="notes-subj-tab" onclick="switchNoteSubject('co')" id="ntab-co">⚙️ CO/COA</button>
+      <button class="notes-subj-tab" onclick="switchNoteSubject('algo')" id="ntab-algo">📊 Algorithms</button>
+      <button class="notes-subj-tab" onclick="switchNoteSubject('dm')" id="ntab-dm">∑ Discrete Maths</button>
+      <button class="notes-subj-tab" onclick="switchNoteSubject('em')" id="ntab-em">📐 Engg Maths</button>
+      <button class="notes-subj-tab" onclick="switchNoteSubject('dsa')" id="ntab-dsa">🔣 DSA Patterns</button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="notes-search-bar">
+      <input type="text" id="notes-search-input" class="notes-search-input" placeholder="🔍 Search across all notes..." oninput="searchAllNotes(this.value)">
+      <span style="font-size:11px; color:var(--text-muted);" id="notes-search-status">9 subjects</span>
+    </div>
+
+    <!-- Formatting Toolbar -->
+    <div class="notes-editor-toolbar">
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('**bold**')">B</button>
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('`code`')" style="font-style:italic;">code</button>
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('\n• ')">• List</button>
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('\n## ')">## H2</button>
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('\n→ ')">→ Arrow</button>
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('\n✅ ')">✅ Done</button>
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('\n❌ ')">❌ Wrong</button>
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('\n⚡ IMPORTANT: ')">⚡ Key</button>
+      <button class="notes-fmt-btn" onclick="insertNoteFormatting('\nFormula: O(N log N)')">f(x)</button>
+    </div>
+
+    <!-- Notes Textarea -->
+    <textarea id="notes-main-textarea" class="notes-textarea" placeholder="Start typing your notes da! Everything auto-saves to your browser...
+
+## OS — Process Scheduling
+• FCFS: No preemption, convoy effect possible
+• SRTF: Optimal avg waiting time
+• Round Robin: q = 2ms for GATE problems
+
+⚡ IMPORTANT: Banker's Algorithm = Safety Algorithm + Resource Request Algorithm"></textarea>
+
+    <!-- Word / Char Count -->
+    <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:11px; color:var(--text-muted);">
+      <span id="notes-current-subject-label">📘 Current: Operating Systems</span>
+      <span id="notes-char-count">0 chars</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 2 — FEATURE 3: COMPANY BATTLE BOARD (KANBAN)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="battle-board-modal">
+  <div class="modal modal-tall" style="max-width:1060px;">
+    <button class="modal-close" data-close="battle-board-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span>🏆</span> Company Battle Board
+        <span class="badge-pill" style="font-size:10px; background:rgba(74,222,128,0.12); color:var(--success); border:1px solid rgba(74,222,128,0.25);" id="bb-total-badge">8 Companies Tracked</span>
+      </div>
+      <button class="action-btn" onclick="openAddCompanyForm()" style="font-size:12px; padding:6px 14px; background:var(--primary); color:#fff; border:none;">+ Add Company</button>
+    </div>
+    <div class="modal-subtitle">Competitive application pipeline da! Track every company from wishlist to offer.</div>
+
+    <!-- Add Company Form (collapsible) -->
+    <div id="add-company-form" style="display:none; background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:14px; margin-bottom:14px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:8px; align-items:end;">
+        <div>
+          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Company</label>
+          <input type="text" id="bb-new-company" class="form-input" placeholder="e.g. Freshworks" style="font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Role</label>
+          <input type="text" id="bb-new-role" class="form-input" placeholder="e.g. SDE Intern" style="font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Package</label>
+          <input type="text" id="bb-new-pkg" class="form-input" placeholder="e.g. 18 LPA" style="font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px;">Tier</label>
+          <select id="bb-new-tier" class="form-input" style="font-size:12px;">
+            <option value="dream">🔴 Dream</option>
+            <option value="target">🟡 Target</option>
+            <option value="backup">🟢 Backup</option>
+          </select>
+        </div>
+        <button class="submit-btn" onclick="addBattleBoardCompany()" style="padding:8px 16px; font-size:12px;">Add</button>
+      </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="kanban-board" id="kanban-board-container">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 2 — FEATURE 4: WEEKLY PDF REPORT GENERATOR
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="weekly-report-modal">
+  <div class="modal modal-tall" style="max-width:780px;">
+    <button class="modal-close" data-close="weekly-report-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span>📊</span> Weekly PDF Report Generator
+        <span class="badge-pill" style="font-size:10px; background:rgba(99,216,255,0.12); color:var(--primary); border:1px solid rgba(99,216,255,0.25);">Week 4 of 13</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="action-btn" onclick="copyWeeklyShareText()" style="font-size:12px; padding:6px 12px;">📋 Copy Share Text</button>
+        <button class="action-btn" onclick="printWeeklyReport()" style="font-size:12px; padding:6px 12px; background:var(--primary); color:#fff; border:none;">🖨️ Export PDF</button>
+      </div>
+    </div>
+    <div class="modal-subtitle">Your weekly performance scorecard. Reflection + accountability = 2x improvement speed.</div>
+
+    <!-- Printable Zone -->
+    <div id="weekly-report-printable" class="weekly-report-printable" style="background:transparent;">
+      <!-- KPI stats row -->
+      <div class="weekly-report-grid" id="wr-stats-row">
+        <!-- Populated via JS -->
+      </div>
+
+      <!-- Subject Breakdown -->
+      <div style="font-size:12px; font-weight:800; color:#fff; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">
+        📚 Subject-wise Study Breakdown (This Week)
+      </div>
+      <div id="wr-subject-breakdown" style="display:flex; flex-direction:column; gap:0;">
+        <!-- Populated via JS -->
+      </div>
+
+      <!-- GATE Mock Trend -->
+      <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:14px;">
+          <div style="font-size:11px; font-weight:800; color:var(--primary); margin-bottom:8px;">⚡ GATE Mock Score Trend</div>
+          <div id="wr-gate-trend" style="font-size:12px; color:var(--text-sub); line-height:1.8;">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:14px;">
+          <div style="font-size:11px; font-weight:800; color:var(--warning); margin-bottom:8px;">🧠 Weak Areas Flagged</div>
+          <div id="wr-weak-areas" style="font-size:12px; color:var(--text-sub); line-height:1.8;">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Shareable Text Box -->
+      <div style="font-size:12px; font-weight:800; color:#fff; margin:16px 0 6px;">📣 Shareable Progress Update:</div>
+      <div class="wr-share-box" id="wr-share-text">Generating your report...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 2 — FEATURE 5: DAILY MOTIVATION & TANGLISH MENTOR ENGINE
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="motivation-modal">
+  <div class="modal" style="max-width:620px;">
+    <button class="modal-close" data-close="motivation-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; gap:10px;">
+      <span>🔥</span> Daily Motivation & Streak Engine
+      <span class="badge-pill" style="font-size:10px; background:rgba(255,179,0,0.15); color:var(--warning); border:1px solid rgba(255,179,0,0.3);">Day 27 🔥</span>
+    </div>
+    <div class="modal-subtitle">Your daily dose of Tanglish energy, a micro-challenge, and your 90-day streak heatmap.</div>
+
+    <!-- Quote Card -->
+    <div class="motivation-quote-card" id="motivation-quote-block">
+      <div class="motivation-quote-text" id="motive-quote-text">Loading your daily dose...</div>
+      <div class="motivation-quote-attr" id="motive-quote-attr">— GT Mentor</div>
+    </div>
+
+    <!-- Shuffle Quote Button -->
+    <div style="text-align:center; margin:10px 0;">
+      <button class="action-btn" onclick="shuffleMotivationQuote()" style="font-size:12px; padding:6px 16px;">🔀 New Quote</button>
+    </div>
+
+    <!-- Daily Challenge -->
+    <div class="motivation-challenge-card" id="motivation-challenge-block">
+      <div class="motivation-challenge-label">⚡ Today's Micro-Challenge</div>
+      <div class="motivation-challenge-text" id="motive-challenge-text">Loading challenge...</div>
+    </div>
+
+    <!-- 90-Day Streak Heatmap -->
+    <div style="margin-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span style="font-size:12px; font-weight:800; color:#fff;">🗓️ 90-Day Study Streak</span>
+        <span style="font-size:11px; color:var(--success);" id="motive-streak-label">27 days active</span>
+      </div>
+      <div class="streak-heatmap-grid" id="motive-heatmap"></div>
+      <div style="display:flex; align-items:center; gap:6px; margin-top:4px; font-size:10px; color:var(--text-muted);">
+        <span>Less</span>
+        <div style="width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.05);"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:rgba(108,99,255,0.2);"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:rgba(108,99,255,0.45);"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:rgba(108,99,255,0.7);"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:var(--primary);"></div>
+        <span>More</span>
+      </div>
+    </div>
+
+    <!-- XP Badge Shelf -->
+    <div style="margin-top:14px;">
+      <div style="font-size:12px; font-weight:800; color:#fff; margin-bottom:8px;">🏅 Milestones Unlocked</div>
+      <div class="badge-shelf" id="motive-badge-shelf">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 2 — FEATURE 6: SLEEP MODE 10 PM LOCKDOWN OVERLAY
+     ══════════════════════════════════════════════════════════════ -->
+<div class="sleep-mode-overlay" id="sleep-mode-overlay" role="dialog" aria-modal="true">
+  <div class="sleep-stars" id="sleep-stars-container"></div>
+  <div class="sleep-moon">🌙</div>
+  <div class="sleep-title">Nalla Thoongu da! 🌙</div>
+  <div class="sleep-sub">
+    10:00 PM aayiduchu Tamizh! Brain-uh sleep-la memories consolidate pannum.
+    Tomorrow 7 AM-la fresh-ah start pannalam. Rest is part of the plan da! 💤
+  </div>
+  <div class="sleep-action-row">
+    <button class="sleep-snooze-btn" id="sleep-snooze-btn" onclick="snoozeSleepMode()">
+      ⏰ Snooze 15 min <span id="sleep-snooze-remaining">(1 left)</span>
+    </button>
+    <button class="sleep-dismiss-btn" onclick="dismissSleepMode()">
+      ⚠️ Override (Not Recommended)
+    </button>
+  </div>
+  <div style="position:relative; z-index:1; margin-top:20px; font-size:11px; color:rgba(255,255,255,0.3);">
+    "Consistency beats intensity every single time. Sleep and return stronger." — GT Mentor
   </div>
 </div>
 

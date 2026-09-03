@@ -1213,3 +1213,748 @@ window.scanJobDescriptionKeywords = function () {
 
   if (typeof showToast === 'function') showToast('Resume scan complete: ' + pct + '% ATS match!', 'success');
 };
+
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 2 — FEATURE 1: POMODORO FOCUS TIMER STUDIO
+// ══════════════════════════════════════════════════════════════
+(function () {
+  let pomoWorkMin = 25;
+  let pomoBreakMin = 5;
+  let pomoTotalSec = 25 * 60;
+  let pomoRemainSec = pomoTotalSec;
+  let pomoIsRunning = false;
+  let pomoIsBreak = false;
+  let pomoIntervalId = null;
+  let pomoSessionsToday = 0;
+  let pomoTotalFocusMin = 0;
+  let pomoCurrentDot = 0;
+  const POMO_STORAGE_KEY = 'gt_pomo_stats';
+  const POMO_RING_CIRCUMFERENCE = 502;
+
+  function loadPomoStats () {
+    try {
+      const saved = JSON.parse(localStorage.getItem(POMO_STORAGE_KEY) || '{}');
+      const today = new Date().toDateString();
+      if (saved.date === today) {
+        pomoSessionsToday = saved.sessions || 0;
+        pomoTotalFocusMin = saved.focusMin || 0;
+      }
+    } catch (e) {}
+  }
+
+  function savePomoStats () {
+    try {
+      localStorage.setItem(POMO_STORAGE_KEY, JSON.stringify({
+        date: new Date().toDateString(),
+        sessions: pomoSessionsToday,
+        focusMin: pomoTotalFocusMin
+      }));
+    } catch (e) {}
+  }
+
+  function updatePomoDisplay () {
+    const m = Math.floor(pomoRemainSec / 60);
+    const s = pomoRemainSec % 60;
+    const digits = document.getElementById('pomo-digits');
+    const label = document.getElementById('pomo-phase-label');
+    const arc = document.getElementById('pomo-ring-arc');
+    const ring = document.getElementById('pomo-ring-container');
+    if (digits) digits.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    if (label) label.textContent = pomoIsBreak ? 'BREAK ☕' : 'FOCUS 🧠';
+    if (arc) {
+      const progress = pomoRemainSec / pomoTotalSec;
+      arc.style.strokeDashoffset = POMO_RING_CIRCUMFERENCE * (1 - progress);
+      if (pomoIsBreak) {
+        arc.classList.add('break-mode');
+      } else {
+        arc.classList.remove('break-mode');
+      }
+    }
+    if (ring) ring.classList.toggle('running', pomoIsRunning);
+
+    const statsSession = document.getElementById('pomo-stat-sessions');
+    const statsFocus = document.getElementById('pomo-stat-focus-time');
+    if (statsSession) statsSession.textContent = String(pomoSessionsToday);
+    if (statsFocus) {
+      const h = Math.floor(pomoTotalFocusMin / 60);
+      const mm = pomoTotalFocusMin % 60;
+      statsFocus.textContent = h + 'h ' + mm + 'm';
+    }
+    document.title = (pomoIsRunning ? (pomoIsBreak ? '☕ ' : '🧠 ') + m + ':' + String(s).padStart(2, '0') + ' — ' : '') + 'GT Study Mentor Pro';
+  }
+
+  function playPomoAlert (isBreak) {
+    if (window.speechSynthesis) {
+      const msgs = isBreak
+        ? ['Break time da! Oru 5 minute rest edukka. Water kudikka, eyes rest pannunga!', 'Nee super-ah pannittu irukka da! Oru short break edukku.']
+        : ['Focus time again da! Lock in aagu, let\'s go!', 'Break mudinjiduchu! GATE syllabus back on track da!'];
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      const utt = new SpeechSynthesisUtterance(msg);
+      utt.lang = 'en-IN';
+      utt.rate = 0.95;
+      window.speechSynthesis.speak(utt);
+    }
+    if (typeof showToast === 'function') {
+      showToast(isBreak ? '☕ Break time da! Rest pannunga!' : '🧠 Focus session starting again!', 'success');
+    }
+  }
+
+  function tickPomo () {
+    if (pomoRemainSec > 0) {
+      pomoRemainSec--;
+      updatePomoDisplay();
+    } else {
+      // Session completed
+      clearInterval(pomoIntervalId);
+      pomoIsRunning = false;
+      if (!pomoIsBreak) {
+        // Work session done
+        pomoSessionsToday++;
+        pomoTotalFocusMin += pomoWorkMin;
+        pomoCurrentDot = Math.min(pomoCurrentDot + 1, 4);
+        for (let i = 0; i < 4; i++) {
+          const dot = document.getElementById('pomo-dot-' + i);
+          if (dot) dot.classList.toggle('filled', i < pomoCurrentDot);
+        }
+        savePomoStats();
+        playPomoAlert(true);
+        // Auto-start break
+        pomoIsBreak = true;
+        pomoTotalSec = pomoBreakMin * 60;
+        pomoRemainSec = pomoTotalSec;
+      } else {
+        playPomoAlert(false);
+        if (pomoCurrentDot >= 4) {
+          pomoCurrentDot = 0;
+          for (let i = 0; i < 4; i++) {
+            const dot = document.getElementById('pomo-dot-' + i);
+            if (dot) dot.classList.remove('filled');
+          }
+          if (typeof showToast === 'function') showToast('🏆 4 sessions done! Long break edukku da!', 'success');
+        }
+        pomoIsBreak = false;
+        pomoTotalSec = pomoWorkMin * 60;
+        pomoRemainSec = pomoTotalSec;
+      }
+      const btn = document.getElementById('pomo-start-btn');
+      if (btn) btn.textContent = '▶ Start ' + (pomoIsBreak ? 'Break' : 'Focus');
+      updatePomoDisplay();
+    }
+  }
+
+  window.initPomoTimer = function () {
+    loadPomoStats();
+    updatePomoDisplay();
+    const btn = document.getElementById('pomo-start-btn');
+    if (btn) btn.textContent = '▶ Start Focus';
+  };
+
+  window.togglePomoTimer = function () {
+    const btn = document.getElementById('pomo-start-btn');
+    if (pomoIsRunning) {
+      clearInterval(pomoIntervalId);
+      pomoIsRunning = false;
+      if (btn) btn.textContent = '▶ Resume ' + (pomoIsBreak ? 'Break' : 'Focus');
+    } else {
+      pomoIsRunning = true;
+      pomoIntervalId = setInterval(tickPomo, 1000);
+      if (btn) btn.textContent = '⏸ Pause';
+    }
+    updatePomoDisplay();
+  };
+
+  window.resetPomoTimer = function () {
+    clearInterval(pomoIntervalId);
+    pomoIsRunning = false;
+    pomoIsBreak = false;
+    pomoRemainSec = pomoTotalSec;
+    const btn = document.getElementById('pomo-start-btn');
+    if (btn) btn.textContent = '▶ Start Focus';
+    updatePomoDisplay();
+  };
+
+  window.setPomoMode = function (workMin, breakMin, label) {
+    clearInterval(pomoIntervalId);
+    pomoIsRunning = false;
+    pomoIsBreak = false;
+    pomoWorkMin = workMin;
+    pomoBreakMin = breakMin;
+    pomoTotalSec = workMin * 60;
+    pomoRemainSec = pomoTotalSec;
+    document.querySelectorAll('.pomo-mode-btn').forEach(b => b.classList.remove('active'));
+    const modeMap = { 25: 'pomo-mode-25', 50: 'pomo-mode-50', 90: 'pomo-mode-90' };
+    const activBtn = document.getElementById(modeMap[workMin]);
+    if (activBtn) activBtn.classList.add('active');
+    const btn = document.getElementById('pomo-start-btn');
+    if (btn) btn.textContent = '▶ Start Focus';
+    updatePomoDisplay();
+  };
+
+  window.openPomodoroModal = function () {
+    if (typeof openModal === 'function') openModal('pomodoro-modal');
+    window.initPomoTimer();
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 2 — FEATURE 2: SUBJECT NOTES VAULT
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const NOTES_KEY = 'gt_notes_vault_v1';
+  const SUBJECT_NAMES = {
+    os: 'Operating Systems', dbms: 'DBMS', cn: 'Computer Networks',
+    toc: 'Theory of Computation', co: 'Computer Organization',
+    algo: 'Algorithms & Data Structures', dm: 'Discrete Mathematics',
+    em: 'Engineering Mathematics', dsa: 'DSA Patterns (Striver A2Z)'
+  };
+  let currentSubject = 'os';
+  let autoSaveTimer = null;
+
+  function loadAllNotes () {
+    try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch (e) { return {}; }
+  }
+  function saveAllNotes (notes) {
+    try { localStorage.setItem(NOTES_KEY, JSON.stringify(notes)); } catch (e) {}
+  }
+  function updateCharCount (text) {
+    const el = document.getElementById('notes-char-count');
+    if (el) el.textContent = text.length + ' chars';
+  }
+  function showAutosaved () {
+    const pill = document.getElementById('notes-autosave-indicator');
+    if (pill) { pill.textContent = '✓ Saved ' + new Date().toLocaleTimeString(); }
+  }
+
+  window.initNotesVault = function () {
+    const notes = loadAllNotes();
+    const ta = document.getElementById('notes-main-textarea');
+    const label = document.getElementById('notes-current-subject-label');
+    if (ta) {
+      ta.value = notes[currentSubject] || '';
+      updateCharCount(ta.value);
+      ta.oninput = function () {
+        updateCharCount(ta.value);
+        const pill = document.getElementById('notes-autosave-indicator');
+        if (pill) pill.textContent = '💾 Saving...';
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => {
+          const allNotes = loadAllNotes();
+          allNotes[currentSubject] = ta.value;
+          saveAllNotes(allNotes);
+          showAutosaved();
+        }, 800);
+      };
+    }
+    if (label) label.textContent = '📘 Current: ' + (SUBJECT_NAMES[currentSubject] || currentSubject);
+  };
+
+  window.switchNoteSubject = function (subj) {
+    // Save current subject first
+    const ta = document.getElementById('notes-main-textarea');
+    if (ta) {
+      const allNotes = loadAllNotes();
+      allNotes[currentSubject] = ta.value;
+      saveAllNotes(allNotes);
+    }
+    currentSubject = subj;
+    // Update tab highlights
+    document.querySelectorAll('.notes-subj-tab').forEach(b => b.classList.remove('active'));
+    const activeTab = document.getElementById('ntab-' + subj);
+    if (activeTab) activeTab.classList.add('active');
+    // Load new content
+    const notes = loadAllNotes();
+    if (ta) {
+      ta.value = notes[subj] || '';
+      updateCharCount(ta.value);
+    }
+    const label = document.getElementById('notes-current-subject-label');
+    if (label) label.textContent = '📘 Current: ' + (SUBJECT_NAMES[subj] || subj);
+    showAutosaved();
+  };
+
+  window.insertNoteFormatting = function (text) {
+    const ta = document.getElementById('notes-main-textarea');
+    if (!ta) return;
+    const start = ta.selectionStart;
+    ta.value = ta.value.substring(0, start) + text + ta.value.substring(ta.selectionEnd);
+    ta.selectionStart = ta.selectionEnd = start + text.length;
+    ta.focus();
+    ta.dispatchEvent(new Event('input'));
+  };
+
+  window.exportCurrentNote = function () {
+    const ta = document.getElementById('notes-main-textarea');
+    const content = ta ? ta.value : '';
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'GT_Notes_' + (SUBJECT_NAMES[currentSubject] || currentSubject).replace(/\s+/g, '_') + '.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    if (typeof showToast === 'function') showToast('📥 Notes exported as .txt file!', 'success');
+  };
+
+  window.clearCurrentNote = function () {
+    if (!confirm('Clear all notes for ' + (SUBJECT_NAMES[currentSubject] || currentSubject) + '?')) return;
+    const ta = document.getElementById('notes-main-textarea');
+    if (ta) { ta.value = ''; ta.dispatchEvent(new Event('input')); }
+    if (typeof showToast === 'function') showToast('🗑 Notes cleared da!', 'warning');
+  };
+
+  window.searchAllNotes = function (query) {
+    const status = document.getElementById('notes-search-status');
+    if (!query.trim()) {
+      if (status) status.textContent = '9 subjects';
+      return;
+    }
+    const notes = loadAllNotes();
+    const matches = Object.keys(SUBJECT_NAMES).filter(k => (notes[k] || '').toLowerCase().includes(query.toLowerCase()));
+    if (status) status.textContent = matches.length + ' match' + (matches.length !== 1 ? 'es' : '') + ' found';
+    if (matches.length > 0 && matches[0] !== currentSubject) {
+      window.switchNoteSubject(matches[0]);
+    }
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 2 — FEATURE 3: COMPANY BATTLE BOARD (KANBAN PIPELINE)
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const BB_KEY = 'gt_battle_board_v1';
+  const COLUMNS = [
+    { id: 'wishlist', label: '⭐ Wishlist', color: '#818CF8' },
+    { id: 'applied', label: '📬 Applied', color: '#63D8FF' },
+    { id: 'oa', label: '💻 OA Round', color: '#FBBF24' },
+    { id: 'interview', label: '🎤 Interview', color: '#FF8C42' },
+    { id: 'offer', label: '🏆 Offer/Reject', color: '#4ADE80' }
+  ];
+  const DEFAULT_COMPANIES = [
+    { id: 'amazon', logo: '📦', name: 'Amazon', role: 'SDE Intern', pkg: '40 LPA', tier: 'dream', status: 'wishlist' },
+    { id: 'google', logo: '🔍', name: 'Google', role: 'STEP Intern', pkg: '45 LPA', tier: 'dream', status: 'wishlist' },
+    { id: 'zoho', logo: '🟣', name: 'Zoho', role: 'Software Engineer', pkg: '10 LPA', tier: 'backup', status: 'applied' },
+    { id: 'tcs', logo: '🔵', name: 'TCS NQT', role: 'System Engineer', pkg: '7 LPA', tier: 'backup', status: 'oa' },
+    { id: 'freshworks', logo: '🌿', name: 'Freshworks', role: 'SDE Intern', pkg: '18 LPA', tier: 'target', status: 'wishlist' },
+    { id: 'juspay', logo: '💳', name: 'Juspay', role: 'SDE', pkg: '22 LPA', tier: 'target', status: 'applied' },
+    { id: 'infosys', logo: '🔷', name: 'Infosys', role: 'Systems Engineer', pkg: '6.5 LPA', tier: 'backup', status: 'wishlist' },
+    { id: 'wipro', logo: '🟤', name: 'Wipro Turbo', role: 'Project Engineer', pkg: '6.5 LPA', tier: 'backup', status: 'wishlist' }
+  ];
+
+  function loadBoard () {
+    try {
+      const saved = JSON.parse(localStorage.getItem(BB_KEY));
+      return saved && Array.isArray(saved) ? saved : DEFAULT_COMPANIES;
+    } catch (e) { return DEFAULT_COMPANIES; }
+  }
+  function saveBoard (companies) {
+    try { localStorage.setItem(BB_KEY, JSON.stringify(companies)); } catch (e) {}
+  }
+
+  window.renderBattleBoard = function () {
+    const container = document.getElementById('kanban-board-container');
+    if (!container) return;
+    const companies = loadBoard();
+    container.innerHTML = COLUMNS.map(col => {
+      const cards = companies.filter(c => c.status === col.id);
+      const cardHTML = cards.map(c => `
+        <div class="kanban-card" onclick="moveBattleCard('${c.id}')">
+          <span class="kanban-tier-pill kanban-tier-${c.tier}">${c.tier === 'dream' ? '🔴 Dream' : c.tier === 'target' ? '🟡 Target' : '🟢 Backup'}</span>
+          <div class="kanban-card-logo">${c.logo}</div>
+          <div class="kanban-card-company">${c.name}</div>
+          <div class="kanban-card-role">${c.role}</div>
+          <div class="kanban-card-pkg">💰 ${c.pkg}</div>
+        </div>
+      `).join('');
+      return `
+        <div class="kanban-col">
+          <div class="kanban-col-header" style="color:${col.color};">
+            ${col.label}
+            <span class="kanban-count-badge">${cards.length}</span>
+          </div>
+          ${cardHTML}
+          <button class="kanban-add-btn" onclick="openAddCompanyForm()">+ Add</button>
+        </div>
+      `;
+    }).join('');
+    const badge = document.getElementById('bb-total-badge');
+    if (badge) badge.textContent = companies.length + ' Companies Tracked';
+  };
+
+  window.moveBattleCard = function (id) {
+    const companies = loadBoard();
+    const idx = companies.findIndex(c => c.id === id);
+    if (idx < 0) return;
+    const statusOrder = ['wishlist', 'applied', 'oa', 'interview', 'offer'];
+    const currentIdx = statusOrder.indexOf(companies[idx].status);
+    if (currentIdx < statusOrder.length - 1) {
+      companies[idx].status = statusOrder[currentIdx + 1];
+      if (typeof showToast === 'function') {
+        showToast('✅ ' + companies[idx].name + ' moved to ' + COLUMNS[currentIdx + 1].label, 'success');
+      }
+    } else {
+      if (typeof showToast === 'function') showToast('🎉 ' + companies[idx].name + ' is at final stage!', 'success');
+    }
+    saveBoard(companies);
+    window.renderBattleBoard();
+  };
+
+  window.openAddCompanyForm = function () {
+    const form = document.getElementById('add-company-form');
+    if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  };
+
+  window.addBattleBoardCompany = function () {
+    const name = (document.getElementById('bb-new-company')?.value || '').trim();
+    const role = (document.getElementById('bb-new-role')?.value || '').trim();
+    const pkg = (document.getElementById('bb-new-pkg')?.value || '').trim();
+    const tier = document.getElementById('bb-new-tier')?.value || 'target';
+    if (!name) {
+      if (typeof showToast === 'function') showToast('Company name kodu da!', 'warning');
+      return;
+    }
+    const companies = loadBoard();
+    const emojiMap = { dream: '🎯', target: '⭐', backup: '📌' };
+    companies.push({
+      id: 'c' + Date.now(),
+      logo: emojiMap[tier] || '🏢',
+      name, role: role || 'SDE', pkg: pkg || 'TBD',
+      tier, status: 'wishlist'
+    });
+    saveBoard(companies);
+    window.renderBattleBoard();
+    ['bb-new-company', 'bb-new-role', 'bb-new-pkg'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    window.openAddCompanyForm();
+    if (typeof showToast === 'function') showToast('🏢 ' + name + ' added to Battle Board!', 'success');
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 2 — FEATURE 4: WEEKLY PDF REPORT GENERATOR
+// ══════════════════════════════════════════════════════════════
+window.renderWeeklyReport = function () {
+  const weeklyStats = [
+    { val: '38.4 hrs', lbl: 'Study Hours', color: 'var(--primary)' },
+    { val: '92%', lbl: 'FSRS Recall', color: 'var(--success)' },
+    { val: '24 / 28', lbl: 'Tasks Done', color: 'var(--warning)' },
+    { val: '740 / 1000', lbl: 'GATE Mock Avg', color: '#FF8C42' }
+  ];
+  const subjectBreakdown = [
+    { name: 'OS & DBMS', pct: 88 }, { name: 'DSA Patterns', pct: 76 },
+    { name: 'Computer Networks', pct: 64 }, { name: 'TOC & Compilers', pct: 52 },
+    { name: 'Discrete Maths', pct: 68 }, { name: 'Engg Maths', pct: 70 }
+  ];
+  const statsRow = document.getElementById('wr-stats-row');
+  if (statsRow) {
+    statsRow.innerHTML = weeklyStats.map(s => `
+      <div class="wr-stat-card">
+        <div class="wr-stat-val" style="color:${s.color};">${s.val}</div>
+        <div class="wr-stat-lbl">${s.lbl}</div>
+      </div>
+    `).join('');
+  }
+  const breakdown = document.getElementById('wr-subject-breakdown');
+  if (breakdown) {
+    breakdown.innerHTML = subjectBreakdown.map(s => `
+      <div class="wr-subj-row">
+        <span class="wr-subj-name">${s.name}</span>
+        <div class="wr-subj-bar-track"><div class="wr-subj-bar-fill" style="width:${s.pct}%;"></div></div>
+        <span class="wr-subj-pct">${s.pct}%</span>
+      </div>
+    `).join('');
+  }
+  const gateTrend = document.getElementById('wr-gate-trend');
+  if (gateTrend) {
+    gateTrend.innerHTML = [
+      'Mon: 720 / 1000', 'Wed: 738 / 1000', 'Fri: 745 / 1000', 'Sun: 762 / 1000'
+    ].map(t => '<div>📈 ' + t + '</div>').join('');
+  }
+  const weakAreas = document.getElementById('wr-weak-areas');
+  if (weakAreas) {
+    weakAreas.innerHTML = [
+      '❌ TOC: Context-Free Grammars (54%)',
+      '❌ OS: Page Replacement (61%)',
+      '⚠️ CN: TCP Flow Control (68%)'
+    ].map(t => '<div>' + t + '</div>').join('');
+  }
+  const shareText = document.getElementById('wr-share-text');
+  const now = new Date();
+  const weekStr = 'Week ' + Math.ceil(27 / 7) + ' / 13';
+  if (shareText) {
+    shareText.textContent = [
+      '📊 GT Study Mentor Pro — ' + weekStr + ' Report',
+      '━━━━━━━━━━━━━━━━━━━━━━━',
+      '⏱  Study Hours: 38.4 / 42.0 (91% target)',
+      '⚡ GATE Mock: 762/1000 → AIR ~280 (Top 0.3%)',
+      '🧠 FSRS Recall: 92% (48 cards reviewed)',
+      '✅ Tasks: 24/28 completed',
+      '⚠️ Weak: TOC CFG, OS Page Replacement',
+      '━━━━━━━━━━━━━━━━━━━━━━━',
+      '💪 Day 27/90 | Consistent. Getting better every week!'
+    ].join('\n');
+  }
+};
+
+window.copyWeeklyShareText = function () {
+  const shareText = document.getElementById('wr-share-text');
+  if (!shareText) return;
+  navigator.clipboard.writeText(shareText.textContent).then(() => {
+    if (typeof showToast === 'function') showToast('📋 Share text copied to clipboard!', 'success');
+  }).catch(() => {
+    if (typeof showToast === 'function') showToast('Copy failed - select manually da!', 'warning');
+  });
+};
+
+window.printWeeklyReport = function () {
+  window.print();
+};
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 2 — FEATURE 5: DAILY MOTIVATION & TANGLISH ENGINE
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const QUOTES = [
+    { text: 'GATE score fix panra varaikkum thoongadha da. Oru mark difference-la thousands of ranks change aagum!', attr: '— GT Mentor (Tanglish)' },
+    { text: 'Don\'t study hard. Study smart. Oru topic-la 80% mastery than needed — not 100%. Prioritize high-weightage da!', attr: '— Striver\'s Strategy, adapted' },
+    { text: 'Nee class-la pesa maatiyingaley, LeetCode-la solve pannurey — that\'s the SDE edge da!', attr: '— GT Mentor' },
+    { text: 'Consistency is everything. Daily 6 hours for 90 days = 540 hours of pure preparation. Nobody beats that da!', attr: '— GT Mentor' },
+    { text: 'Os, DBMS, CN, TOC — intha 4-um clear-a irundha GATE top 500-la confirm da!', attr: '— GATE Topper Strategy' },
+    { text: 'Resume-la oru good project = 10 interviews. Build something real with what you\'re learning da!', attr: '— GT Mentor' },
+    { text: 'Error message paakardhey learning. Correct-a run aagum pothu satisfaction, aana error correct pannalum satisfaction da!', attr: '— Anonymous Coder' },
+    { text: 'Amazon valambhukku oru LinkedList question solve pannurey nee — that\'s the kind of person they want da!', attr: '— GT Mentor' },
+    { text: 'CGPA matters less than GitHub projects and LeetCode rating in Product companies. Both important da!', attr: '— Industry Wisdom' },
+    { text: 'Weak area-la time invest pannurey strength aagidum. That\'s how GATE toppers break the AIR ceiling da!', attr: '— GT Mentor' },
+    { text: 'Each solved problem adds one brick to your product mindset temple. Keep solving da!', attr: '— GT Mentor' },
+    { text: 'Sleep well. The brain consolidates memories during REM. 10 PM-ley thoongu — it\'s science da, not laziness!', attr: '— Neuroscience, GT Mentor' },
+    { text: 'Oru aayiram questions solve pannalan? Start with Question 1. Today. Right now. da!', attr: '— GT Mentor' },
+    { text: 'System Design = Reading + Drawing + Discussing. Alone-la practice panna mudiyum! Try it da!', attr: '— GT Mentor' },
+    { text: 'GATE 2027 is not a dream — it\'s a 90-day engineering project. You have the blueprint da!', attr: '— GT Mentor' }
+  ];
+
+  const CHALLENGES = [
+    'Explain Binary Search in exactly 30 words to yourself — out loud da! Time: 2 minutes.',
+    'Write the OS Deadlock 4 Coffman conditions from memory. Check. Reattempt if wrong da!',
+    'Solve one easy LeetCode problem on Arrays before closing this app da! 15 minutes.',
+    'Draw the OSI model 7 layers from memory in 90 seconds da!',
+    'Code Bubble Sort in C++ from scratch. No copying da! Just brain + keyboard.',
+    'Explain TCP vs UDP in Tanglish to your imaginary junior da! 60 seconds.',
+    'Apply to ONE company on your Battle Board today — even if it\'s just finding the link da!',
+    'Add 5 bullet points to your Notes Vault on today\'s weakest subject da!',
+    'Solve a Binary Tree Inorder Traversal problem recursively AND iteratively — both da!',
+    'Read ONE system design case study (URL shortener / Rate Limiter) for 20 minutes da!',
+    'Review your Mistake Book entries from this week and pick ONE to fix right now da!',
+    'Type out your 30-second "elevator pitch" as an SDE candidate. Practice out loud da!'
+  ];
+
+  const XP_BADGES = [
+    { icon: '🌅', name: 'First Light', days: 1, unlocked: true },
+    { icon: '🔥', name: '7-Day Fire', days: 7, unlocked: true },
+    { icon: '🧠', name: 'Fortnight Brain', days: 14, unlocked: true },
+    { icon: '⚡', name: 'Month Surge', days: 30, unlocked: false },
+    { icon: '🏆', name: '60-Day Elite', days: 60, unlocked: false },
+    { icon: '🎯', name: '90-Day Legend', days: 90, unlocked: false }
+  ];
+
+  let currentQuoteIndex = 0;
+
+  function getDayIndex () { return 27; } // Current day in 90-day journey
+
+  window.renderMotivationEngine = function () {
+    const dayIdx = getDayIndex();
+    // Daily quote (deterministic by day)
+    currentQuoteIndex = dayIdx % QUOTES.length;
+    renderQuote(currentQuoteIndex);
+
+    // Daily challenge (deterministic by day)
+    const challengeEl = document.getElementById('motive-challenge-text');
+    if (challengeEl) challengeEl.textContent = CHALLENGES[dayIdx % CHALLENGES.length];
+
+    // Streak heatmap
+    const heatmap = document.getElementById('motive-heatmap');
+    if (heatmap) {
+      let cells = '';
+      for (let i = 0; i < 90; i++) {
+        const isStudied = i < dayIdx;
+        const isToday = i === dayIdx - 1;
+        const intensity = isStudied ? (Math.random() > 0.2 ? (Math.random() > 0.4 ? (Math.random() > 0.6 ? 'lvl4' : 'lvl3') : 'lvl2') : 'lvl1') : '';
+        cells += `<div class="streak-heatmap-cell ${intensity} ${isToday ? 'today' : ''}" data-day="Day ${i + 1}" title="Day ${i + 1}${isToday ? ' (Today)' : ''}"></div>`;
+      }
+      heatmap.innerHTML = cells;
+    }
+
+    const streakLabel = document.getElementById('motive-streak-label');
+    if (streakLabel) streakLabel.textContent = dayIdx + ' days active 🔥';
+
+    // XP Badges
+    const badgeShelf = document.getElementById('motive-badge-shelf');
+    if (badgeShelf) {
+      badgeShelf.innerHTML = XP_BADGES.map(b => {
+        const unlocked = dayIdx >= b.days;
+        return `
+          <div class="xp-badge ${unlocked ? 'unlocked' : ''}">
+            <div class="xp-badge-icon" style="${unlocked ? '' : 'filter:grayscale(1);opacity:0.4;'}">${b.icon}</div>
+            <div class="xp-badge-name">${b.name}</div>
+            <div style="font-size:9px; color:var(--text-muted);">Day ${b.days}</div>
+          </div>
+        `;
+      }).join('');
+    }
+  };
+
+  function renderQuote (idx) {
+    const q = QUOTES[idx % QUOTES.length];
+    const textEl = document.getElementById('motive-quote-text');
+    const attrEl = document.getElementById('motive-quote-attr');
+    if (textEl) textEl.textContent = q.text;
+    if (attrEl) attrEl.textContent = q.attr;
+  }
+
+  window.shuffleMotivationQuote = function () {
+    currentQuoteIndex = (currentQuoteIndex + 1) % QUOTES.length;
+    renderQuote(currentQuoteIndex);
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 2 — FEATURE 6: SLEEP MODE 10 PM LOCKDOWN SYSTEM
+// ══════════════════════════════════════════════════════════════
+(function () {
+  let sleepSnoozeCount = 1;
+  let sleepDismissed = false;
+  let sleepSnoozedUntil = null;
+  let sleepWatcherInterval = null;
+
+  // Build starfield
+  function buildStarfield () {
+    const container = document.getElementById('sleep-stars-container');
+    if (!container || container.children.length > 0) return;
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'sleep-star';
+      const size = Math.random() * 3 + 1;
+      star.style.cssText = [
+        'width:' + size + 'px',
+        'height:' + size + 'px',
+        'left:' + Math.random() * 100 + '%',
+        'top:' + Math.random() * 100 + '%',
+        '--dur:' + (Math.random() * 3 + 2) + 's',
+        '--delay:' + Math.random() * 4 + 's',
+        '--max-op:' + (Math.random() * 0.6 + 0.3)
+      ].join(';');
+      container.appendChild(star);
+    }
+  }
+
+  function showSleepOverlay () {
+    buildStarfield();
+    const overlay = document.getElementById('sleep-mode-overlay');
+    if (overlay) overlay.classList.add('active');
+    if (window.speechSynthesis) {
+      const utt = new SpeechSynthesisUtterance('Nalla thoongu da Tamizh! Brain-uh memories consolidate pannum. Good night!');
+      utt.lang = 'en-IN';
+      window.speechSynthesis.speak(utt);
+    }
+    if (typeof showToast === 'function') showToast('🌙 10 PM — Time to sleep da! Nalla thoongu!', 'warning');
+  }
+
+  function hideSleepOverlay () {
+    const overlay = document.getElementById('sleep-mode-overlay');
+    if (overlay) overlay.classList.remove('active');
+  }
+
+  function updateSleepCountdown () {
+    const now = new Date();
+    // Build sidebar countdown
+    const sidebarEl = document.getElementById('sidebar-sleep-countdown-val');
+    if (sidebarEl) {
+      const target = new Date();
+      target.setHours(22, 0, 0, 0);
+      if (now >= target) {
+        sidebarEl.textContent = 'Sleep time!';
+      } else {
+        const diff = Math.floor((target - now) / 1000);
+        const hh = Math.floor(diff / 3600);
+        const mm = Math.floor((diff % 3600) / 60);
+        const ss = diff % 60;
+        sidebarEl.textContent = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+        const parent = sidebarEl.parentElement;
+        if (parent) parent.classList.toggle('danger', hh === 0 && mm < 30);
+      }
+    }
+
+    if (sleepDismissed) return;
+    if (sleepSnoozedUntil && now < sleepSnoozedUntil) return;
+
+    const h = now.getHours();
+    const m = now.getMinutes();
+    const isAfter10PM = (h === 22 && m === 0) || h > 22;
+    const isBeforeWake = h < 7;
+
+    if (isAfter10PM || isBeforeWake) {
+      const overlay = document.getElementById('sleep-mode-overlay');
+      if (overlay && !overlay.classList.contains('active')) {
+        showSleepOverlay();
+      }
+    } else {
+      hideSleepOverlay();
+      sleepDismissed = false;
+    }
+  }
+
+  window.snoozeSleepMode = function () {
+    const btn = document.getElementById('sleep-snooze-btn');
+    const remaining = document.getElementById('sleep-snooze-remaining');
+    if (sleepSnoozeCount <= 0) {
+      if (typeof showToast === 'function') showToast('No more snoozes da! Go to sleep! 🌙', 'warning');
+      return;
+    }
+    sleepSnoozeCount--;
+    sleepSnoozedUntil = new Date(Date.now() + 15 * 60 * 1000);
+    hideSleepOverlay();
+    if (remaining) remaining.textContent = sleepSnoozeCount > 0 ? '(' + sleepSnoozeCount + ' left)' : '(none left)';
+    if (btn) btn.disabled = sleepSnoozeCount <= 0;
+    if (typeof showToast === 'function') showToast('⏰ Snoozed 15 minutes. Then sleep promise da! 🌙', 'warning');
+  };
+
+  window.dismissSleepMode = function () {
+    if (!confirm('Are you sure da? Sleep is NON-NEGOTIABLE. Your brain needs this rest! Override anyway?')) return;
+    sleepDismissed = true;
+    hideSleepOverlay();
+    if (typeof showToast === 'function') showToast('⚠️ Override logged. Please sleep soon da!', 'warning');
+  };
+
+  // Initialize watcher on DOMContentLoaded
+  function initSleepWatcher () {
+    buildStarfield();
+    updateSleepCountdown();
+    sleepWatcherInterval = setInterval(updateSleepCountdown, 30000); // Check every 30s
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSleepWatcher);
+  } else {
+    setTimeout(initSleepWatcher, 500);
+  }
+
+  // Also initialize motivation on page load
+  setTimeout(function () {
+    if (typeof renderMotivationEngine === 'function') {
+      // Auto-show motivation if first visit today
+      try {
+        const lastMotivation = localStorage.getItem('gt_last_motivation_date');
+        const today = new Date().toDateString();
+        if (lastMotivation !== today) {
+          localStorage.setItem('gt_last_motivation_date', today);
+          // Subtle toast, not intrusive full modal
+          if (typeof showToast === 'function') {
+            setTimeout(() => showToast('🔥 Your daily Tanglish motivation is ready! Click "Daily Motivation" da!', 'success'), 2000);
+          }
+        }
+      } catch (e) {}
+    }
+  }, 1500);
+})();
+
