@@ -99,6 +99,130 @@
       </div>
 
       <!-- ══ STUDIO FILTER & LIVE SEARCH BAR (UI/UX REDESIGN) ══ -->
+      <div class="v2-command-card greeting-hero-card" id="greeting-hero">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+          <div style="flex:1; min-width:0;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <div style="font-size:11px; font-weight:800; color:var(--primary); letter-spacing:1px; text-transform:uppercase;" id="greeting-day-label">
+                Day 27 / 90 • Phase 1 (Foundation)
+              </div>
+              <span class="greeting-streak-badge" id="greeting-streak-badge">Ã°Å¸â€Â¥ 7 Day Streak</span>
+              <span class="greeting-xp-badge" id="greeting-xp-badge">⚡ 2450 XP · Lv.8</span>
+            </div>
+            <h2 class="greeting-hero-title" id="greeting-hero-title">
+              Good Morning, Tamizh! 🌅
+            </h2>
+            <p class="greeting-hero-quote" id="greeting-hero-quote">
+              "Consistency beats intensity da — every day you show up, you compound!"
+            </p>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:11px; color:var(--text-muted);">Today's Target</div>
+            <div style="font-size:2.2rem; font-weight:900; color:var(--primary); font-family:var(--font-display);">
+              6 HOURS
+            </div>
+            <div style="font-size:12px; color:var(--success);" id="home-completed-time-label">
+              Completed: 3h 42m • Remaining: 2h 18m
+            </div>
+          </div>
+        </div>
+
+        <!-- 90-Day Progress Bar -->
+        <div style="margin:20px 0 10px;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:6px;">
+            <span>90-Day Timeline Progress</span>
+            <span style="color:#fff; font-weight:700;">Day 27 / 90 (30%)</span>
+          </div>
+          <div style="width:100%; height:10px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden;">
+            <div style="width:30%; height:100%; background:linear-gradient(90deg, var(--primary), #6C63FF); border-radius:5px;"></div>
+          </div>
+        </div>
+
+        <!-- Four Preparation Tracks Summary Pills -->
+        <!-- Four Preparation Tracks Summary KPI Cards (MagicPatterns Style) -->
+        <div class="magic-kpi-grid">
+          <!-- GATE 2027 -->
+          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'gate')">
+            <div class="magic-kpi-top">
+              <span class="magic-kpi-label">⚡ GATE 2027</span>
+              <span class="magic-trend-pill pos">↑ +4.2%</span>
+            </div>
+            <div class="magic-kpi-mid">
+              <div class="magic-kpi-val" id="kpi-gate-val">76%</div>
+              <div class="magic-kpi-sparkline">
+                <svg width="56" height="22" viewBox="0 0 56 22">
+                  <path d="M2 18 Q 14 15, 26 16 T 44 6 T 54 3" fill="none" stroke="#63D8FF" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="magic-kpi-footer">
+              <span>12 Core Subjects Active</span>
+              <span style="color:var(--primary); font-weight:700;">71% PYQs</span>
+            </div>
+          </div>
+
+          <!-- Placements -->
+          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'placement')">
+            <div class="magic-kpi-top">
+              <span class="magic-kpi-label">💼 Placements</span>
+              <span class="magic-trend-pill pos">↑ +6.8%</span>
+            </div>
+            <div class="magic-kpi-mid">
+              <div class="magic-kpi-val" id="kpi-placement-val">78%</div>
+              <div class="magic-kpi-sparkline">
+                <svg width="56" height="22" viewBox="0 0 56 22">
+                  <path d="M2 19 Q 15 17, 28 12 T 46 8 T 54 3" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="magic-kpi-footer">
+              <span>Aptitude &amp; Reasoning</span>
+              <span style="color:var(--success); font-weight:700;">108 Qs</span>
+            </div>
+          </div>
+
+          <!-- Software Eng -->
+          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'swe')">
+            <div class="magic-kpi-top">
+              <span class="magic-kpi-label">💻 Software Eng</span>
+              <span class="magic-trend-pill pos">↑ +5.1%</span>
+            </div>
+            <div class="magic-kpi-mid">
+              <div class="magic-kpi-val" id="kpi-swe-val">81%</div>
+              <div class="magic-kpi-sparkline">
+                <svg width="56" height="22" viewBox="0 0 56 22">
+                  <path d="M2 20 Q 18 17, 30 11 T 44 7 T 54 2" fill="none" stroke="#818CF8" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="magic-kpi-footer">
+              <span>17 DSA Patterns + APIs</span>
+              <span style="color:#818CF8; font-weight:700;">142 Solved</span>
+            </div>
+          </div>
+
+          <!-- Internship -->
+          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'internship')">
+            <div class="magic-kpi-top">
+              <span class="magic-kpi-label">🚀 Internship</span>
+              <span class="magic-trend-pill pos">↑ +8.0%</span>
+            </div>
+            <div class="magic-kpi-mid">
+              <div class="magic-kpi-val" id="kpi-intern-val">68%</div>
+              <div class="magic-kpi-sparkline">
+                <svg width="56" height="22" viewBox="0 0 56 22">
+                  <path d="M2 21 Q 14 17, 26 15 T 42 9 T 54 4" fill="none" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="magic-kpi-footer">
+              <span>Resume: 84/100</span>
+              <span style="color:var(--warning); font-weight:700;">8 Applied</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="studio-hub-header" style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
         <div class="studio-search-bar-wrap" style="position:relative; width:100%;">
           <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:14px; color:var(--text-muted); pointer-events:none;">🔍</span>
@@ -351,129 +475,6 @@
 
 
       <!-- Main Command Card — Animated Time-Aware Greeting -->
-      <div class="v2-command-card greeting-hero-card" id="greeting-hero">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
-          <div style="flex:1; min-width:0;">
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <div style="font-size:11px; font-weight:800; color:var(--primary); letter-spacing:1px; text-transform:uppercase;" id="greeting-day-label">
-                Day 27 / 90 • Phase 1 (Foundation)
-              </div>
-              <span class="greeting-streak-badge" id="greeting-streak-badge">Ã°Å¸â€Â¥ 7 Day Streak</span>
-              <span class="greeting-xp-badge" id="greeting-xp-badge">⚡ 2450 XP · Lv.8</span>
-            </div>
-            <h2 class="greeting-hero-title" id="greeting-hero-title">
-              Good Morning, Tamizh! 🌅
-            </h2>
-            <p class="greeting-hero-quote" id="greeting-hero-quote">
-              "Consistency beats intensity da — every day you show up, you compound!"
-            </p>
-          </div>
-          <div style="text-align:right; flex-shrink:0;">
-            <div style="font-size:11px; color:var(--text-muted);">Today's Target</div>
-            <div style="font-size:2.2rem; font-weight:900; color:var(--primary); font-family:var(--font-display);">
-              6 HOURS
-            </div>
-            <div style="font-size:12px; color:var(--success);" id="home-completed-time-label">
-              Completed: 3h 42m • Remaining: 2h 18m
-            </div>
-          </div>
-        </div>
-
-        <!-- 90-Day Progress Bar -->
-        <div style="margin:20px 0 10px;">
-          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:6px;">
-            <span>90-Day Timeline Progress</span>
-            <span style="color:#fff; font-weight:700;">Day 27 / 90 (30%)</span>
-          </div>
-          <div style="width:100%; height:10px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden;">
-            <div style="width:30%; height:100%; background:linear-gradient(90deg, var(--primary), #6C63FF); border-radius:5px;"></div>
-          </div>
-        </div>
-
-        <!-- Four Preparation Tracks Summary Pills -->
-        <!-- Four Preparation Tracks Summary KPI Cards (MagicPatterns Style) -->
-        <div class="magic-kpi-grid">
-          <!-- GATE 2027 -->
-          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'gate')">
-            <div class="magic-kpi-top">
-              <span class="magic-kpi-label">⚡ GATE 2027</span>
-              <span class="magic-trend-pill pos">↑ +4.2%</span>
-            </div>
-            <div class="magic-kpi-mid">
-              <div class="magic-kpi-val" id="kpi-gate-val">76%</div>
-              <div class="magic-kpi-sparkline">
-                <svg width="56" height="22" viewBox="0 0 56 22">
-                  <path d="M2 18 Q 14 15, 26 16 T 44 6 T 54 3" fill="none" stroke="#63D8FF" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-            <div class="magic-kpi-footer">
-              <span>12 Core Subjects Active</span>
-              <span style="color:var(--primary); font-weight:700;">71% PYQs</span>
-            </div>
-          </div>
-
-          <!-- Placements -->
-          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'placement')">
-            <div class="magic-kpi-top">
-              <span class="magic-kpi-label">💼 Placements</span>
-              <span class="magic-trend-pill pos">↑ +6.8%</span>
-            </div>
-            <div class="magic-kpi-mid">
-              <div class="magic-kpi-val" id="kpi-placement-val">78%</div>
-              <div class="magic-kpi-sparkline">
-                <svg width="56" height="22" viewBox="0 0 56 22">
-                  <path d="M2 19 Q 15 17, 28 12 T 46 8 T 54 3" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-            <div class="magic-kpi-footer">
-              <span>Aptitude &amp; Reasoning</span>
-              <span style="color:var(--success); font-weight:700;">108 Qs</span>
-            </div>
-          </div>
-
-          <!-- Software Eng -->
-          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'swe')">
-            <div class="magic-kpi-top">
-              <span class="magic-kpi-label">💻 Software Eng</span>
-              <span class="magic-trend-pill pos">↑ +5.1%</span>
-            </div>
-            <div class="magic-kpi-mid">
-              <div class="magic-kpi-val" id="kpi-swe-val">81%</div>
-              <div class="magic-kpi-sparkline">
-                <svg width="56" height="22" viewBox="0 0 56 22">
-                  <path d="M2 20 Q 18 17, 30 11 T 44 7 T 54 2" fill="none" stroke="#818CF8" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-            <div class="magic-kpi-footer">
-              <span>17 DSA Patterns + APIs</span>
-              <span style="color:#818CF8; font-weight:700;">142 Solved</span>
-            </div>
-          </div>
-
-          <!-- Internship -->
-          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'internship')">
-            <div class="magic-kpi-top">
-              <span class="magic-kpi-label">🚀 Internship</span>
-              <span class="magic-trend-pill pos">↑ +8.0%</span>
-            </div>
-            <div class="magic-kpi-mid">
-              <div class="magic-kpi-val" id="kpi-intern-val">68%</div>
-              <div class="magic-kpi-sparkline">
-                <svg width="56" height="22" viewBox="0 0 56 22">
-                  <path d="M2 21 Q 14 17, 26 15 T 42 9 T 54 4" fill="none" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-            <div class="magic-kpi-footer">
-              <span>Resume: 84/100</span>
-              <span style="color:var(--warning); font-weight:700;">8 Applied</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- NEXT BEST ACTION BANNER -->
       <div class="v2-next-action-strip">
@@ -626,30 +627,30 @@
   <!-- â”€â”€ FLOATING QUICK-ACTION BAR (Home View Only) â”€â”€ -->
   <div class="floating-qab" id="floating-qab">
     <button class="fqab-btn fqab-pomo" onclick="openModal('pomodoro-modal'); initPomoTimer();" title="Pomodoro Focus Engine">
-      <span class="fqab-icon">⏱️</span>
+      <span class="fqab-icon">&#x23F1;&#xFE0F;</span>
       <span class="fqab-label">Focus</span>
     </button>
     <button class="fqab-btn fqab-battle" onclick="openModal('dsa-battle-modal'); initDSABattle();" title="DSA Battle Arena">
-      <span class="fqab-icon">⚔️</span>
+      <span class="fqab-icon">&#x2694;&#xFE0F;</span>
       <span class="fqab-label">Battle</span>
     </button>
     <button class="fqab-btn fqab-quiz" onclick="openModal('formula-quiz-modal'); initFormulaQuiz();" title="Formula Quiz Blitz">
-      <span class="fqab-icon">⚡</span>
+      <span class="fqab-icon">&#x26A1;</span>
       <span class="fqab-label">Blitz</span>
     </button>
     <button class="fqab-btn fqab-note" onclick="openModal('notes-vault-modal'); initNotesVault();" title="Notes Vault">
-      <span class="fqab-icon">📝</span>
+      <span class="fqab-icon">&#x1F4DD;</span>
       <span class="fqab-label">Notes</span>
     </button>
     <button class="fqab-btn fqab-standup" onclick="openModal('standup-journal-modal'); initStandupJournal();" title="Daily Standup Reflection">
-      <span class="fqab-icon">📔</span>
+      <span class="fqab-icon">&#x1F4D4;</span>
       <span class="fqab-label">Standup</span>
     </button>
     <button class="fqab-btn fqab-mentor" onclick="navigateToView('chat');" title="Ask AI Mentor">
-      <span class="fqab-icon">🤖</span>
+      <span class="fqab-icon">&#x1F916;</span>
       <span class="fqab-label">Mentor</span>
     </button>
-    <button class="fqab-dismiss" onclick="this.parentElement.classList.add('fqab-dismissed');" title="Dismiss Dock">✕</button>
+    <button class="fqab-dismiss" onclick="this.parentElement.classList.add('fqab-dismissed');" title="Dismiss Dock">&#x2715;</button>
   </div>
 
   <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
@@ -1133,11 +1134,11 @@
         <!-- Skilldunia AI Quick Action Pills -->
         <span class="network-status-badge online" id="header-network-badge">Ã¢â€”Â Online</span>
         <span class="role-badge student" id="user-role-badge" title="Click to cycle role (Student / Mentor / Admin)" onclick="cycleUserRole()" style="cursor:pointer;">STUDENT</span>
-        <button class="header-badge-pill" id="hdr-qbank-btn" onclick="openModal('master-question-bank-modal');initQBank();" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.35);color:var(--accent);cursor:pointer;font-weight:700;">
+        <button class="header-badge-pill" id="hdr-qbank-btn" onclick="navigateToView('practice', 'pyq');initQBank();" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.35);color:var(--accent);cursor:pointer;font-weight:700;">
           <svg class="tech-svg-icon neon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
           <span>Question Bank (2000—œNow)</span>
         </button>
-        <button class="header-badge-pill" id="hdr-tracks-btn" onclick="openModal('unified-tracks-hub-modal');initUnifiedTracks();" style="background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(0,212,255,0.2));border:1px solid var(--accent);color:var(--accent);cursor:pointer;font-weight:700;">
+        <button class="header-badge-pill" id="hdr-tracks-btn" onclick="navigateToView('prepare');initUnifiedTracks();" style="background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(0,212,255,0.2));border:1px solid var(--accent);color:var(--accent);cursor:pointer;font-weight:700;">
           <svg class="tech-svg-icon neon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)"/></svg>
           <span>Unified Tracks</span>
         </button>
@@ -1159,7 +1160,7 @@
           <span>Ã°Å¸Å½â„¢Ã¯Â¸Â</span>
           <span>AI Mock</span>
         </button>
-        <button class="header-badge-pill" id="hdr-career-btn" onclick="openModal('career-map-modal');renderCareerMap();" style="background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);color:var(--primary-light);cursor:pointer;">
+        <button class="header-badge-pill" id="hdr-career-btn" onclick="navigateToView('career')" style="background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);color:var(--primary-light);cursor:pointer;">
           <svg class="tech-svg-icon neon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
           <span>Career Map</span>
         </button>
@@ -2517,431 +2518,30 @@ WHERE p.package_lpa >= 10.0;</textarea>
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Skilldunia-Inspired AI Voice Mock Interviewer
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="ai-mock-interview-modal">
-  <div class="modal modal-tall ai-interview-dialog" style="max-width: 860px;">
-    <button class="modal-close" data-close="ai-mock-interview-modal">&#x2715;</button>
-    <div class="modal-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <span>Ã°Å¸Å½â„¢Ã¯Â¸Â</span> AI Voice Mock Interviewer & Evaluation Studio
-      <span class="badge-pill" style="font-size:10px;background:rgba(0,230,118,0.15);color:var(--success);border:1px solid rgba(0,230,118,0.3);padding:2px 8px;border-radius:12px;">Live Audio Waveform</span>
-      <span class="badge-pill" style="font-size:10px;background:rgba(108,99,255,0.15);color:var(--primary-light);border:1px solid rgba(108,99,255,0.3);padding:2px 8px;border-radius:12px;">Skilldunia AI Inspired</span>
-    </div>
-    <div class="modal-subtitle">Role-specific tech interviews with voice interaction, speech recognition, and instant rubric scoring</div>
 
-    <!-- Role Track Selector & Setup -->
-    <div style="display:flex;gap:10px;margin:12px 0;flex-wrap:wrap;align-items:center;">
-      <select id="mock-role-select" class="form-input" style="flex:1;min-width:220px;">
-        <option value="sde_product">Role: SDE-1 / Software Engineer (Amazon, Google, PayPal)</option>
-        <option value="zoho_developer">Role: Core Product Developer (Zoho, Freshworks, Kissflow)</option>
-        <option value="gate_cs_core">Role: GATE CS 2027 Core (OS, DBMS, TOC, Networks)</option>
-        <option value="service_prime">Role: High-Package IT Track (TCS Prime/Digital, Infosys SP)</option>
-      </select>
-      <button class="submit-btn" id="mock-start-new-btn" style="padding:0 18px;">⚡ Generate Question</button>
-    </div>
-
-    <!-- AI Interviewer Dialogue Box -->
-    <div class="mock-dialogue-card" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:18px;">🤖</span>
-          <strong>Skilldunia AI Mentor</strong>
-          <span class="badge-pill" style="font-size:9px;background:rgba(0,230,118,0.2);color:var(--success);">Active Now</span>
-        </div>
-        <button class="icon-btn" id="mock-speak-q-btn" title="Read Question Out Loud" style="font-size:14px;">Ã°Å¸â€Å  Listen</button>
-      </div>
-      <div id="mock-question-display" style="font-size:14px;font-weight:600;color:var(--text);line-height:1.5;min-height:48px;">
-        "Explain how you would handle race conditions in a multi-threaded banking system where two users simultaneously withdraw from the same account."
-      </div>
-    </div>
-
-    <!-- Live Audio Waveform Visualizer (Skilldunia Style) -->
-    <div class="mock-audio-waveform-container" id="mock-waveform-wrap" style="background:#03030a;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;">
-        <span class="mock-record-dot" id="mock-record-dot"></span>
-        <span class="mock-status-text" id="mock-status-text" style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Microphone Standby</span>
-      </div>
-      <div class="mock-waveform-bars" id="mock-waveform-bars" style="display:flex;align-items:center;justify-content:center;gap:3px;height:36px;">
-        <!-- 24 Waveform bars rendered via JS -->
-      </div>
-    </div>
-
-    <!-- Candidate Response Input Area -->
-    <div style="margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <label style="font-size:12px;font-weight:700;color:var(--text-sub);">Your Interview Answer:</label>
-        <button class="action-btn" id="mock-voice-toggle-btn" style="font-size:11px;padding:3px 10px;">Ã°Å¸Å½â„¢Ã¯Â¸Â Start Voice Input</button>
-      </div>
-      <textarea id="mock-answer-input" class="form-input" rows="3" placeholder="Speak into microphone or type your response here... (e.g. 'I would use database row-level locking with SELECT FOR UPDATE or a synchronized block with distributed Redis mutex...')"></textarea>
-    </div>
-
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:14px;">
-      <button class="submit-btn" id="mock-evaluate-btn" style="padding:0 24px;">⚡ Submit Answer for AI Evaluation</button>
-    </div>
-
-    <!-- AI Evaluation Rubric & Feedback Box -->
-    <div class="mock-feedback-box" id="mock-feedback-box" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
-      <!-- Generated via JS -->
-    </div>
-  </div>
-</div>
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Interactive Visual Career Map & Milestones
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="career-map-modal">
-  <div class="modal modal-tall career-map-dialog" style="max-width: 900px;">
-    <button class="modal-close" data-close="career-map-modal">&#x2715;</button>
-    <div class="modal-title" style="display:flex;align-items:center;gap:8px;">
-      <span>Ã°Å¸Â§Â­</span> Interactive Visual Career Map & Milestone Roadmap
-      <span class="badge-pill" style="font-size:10px;background:rgba(0,212,255,0.15);color:var(--accent);border:1px solid rgba(0,212,255,0.3);padding:2px 8px;border-radius:12px;">Skilldunia AI Roadmap</span>
-    </div>
-    <div class="modal-subtitle">Track your progressive journey from learner to tier-1 engineer & GATE 2027 AIR ranker</div>
 
-    <div class="career-progress-summary" style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-      <div>
-        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Overall Career Readiness</div>
-        <div style="font-size:22px;font-weight:900;color:var(--accent);font-family:var(--font-display);" id="career-overall-pct">60% Complete</div>
-      </div>
-      <div style="flex:1;max-width:320px;">
-        <div class="weightage-bar-wrap"><div class="weightage-bar-fill" id="career-progress-bar" style="width:60%;background:linear-gradient(90deg,var(--primary),var(--accent));"></div></div>
-      </div>
-    </div>
-
-    <!-- Career Roadmap Steps Grid -->
-    <div class="career-milestones-grid" id="career-milestones-grid" style="display:flex;flex-direction:column;gap:12px;max-height:460px;overflow-y:auto;">
-      <!-- Generated via JS -->
-    </div>
-  </div>
-</div>
 
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Free Preparation Resources Hub (Skilldunia AI Inspired)
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="free-prep-hub-modal">
-  <div class="modal modal-tall prep-hub-dialog" style="max-width: 960px;">
-    <button class="modal-close" data-close="free-prep-hub-modal">&#x2715;</button>
-    <div class="modal-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <span>Ã°Å¸â€œÅ¡</span> Free Preparation Resources & Skill Assessment Hub
-      <span class="badge-pill" style="font-size:10px;background:rgba(0,230,118,0.15);color:var(--success);border:1px solid rgba(0,230,118,0.3);padding:2px 8px;border-radius:12px;">100% Free Access</span>
-      <span class="badge-pill" style="font-size:10px;background:rgba(108,99,255,0.15);color:var(--primary-light);border:1px solid rgba(108,99,255,0.3);padding:2px 8px;border-radius:12px;">Skilldunia AI Partner</span>
-    </div>
-    <div class="modal-subtitle">Comprehensive tests for Aptitude, Core CS MCQs, Live Coding Challenges, and Company-specific guides</div>
 
-    <!-- Prep Hub Tabs -->
-    <div class="placement-tabs-row" style="margin: 12px 0;">
-      <button class="tab-pill active" id="prep-tab-mcq-btn" onclick="switchPrepTab('mcq')">Ã°Å¸â€œÂ Aptitude & Technical MCQs</button>
-      <button class="tab-pill" id="prep-tab-code-btn" onclick="switchPrepTab('code')">💻 Live Coding Challenges</button>
-      <button class="tab-pill" id="prep-tab-guides-btn" onclick="switchPrepTab('guides')">Ã°Å¸ÂÂ¢ Company Preparation Guides</button>
-    </div>
-
-    <!-- View 1: Aptitude & Technical MCQs -->
-    <div class="prep-tab-view" id="view-prep-mcq" style="display:block;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="state-pill-btn active" id="filter-prep-all" onclick="filterPrepQuizzes('all')">All Domains</button>
-          <button class="state-pill-btn" id="filter-prep-apt" onclick="filterPrepQuizzes('Aptitude')">Quantitative Aptitude</button>
-          <button class="state-pill-btn" id="filter-prep-logic" onclick="filterPrepQuizzes('Logical')">Logical Reasoning</button>
-          <button class="state-pill-btn" id="filter-prep-os" onclick="filterPrepQuizzes('Operating Systems')">Operating Systems</button>
-          <button class="state-pill-btn" id="filter-prep-dbms" onclick="filterPrepQuizzes('DBMS')">DBMS</button>
-          <button class="state-pill-btn" id="filter-prep-cn" onclick="filterPrepQuizzes('Networks')">Computer Networks</button>
-          <button class="state-pill-btn" id="filter-prep-dsa" onclick="filterPrepQuizzes('Algorithms')">DSA</button>
-        </div>
-        <span style="font-size:11px;color:var(--accent);font-weight:700;" id="prep-quiz-count-label">Loading questions...</span>
-      </div>
-      <div id="prep-quizzes-container" style="max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;">
-        <!-- Quizzes populated via JS -->
-      </div>
-    </div>
-
-    <!-- View 2: Live Coding Challenges -->
-    <div class="prep-tab-view" id="view-prep-code" style="display:none;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;">Select Coding Problem:</div>
-          <select id="prep-code-problem-select" class="form-input" onchange="loadCodingProblem()" style="margin-bottom:10px;"></select>
-          <div id="prep-code-desc-box" style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text);line-height:1.5;"></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:12px;font-weight:700;color:var(--text);">JavaScript Solution Editor:</span>
-            <button class="action-btn" onclick="runCodingTest()" style="padding:3px 10px;font-size:11px;background:linear-gradient(135deg,var(--accent),var(--primary));color:#000;font-weight:700;">▶ Run Test Cases</button>
-          </div>
-          <textarea id="prep-code-editor" class="form-input" rows="12" style="font-family:var(--font-mono);font-size:12px;background:#05050f;line-height:1.4;"></textarea>
-          <div id="prep-code-result-box" style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:8px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text-sub);">
-            Ready to test solution...
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- View 3: Company Preparation Guides -->
-    <div class="prep-tab-view" id="view-prep-guides" style="display:none;">
-      <div id="prep-guides-container" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;max-height:420px;overflow-y:auto;">
-        <!-- Guides populated via JS -->
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Unified Multi-Track Master Command Center (v12.0)
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="unified-tracks-hub-modal">
-  <div class="modal modal-tall unified-tracks-dialog" style="max-width: 1040px;">
-    <button class="modal-close" data-close="unified-tracks-hub-modal">&#x2715;</button>
-    <div class="modal-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <span>Ã°Å¸Å’Â</span> Unified Career & Preparation Command Center
-      <span class="badge-pill" style="font-size:10px;background:rgba(108,99,255,0.15);color:var(--primary-light);border:1px solid rgba(108,99,255,0.3);padding:2px 8px;border-radius:12px;">All-in-One Super Track</span>
-      <span class="badge-pill" style="font-size:10px;background:rgba(0,230,118,0.15);color:var(--success);border:1px solid rgba(0,230,118,0.3);padding:2px 8px;border-radius:12px;">GATE 2027 + Placements + SWE</span>
-    </div>
-    <div class="modal-subtitle">Integrated ecosystem synchronizing Placement Prep, GATE CS 2027, Internships, SWE 3-Month Intensive, and Career Decision Matrix</div>
 
-    <!-- Master Tracks Navigation Row -->
-    <div class="placement-tabs-row" style="margin: 12px 0; overflow-x: auto; flex-wrap: nowrap;">
-      <button class="tab-pill active" id="track-btn-placement" onclick="switchUnifiedTrack('placement')">💼 Placement Engine & Puzzles</button>
-      <button class="tab-pill" id="track-btn-gate" onclick="switchUnifiedTrack('gate')">Ã°Å¸Å½â€œ GATE CS 2027 Track</button>
-      <button class="tab-pill" id="track-btn-internship" onclick="switchUnifiedTrack('internship')">🎯 Internship Pipeline</button>
-      <button class="tab-pill" id="track-btn-swe" onclick="switchUnifiedTrack('swe')">⚡ SWE 3-Month Intensive</button>
-      <button class="tab-pill" id="track-btn-decision" onclick="switchUnifiedTrack('decision')">Ã¢Å¡â€“Ã¯Â¸Â Career Decision Matrix</button>
-      <button class="tab-pill" id="track-btn-tree" onclick="switchUnifiedTrack('tree')">Ã°Å¸Å’Â³ Skill Tree & Burnout Monitor</button>
-    </div>
-
-    <!-- TRACK 1: Placement Preparation Engine & Puzzles -->
-    <div class="unified-track-view" id="view-track-placement" style="display:block;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-        <div style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:6px;">🧩 Tech Interview Puzzles & Guesstimates:</div>
-          <div style="font-size:11px;color:var(--text-sub);margin-bottom:10px;">Classic analytical brainteasers frequently asked in Google, Amazon, Adobe, and Goldman Sachs interviews.</div>
-          <div id="track-puzzles-list" style="display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;">
-            <!-- Populated via JS -->
-          </div>
-        </div>
-        <div style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-size:14px;font-weight:800;color:var(--success);margin-bottom:6px;">📅 Campus Hiring Calendar & Windows:</div>
-          <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text-sub);">
-            <div style="background:var(--card);padding:10px;border-radius:4px;border-left:3px solid var(--accent);">
-              <strong style="color:var(--text);">August —œ October (Day 1 / Dream Phase):</strong>
-              <div style="margin-top:2px;">Top Tier-1 Product firms (Google, Microsoft, Amazon, Zoho, PayPal) conduct on-campus coding assessments & day-long hackathons.</div>
-            </div>
-            <div style="background:var(--card);padding:10px;border-radius:4px;border-left:3px solid var(--primary-light);">
-              <strong style="color:var(--text);">November —œ January (SaaS & FinTech Unicorns):</strong>
-              <div style="margin-top:2px;">Unicorn & high-growth product startups (Flipkart, Swiggy, Razorpay, Freshworks) hire for early engineer cohorts.</div>
-            </div>
-            <div style="background:var(--card);padding:10px;border-radius:4px;border-left:3px solid var(--warning);">
-              <strong style="color:var(--text);">February —œ May (Off-Campus Drives & High-Volume IT):</strong>
-              <div style="margin-top:2px;">Mass technical hiring (TCS Prime/Digital, Infosys SP, Cognizant, Accenture) and nationwide off-campus referral portals.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TRACK 2: GATE CS 2027 Dedicated Track -->
-    <div class="unified-track-view" id="view-track-gate" style="display:none;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="state-pill-btn active" id="gate-tab-formulas" onclick="switchGateTrackSub('formulas')">Ã°Å¸â€œÂ Formula Sheets & Quick Notes</button>
-          <button class="state-pill-btn" id="gate-tab-predictor" onclick="switchGateTrackSub('predictor')">Ã°Å¸Â§Â® National Percentile & AIR Rank Simulator</button>
-        </div>
-      </div>
-      <div id="gate-sub-formulas" style="display:block;">
-        <div id="gate-formulas-container" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:10px;max-height:360px;overflow-y:auto;">
-          <!-- Formula cards populated via JS -->
-        </div>
-      </div>
-      <div id="gate-sub-predictor" style="display:none;background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:16px;">
-        <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:8px;">GATE CS Simulated Percentile & College Cutoff Calculator:</div>
-        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
-          <input type="number" id="gate-sim-marks-input" class="form-input" placeholder="Enter Expected Marks (0 - 100)" min="0" max="100" value="68" style="width:220px;">
-          <button class="submit-btn" onclick="calculateGateSimulatedRank()" style="padding:0 20px;">⚡ Simulate AIR & Percentile</button>
-        </div>
-        <div id="gate-sim-results-box" style="background:var(--card);padding:12px;border-radius:4px;font-size:12px;color:var(--text);line-height:1.5;">
-          Click Simulate to view expected All India Rank (AIR), normalized GATE Score, and qualifying IITs/IISc.
-        </div>
-      </div>
-    </div>
-
-    <!-- TRACK 3: Internship Preparation Pipeline -->
-    <div class="unified-track-view" id="view-track-internship" style="display:none;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:6px;">✨ Tailored AI Cover Letter Generator:</div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
-            <input type="text" id="cover-comp-input" class="form-input" placeholder="Company Name (e.g. Google, Zoho, Amazon)" value="Zoho Corporation">
-            <input type="text" id="cover-role-input" class="form-input" placeholder="Target Role (e.g. Software Development Intern)" value="Software Development Engineer Intern">
-            <input type="text" id="cover-skills-input" class="form-input" placeholder="Core Skills (e.g. Java, Data Structures, Spring Boot, React)" value="Java, Data Structures, OOPs, SQL, REST APIs">
-            <button class="submit-btn" onclick="generateCoverLetter()" style="align-self:flex-start;padding:0 16px;">⚡ Generate Tailored Cover Letter</button>
-          </div>
-        </div>
-        <div style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;display:flex;flex-direction:column;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <span style="font-size:13px;font-weight:700;color:var(--text);">Generated Cover Letter:</span>
-            <button class="action-btn" onclick="copyCoverLetter()" style="padding:2px 8px;font-size:11px;">📋 Copy</button>
-          </div>
-          <textarea id="cover-letter-preview" class="form-input" rows="12" style="font-size:11px;line-height:1.4;background:var(--card);" readonly></textarea>
-        </div>
-      </div>
-    </div>
-
-    <!-- TRACK 4: SWE 3-Month Intensive Track -->
-    <div class="unified-track-view" id="view-track-swe" style="display:none;">
-      <div style="margin-bottom:12px;background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:12px;">
-        <div style="font-size:13px;font-weight:800;color:var(--accent);margin-bottom:6px;">Ã°Å¸â€Â¥ 12-Week Coding Challenge Activity Heatmap:</div>
-        <div id="swe-heatmap-grid" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
-          <!-- 84 days streak blocks populated via JS -->
-        </div>
-        <div style="font-size:10px;color:var(--text-muted);">Each block represents daily coding drills. Click any block to toggle logged practice.</div>
-      </div>
-      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">12-Week Structured Curriculum:</div>
-      <div id="swe-curriculum-container" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;max-height:260px;overflow-y:auto;">
-        <!-- 4 Phase cards populated via JS -->
-      </div>
-    </div>
-
-    <!-- TRACK 5: Career Decision Support Matrix -->
-    <div class="unified-track-view" id="view-track-decision" style="display:none;">
-      <div style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
-        <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:8px;">🎯 M.Tech (IISc / IITs) vs Direct Industry Job Decision Matrix:</div>
-        <table class="compare-table">
-          <thead>
-            <tr>
-              <th>Evaluation Factor</th>
-              <th>Top M.Tech (IISc / IITB / IITM / IITD)</th>
-              <th>Direct Industry SDE Job</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Starting CTC Package</strong></td>
-              <td style="color:var(--success);font-weight:800;">Ã¢â€šÂ¹26 —œ Ã¢â€šÂ¹45 LPA Average</td>
-              <td style="color:var(--accent);font-weight:700;">Ã¢â€šÂ¹6 —œ Ã¢â€šÂ¹18 LPA Average</td>
-            </tr>
-            <tr>
-              <td><strong>Role Types & Ceiling</strong></td>
-              <td>AI Research Scientist, Systems Architect, Core R&D</td>
-              <td>Full-Stack Developer, Feature Engineer, DevOps</td>
-            </tr>
-            <tr>
-              <td><strong>Opportunity Cost</strong></td>
-              <td>2 Years of academic study (Ã¢â€šÂ¹12,400/mo MHRD stipend)</td>
-              <td>2 Years of industry salary & promotions</td>
-            </tr>
-            <tr>
-              <td><strong>Best Suited Profile</strong></td>
-              <td>High affinity for Core CS (OS, AI, Compilers) & Tier-1 dreams</td>
-              <td>Hands-on web/app developers wanting early financial independence</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TRACK 6: Skill Tree & Burnout Monitor -->
-    <div class="unified-track-view" id="view-track-tree" style="display:none;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-size:14px;font-weight:800;color:var(--accent);margin-bottom:8px;">Ã°Å¸Å’Â³ Competency Skill Tree:</div>
-          <div id="skill-tree-container" style="display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;">
-            <!-- Tree nodes populated via JS -->
-          </div>
-        </div>
-        <div style="background:var(--surface2);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:14px;">
-          <div style="font-size:14px;font-weight:800;color:var(--warning);margin-bottom:8px;">Ã¢ÂÂ±Ã¯Â¸Â Burnout Detection & Fatigue Monitor:</div>
-          <div style="font-size:12px;color:var(--text-sub);line-height:1.5;margin-bottom:12px;">
-            GT Mentor Pro continuously analyzes your daily Pomodoro sessions and logged question drills to detect cognitive exhaustion.
-          </div>
-          <div style="background:var(--card);border:1px solid var(--border-subtle);border-radius:4px;padding:12px;margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;">
-              <span>Current Cognitive Fatigue Index:</span>
-              <span style="color:var(--success);" id="burnout-index-label">Low (28%)</span>
-            </div>
-            <div class="weightage-bar-wrap" style="margin-top:6px;"><div class="weightage-bar-fill" id="burnout-bar" style="width:28%;background:var(--success);"></div></div>
-          </div>
-          <div id="burnout-recommendation-box" style="font-size:11px;color:var(--text-sub);background:var(--card);padding:10px;border-radius:4px;border-left:3px solid var(--success);">
-            Ã¢Å“â€¦ Optimal study condition. Maintain your 25/5 Pomodoro rhythm and take a 15-minute hydration walk every 2 hours!
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Comprehensive Question Database (2000—œPresent & Predictive Engine)
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="master-question-bank-modal">
-  <div class="modal modal-tall question-bank-dialog" style="max-width: 1040px;">
-    <button class="modal-close" data-close="master-question-bank-modal">&#x2715;</button>
-    <div class="modal-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <span>Ã°Å¸â€œâ€š</span> Comprehensive A-to-Z Company Question Bank & Predictive Engine
-      <span class="badge-pill" style="font-size:10px;background:rgba(0,212,255,0.15);color:var(--accent);border:1px solid rgba(0,212,255,0.3);padding:2px 8px;border-radius:12px;">2000 —œ Present</span>
-      <span class="badge-pill" style="font-size:10px;background:rgba(0,230,118,0.15);color:var(--success);border:1px solid rgba(0,230,118,0.3);padding:2px 8px;border-radius:12px;">AI Predictive Engine</span>
-    </div>
-    <div class="modal-subtitle">Exhaustive repository of Aptitude, Technical MCQs, Role-Specific Deep Dives, and Probability-Weighted Exam Forecasts</div>
 
-    <!-- Question Bank Tabs -->
-    <div class="placement-tabs-row" style="margin: 12px 0; overflow-x: auto; flex-wrap: nowrap;">
-      <button class="tab-pill active" id="qbank-tab-archive-btn" onclick="switchQBankTab('archive')">📜 Historical Archive (2000—œPresent)</button>
-      <button class="tab-pill" id="qbank-tab-predict-btn" onclick="switchQBankTab('predict')">Ã°Å¸â€Â® AI Predictive Forecasts</button>
-      <button class="tab-pill" id="qbank-tab-roles-btn" onclick="switchQBankTab('roles')">Ã°Å¸â€ºÂ Ã¯Â¸Â Role-Specific Deep Dives</button>
-      <button class="tab-pill" id="qbank-tab-hr-btn" onclick="switchQBankTab('hr')">Ã°Å¸Â¤Â HR & Cultural Fit Studio</button>
-    </div>
-
-    <!-- TAB 1: Historical Archive -->
-    <div class="qbank-tab-view" id="view-qbank-archive" style="display:block;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-          <input type="text" id="qbank-search-input" class="form-input" placeholder="Search company or topic..." oninput="filterQBankArchive()" style="width:200px;font-size:12px;">
-          <select id="qbank-comp-filter" class="form-input" onchange="filterQBankArchive()" style="width:130px;font-size:12px;">
-            <option value="all">All Companies</option>
-            <option value="Amazon">Amazon</option>
-            <option value="Google">Google</option>
-            <option value="Zoho">Zoho</option>
-            <option value="Microsoft">Microsoft</option>
-            <option value="TCS">TCS Prime</option>
-            <option value="Infosys">Infosys</option>
-          </select>
-          <select id="qbank-diff-filter" class="form-input" onchange="filterQBankArchive()" style="width:120px;font-size:12px;">
-            <option value="all">All Levels</option>
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <span style="font-size:11px;color:var(--accent);font-weight:700;" id="qbank-count-label">Loading questions...</span>
-          <button class="action-btn" onclick="exportQBankPDF()" style="font-size:11px;padding:3px 10px;">Ã°Å¸â€œÂ¥ Export / Print Sheet</button>
-        </div>
-      </div>
-      <div id="qbank-archive-container" style="max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;">
-        <!-- Populated via JS -->
-      </div>
-    </div>
-
-    <!-- TAB 2: AI Predictive Forecasts -->
-    <div class="qbank-tab-view" id="view-qbank-predict" style="display:none;">
-      <div id="qbank-predict-container" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:12px;max-height:460px;overflow-y:auto;">
-        <!-- Populated via JS -->
-      </div>
-    </div>
-
-    <!-- TAB 3: Role-Specific Deep Dives -->
-    <div class="qbank-tab-view" id="view-qbank-roles" style="display:none;">
-      <div id="qbank-roles-container" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:12px;max-height:460px;overflow-y:auto;">
-        <!-- Populated via JS -->
-      </div>
-    </div>
-
-    <!-- TAB 4: HR & Cultural Fit Studio -->
-    <div class="qbank-tab-view" id="view-qbank-hr" style="display:none;">
-      <div id="qbank-hr-container" style="display:flex;flex-direction:column;gap:12px;max-height:460px;overflow-y:auto;">
-        <!-- Populated via JS -->
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- Toast -->
 
