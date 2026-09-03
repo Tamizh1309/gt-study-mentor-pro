@@ -1,6 +1,6 @@
 # 🚀 GT Study Mentor Pro — Enterprise AI Career & GATE Preparation Ecosystem
 
-An enterprise-grade, full-stack AI preparation and placement platform (inspired by **Skilldunia AI**) combining:
+An enterprise-grade, full-stack AI preparation and placement platform combining:
 - **Master Placement Directory (1,024 Companies)** with interactive embedded Leaflet mini-maps, Google Maps directions, and salary breakdowns.
 - **State-by-State Tech Corridor Map Radar** covering Tamil Nadu, Karnataka, Telangana, Maharashtra, NCR, Gujarat, Kerala, and West Bengal.
 - **Unified Multi-Track Command Center**:
@@ -10,14 +10,39 @@ An enterprise-grade, full-stack AI preparation and placement platform (inspired 
   4. Software Engineer 3-Month Intensive with 84-day activity heatmap
   5. Career Decision Support Matrix (M.Tech vs Industry Job)
   6. Competency Skill Tree with Cognitive Fatigue & Burnout Monitor
-- **Free Preparation Resources Hub** with Aptitude tests, Core CS MCQs, and in-browser JavaScript Coding Runner.
-- **Skilldunia-Inspired AI Voice Mock Interviewer** with 24-bar live audio waveform visualizer and rubric scoring.
-- **Multi-Device Compatibility** (Mobile 320px, Tablet 768px, Desktop 1440px+) with Dark/Light theme switching and Multi-language support (English, Hindi, Tamil).
+- **AI Power Studio Ecosystem (Wave 1 to Wave 4)**:
+  - **AI Mock Interview Studio** with live voice recording & rubric scoring
+  - **GATE 2027 AIR Predictor** with college cutoff matching
+  - **CSE Code Studio Sandbox** with multi-language execution
+  - **90-Day Trajectory Calendar** with iCal sync
+  - **ATS Resume Studio** with JD matching & instant print
+  - **Pomodoro Deep Focus Engine** (25/5, 50/10, 90/20) with ambient lofi audio
+  - **Subject Notes Vault** across 9 core GATE CS subjects with auto-save
+  - **Company Application Kanban Board** with drag/move pipeline
+  - **Weekly Performance Report** with print-to-PDF export
+  - **Daily Motivation Engine** with XP streaks and milestone badges
+  - **10:00 PM Sleep Mode Lockdown** with starfield animations & memory consolidation reminders
+  - **GATE Formula Vault** with 40+ high-yield formulas & one-click AI explanation
+  - **AI Code Reviewer & Complexity Studio** with time/space $O(...)$ analysis
+  - **90-Day Smart Daily Schedule** with persistent task tracking & XP gains
+  - **Striver A2Z 17 DSA Patterns Tracker** with status toggles & progress radar
+  - **AI Gateway & FreeLLMAPI Config Studio** with 1-click test ping
+  - **CS Blitz Speed Arena** (60-second rapid fire MCQ sprint with combo multiplier)
+  - **System Design & Architecture Studio** with interactive blueprints (TinyURL, Rate Limiter, Notification Engine, E-Commerce, Real-Time Chat)
+  - **GATE 2027 Weightage Radar & Mark Maximizer** with dynamic score calculator
+  - **Study Vault Backup, Restore & Printable Cheat Sheet Engine** (Full offline JSON export/import)
 
 ---
 
 ## 🏛️ System Architecture
 
+* **AI Gateway Architecture**: OpenAI-compatible endpoint (`http://127.0.0.1:3001/v1/chat/completions`) powered by **FreeLLMAPI** / **GPT-5.4**.
+  - **Zero Key Leaks**: Pure gateway design eliminating hardcoded vendor keys.
+  - **Smart Offline Resiliency**: Seamlessly falls back to rich, high-yield built-in CSE intelligence if the local gateway is offline.
+  - **One-Liner FreeLLMAPI Setup**:
+    ```powershell
+    iwr -useb https://freellmapi.co/install.ps1 | iex
+    ```
 * **Backend**: Node.js & Express with SQLite persistence (`database.js`), WebSocket real-time broadcast, and REST APIs (`companiesService.js`, `prepService.js`).
 * **Production Middleware Layer (`middleware.js`)**:
   * **Security**: HTTP Security Headers (`X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`).
@@ -37,29 +62,16 @@ An enterprise-grade, full-stack AI preparation and placement platform (inspired 
 * npm (v9.0.0 or higher)
 
 ### 1. Clone & Install Dependencies
-\`\`\`bash
-cd assistant_ai
+```bash
+git clone https://github.com/Tamizh1309/gt-study-mentor-pro.git
+cd gt-study-mentor-pro
 npm install
-\`\`\`
+```
 
-### 2. Environment Configuration
-Copy the provided environment template:
-\`\`\`bash
-cp .env.example .env
-\`\`\`
-Edit `.env` to configure your port and security parameters:
-\`\`\`ini
-PORT=3000
-NODE_ENV=production
-RATE_LIMIT_WINDOW_MS=60000
-MAX_REQUESTS_PER_WINDOW=120
-CACHE_TTL_COMPANIES=180
-\`\`\`
-
-### 3. Launch Server
-\`\`\`bash
+### 2. Launch Local Server
+```bash
 node server.js
-\`\`\`
+```
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
@@ -67,13 +79,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 🧪 Automated Testing Suite
 
 Run the full automated unit, integration, and E2E verification suite:
-\`\`\`bash
-node test_enterprise_suite.js
-\`\`\`
+```bash
+node test_v2_comprehensive.js
+```
 **Coverage Overview:**
 * **Unit Tests**: Input sanitization, token bucket rate limiter, cache TTL.
 * **Integration Tests**: REST API endpoints (`/api/companies`, `/api/map/states`, `/api/prep/quizzes`).
-* **E2E Puppeteer**: Desktop (1440x900) and Mobile (390x844) viewport rendering, multi-criteria sorting, role cycling, and 0 console errors.
+* **E2E Puppeteer**: Desktop (1440x900) and Mobile (390x844) viewport rendering, 19 studio modal activations, and 0 console errors.
 
 ---
 
@@ -95,4 +107,9 @@ node test_enterprise_suite.js
 * **Student** (Default): Full access to mock tests, practice quizzes, coding challenges, calculators, and career tracks.
 * **Mentor**: Unlocks review of candidate STAR interview responses, custom question creation, and study plan recommendations.
 * **Admin**: Unlocks platform telemetry, cache invalidation, and system-wide WebSocket broadcast alerts.
-Cycle roles dynamically by clicking the role badge in the top navigation bar.
+
+---
+
+## 🌐 Live Deployment
+* **GitHub Pages**: [https://tamizh1309.github.io/gt-study-mentor-pro/](https://tamizh1309.github.io/gt-study-mentor-pro/)
+* **Repository**: [https://github.com/Tamizh1309/gt-study-mentor-pro](https://github.com/Tamizh1309/gt-study-mentor-pro)

@@ -2401,4 +2401,401 @@ Be concise, direct, and encourage the student in friendly Tanglish.`;
   };
 })();
 
+// ══════════════════════════════════════════════════════════════
+// WAVE 4 — FEATURE 1: CS BLITZ SPEED ARENA CONTROLLER
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const BLITZ_QUESTIONS = [
+    { subj: 'OS', q: 'Which condition is NOT strictly required for a Deadlock to occur?', opts: ['Mutual Exclusion', 'Hold and Wait', 'Preemption', 'Circular Wait'], ans: 2, exp: 'Preemption PREVENTS deadlock. No-preemption is the required Coffman condition.' },
+    { subj: 'DBMS', q: 'A relation where all non-prime attributes are fully functionally dependent on Candidate Key is in:', opts: ['1NF', '2NF', '3NF', 'BCNF'], ans: 1, exp: '2NF eliminates partial dependencies where non-prime depends on part of a composite key.' },
+    { subj: 'CN', q: 'What is the default minimum frame size in Ethernet (CSMA/CD) for 10 Mbps?', opts: ['32 Bytes', '64 Bytes', '128 Bytes', '512 Bytes'], ans: 1, exp: '64 Bytes (512 bits) ensures collision detection across standard network slot time.' },
+    { subj: 'TOC', q: 'Which of the following problems is DECIDABLE for Context-Free Languages?', opts: ['Ambiguity', 'Equivalence', 'Emptiness', 'Universality (L = Σ*)'], ans: 2, exp: 'Emptiness and Finiteness are decidable for CFLs; Equivalence and Ambiguity are undecidable.' },
+    { subj: 'ALGO', q: 'What is the worst-case time complexity of QuickSelect to find the k-th smallest element?', opts: ['O(k)', 'O(N log N)', 'O(N²)', 'O(N)'], ans: 2, exp: 'Standard QuickSelect worst-case with bad pivots is O(N²), while average is O(N).' },
+    { subj: 'COA', q: 'In IEEE 754 32-bit floating point format, how many bits are allocated for the Exponent?', opts: ['7 bits', '8 bits', '11 bits', '23 bits'], ans: 1, exp: '8 bits exponent (bias 127), 23 bits mantissa, 1 sign bit.' },
+    { subj: 'DSA', q: 'Which algorithmic pattern is optimal to find the longest substring without repeating characters?', opts: ['Two Heaps', 'Sliding Window', 'Cyclic Sort', 'K-way Merge'], ans: 1, exp: 'Sliding window with hash set / map achieves linear O(N) time.' },
+    { subj: 'MATH', q: 'How many edges are present in a complete bipartite graph K_{4, 5}?', opts: ['9', '20', '40', '16'], ans: 1, exp: 'In K_{m,n}, number of edges = m × n = 4 × 5 = 20.' },
+    { subj: 'OS', q: 'Belady\'s Anomaly occurs in which page replacement algorithm?', opts: ['Optimal', 'LRU', 'FIFO', 'Clock (Second Chance)'], ans: 2, exp: 'FIFO can suffer from Belady\'s Anomaly where more frames cause more page faults.' },
+    { subj: 'CN', q: 'Which transport layer protocol header size is fixed at exactly 8 bytes?', opts: ['TCP', 'UDP', 'IP', 'ICMP'], ans: 1, exp: 'UDP header is always 8 bytes: Source Port, Dest Port, Length, Checksum (2 bytes each).' }
+  ];
+
+  let blitzTimer = null;
+  let timeLeft = 60;
+  let score = 0;
+  let combo = 1;
+  let currentQIndex = 0;
+  let isAnswerable = true;
+
+  window.startCSBlitz = function () {
+    timeLeft = 60;
+    score = 0;
+    combo = 1;
+    currentQIndex = Math.floor(Math.random() * BLITZ_QUESTIONS.length);
+    isAnswerable = true;
+
+    const endView = document.getElementById('blitz-end-container');
+    const activeView = document.getElementById('blitz-active-container');
+    if (endView) endView.style.display = 'none';
+    if (activeView) activeView.style.display = 'block';
+
+    updateBlitzUI();
+    renderBlitzQuestion();
+
+    if (blitzTimer) clearInterval(blitzTimer);
+    blitzTimer = setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        stopCSBlitz();
+        finishBlitzSession();
+      } else {
+        updateBlitzUI();
+      }
+    }, 1000);
+  };
+
+  window.stopCSBlitz = function () {
+    if (blitzTimer) {
+      clearInterval(blitzTimer);
+      blitzTimer = null;
+    }
+  };
+
+  function updateBlitzUI () {
+    const timerText = document.getElementById('blitz-timer-text');
+    const scoreText = document.getElementById('blitz-score-text');
+    const comboBadge = document.getElementById('blitz-combo-badge');
+    const timerBar = document.getElementById('blitz-timer-bar');
+
+    if (timerText) timerText.textContent = `${timeLeft}s`;
+    if (scoreText) scoreText.textContent = score;
+    if (comboBadge) comboBadge.textContent = `🔥 ${combo}x Combo`;
+    if (timerBar) timerBar.style.width = `${(timeLeft / 60) * 100}%`;
+  }
+
+  function renderBlitzQuestion () {
+    const q = BLITZ_QUESTIONS[currentQIndex];
+    const subjTag = document.getElementById('blitz-subj-tag');
+    const qText = document.getElementById('blitz-q-text');
+    const optionsGrid = document.getElementById('blitz-options-grid');
+    const feedbackText = document.getElementById('blitz-feedback-text');
+
+    if (subjTag) subjTag.textContent = q.subj;
+    if (qText) qText.textContent = q.q;
+    if (feedbackText) feedbackText.textContent = '';
+
+    if (optionsGrid) {
+      optionsGrid.innerHTML = q.opts.map((opt, idx) => `
+        <button class="blitz-option-btn" id="blitz-opt-${idx}" onclick="handleBlitzAnswer(${idx})">
+          <span style="opacity:0.6; font-family:var(--font-mono);">${['A','B','C','D'][idx]}.</span>
+          <span>${opt}</span>
+        </button>
+      `).join('');
+    }
+    isAnswerable = true;
+  }
+
+  window.handleBlitzAnswer = function (chosenIdx) {
+    if (!isAnswerable) return;
+    isAnswerable = false;
+
+    const q = BLITZ_QUESTIONS[currentQIndex];
+    const btn = document.getElementById(`blitz-opt-${chosenIdx}`);
+    const correctBtn = document.getElementById(`blitz-opt-${q.ans}`);
+    const feedback = document.getElementById('blitz-feedback-text');
+
+    if (chosenIdx === q.ans) {
+      if (btn) btn.classList.add('correct');
+      const gained = 10 * combo;
+      score += gained;
+      combo = Math.min(combo + 1, 4);
+      if (feedback) feedback.innerHTML = `<span style="color:#10B981; font-weight:700;">✅ Correct! +${gained} pts!</span> ${q.exp}`;
+    } else {
+      if (btn) btn.classList.add('wrong');
+      if (correctBtn) correctBtn.classList.add('correct');
+      combo = 1;
+      if (feedback) feedback.innerHTML = `<span style="color:#EF4444; font-weight:700;">❌ Oops!</span> ${q.exp}`;
+    }
+
+    updateBlitzUI();
+
+    setTimeout(() => {
+      currentQIndex = (currentQIndex + 1) % BLITZ_QUESTIONS.length;
+      renderBlitzQuestion();
+    }, 1100);
+  };
+
+  function finishBlitzSession () {
+    const endView = document.getElementById('blitz-end-container');
+    const activeView = document.getElementById('blitz-active-container');
+    if (endView) endView.style.display = 'block';
+    if (activeView) activeView.style.display = 'none';
+
+    const finalScore = document.getElementById('blitz-final-score');
+    const finalStreak = document.getElementById('blitz-final-streak');
+    if (finalScore) finalScore.textContent = score;
+    if (finalStreak) finalStreak.textContent = `${combo}x`;
+
+    if (typeof addXP === 'function') addXP(Math.round(score / 2), 'Completed 60s CS Blitz');
+    if (typeof showToast === 'function') showToast(`CS Blitz finished! You scored ${score} pts! 🔥`, 'success');
+  }
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 4 — FEATURE 2: SYSTEM DESIGN VISUALIZER CONTROLLER
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const BLUEPRINTS = {
+    tinyurl: {
+      title: 'TinyURL / Distributed URL Shortener',
+      nodes: [
+        { title: '1. Web / Mobile Clients', desc: 'Sends long URLs via POST /api/v1/shorten; redirects via GET /{shortCode}' },
+        { title: '2. Cloudflare CDN & Edge', desc: 'Caches high-frequency short link redirects with HTTP 301/302 status' },
+        { title: '3. API Gateway / Load Balancer', desc: 'Round-robin distributes read/write traffic across stateless app instances' },
+        { title: '4. Distributed Key Gen / Base62', desc: 'Generates 7-character Base62 keys from 64-bit integer IDs (62^7 = 3.5 Trillion URLs)' },
+        { title: '5. Redis Distributed Cache', desc: 'LRU cache holding top 20% most accessed URLs, serving 80% of read traffic' },
+        { title: '6. Sharded SQL / NoSQL Store', desc: 'Partitioned by MD5 hash of shortCode. Stores mappings with soft TTL expiration' }
+      ],
+      tradeoffs: '⚡ <strong>Latency vs Consistency:</strong> Eventual consistency is optimal. <strong>Hash Collision vs Pre-generated IDs:</strong> Pre-generating ranges via Zookeeper prevents runtime collision retries.'
+    },
+    ratelimit: {
+      title: 'Distributed Rate Limiter (Token Bucket)',
+      nodes: [
+        { title: '1. Ingress Traffic', desc: 'Thousands of concurrent requests from authenticated API users and guests' },
+        { title: '2. Nginx / Envoy Filter', desc: 'Inspects IP, API Key, and client tokens before forwarding downstream' },
+        { title: '3. Token Bucket Algorithm', desc: 'Allows bursts up to capacity while refilling tokens continuously at fixed rate' },
+        { title: '4. Redis Atomic Counters', desc: 'Executes Lua scripts with MULTI/EXEC to prevent race conditions across server nodes' },
+        { title: '5. HTTP 429 Responder', desc: 'Returns "Too Many Requests" with Retry-After headers when quota is exceeded' },
+        { title: '6. Kafka Metric Stream', desc: 'Logs rate-limiting telemetry to monitor potential DDoS attacks' }
+      ],
+      tradeoffs: '⚡ <strong>Centralized vs Local:</strong> Local memory avoids Redis network hop but doesn\'t sync across pods. Redis + Lua script solves distributed synchronization.'
+    },
+    notify: {
+      title: 'Real-Time Notification Engine (Multi-Channel)',
+      nodes: [
+        { title: '1. Microservice Trigger', desc: 'Order placed, message received, or daily study reminder triggered' },
+        { title: '2. Notification Service', desc: 'Validates user notification preferences, rate-limits, and deduplicates' },
+        { title: '3. Kafka / RabbitMQ Queues', desc: 'Separated queues by priority: OTP (Urgent), In-App, Email, Marketing' },
+        { title: '4. Worker Node Cluster', desc: 'Pulls tasks from queues and connects to vendor gateways' },
+        { title: '5. Delivery Integrations', desc: 'FCM / APNs for Mobile Push, WebSockets for In-App, SendGrid for Email' },
+        { title: '6. Dead-Letter Queue (DLQ)', desc: 'Captures failed deliveries for automatic exponential backoff retries' }
+      ],
+      tradeoffs: '⚡ <strong>Reliability vs Throughput:</strong> At-least-once delivery with idempotent idempotency keys on client devices prevents duplicate notifications.'
+    },
+    ecommerce: {
+      title: 'Scalable E-Commerce Cart & Inventory',
+      nodes: [
+        { title: '1. User Browser / Mobile App', desc: 'Add to cart, update quantity, and checkout triggers' },
+        { title: '2. Cart Session Cache (Redis)', desc: 'In-memory cart state stored per session ID, resilient across page reloads' },
+        { title: '3. Inventory Reservation Service', desc: 'Temporarily reserves stock for 10 minutes during checkout flow' },
+        { title: '4. Distributed Lock (Redlock)', desc: 'Prevents two users from purchasing the final stock simultaneously' },
+        { title: '5. Relational Orders DB (Postgres)', desc: 'ACID transactions for payment capture and permanent invoice creation' },
+        { title: '6. Change Data Capture (Debezium)', desc: 'Streams DB changes to Elasticsearch for search queries and analytics' }
+      ],
+      tradeoffs: '⚡ <strong>Pessimistic vs Optimistic Locking:</strong> Optimistic locking with version numbers is ideal for medium contention; Redis reservation handles flash sales.'
+    },
+    chat: {
+      title: 'Real-Time Chat & Messaging (WhatsApp Scale)',
+      nodes: [
+        { title: '1. WebSocket Connection', desc: 'Persistent bidirectional TCP stream for instant message delivery' },
+        { title: '2. Chat Gateway Pods', desc: 'Maintains open socket connections for active online users' },
+        { title: '3. Redis Pub/Sub Session Router', desc: 'Tracks which server pod holds the recipient\'s active WebSocket' },
+        { title: '4. Message Broker (Kafka)', desc: 'Buffers messages for offline users and delivers when reconnected' },
+        { title: '5. NoSQL Document Store (Cassandra)', desc: 'LSM-tree storage optimized for high write throughput sorted by timestamp' },
+        { title: '6. Media Object Storage (S3)', desc: 'Stores encrypted images, voice notes, and documents with presigned URLs' }
+      ],
+      tradeoffs: '⚡ <strong>Push vs Pull:</strong> WebSockets for real-time push; HTTP long polling as fallback for restricted firewalls.'
+    }
+  };
+
+  let activeBlueprint = 'tinyurl';
+
+  window.initSystemDesign = function () {
+    loadSystemBlueprint('tinyurl');
+  };
+
+  window.loadSystemBlueprint = function (key) {
+    activeBlueprint = key;
+    const bp = BLUEPRINTS[key];
+    if (!bp) return;
+
+    document.querySelectorAll('#sysdesign-system-tabs .formula-subj-btn').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('onclick').includes(key));
+    });
+
+    const titleEl = document.getElementById('sysdesign-title');
+    if (titleEl) titleEl.textContent = bp.title;
+
+    const grid = document.getElementById('sysdesign-nodes-grid');
+    if (grid) {
+      grid.innerHTML = bp.nodes.map(n => `
+        <div class="sysdesign-node-card">
+          <div class="sysdesign-node-title">${n.title}</div>
+          <div class="sysdesign-node-desc">${n.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    const tradeoffBox = document.getElementById('sysdesign-tradeoff-box');
+    if (tradeoffBox) {
+      tradeoffBox.innerHTML = `
+        <div style="font-size:11px; font-weight:800; color:var(--warning); text-transform:uppercase; margin-bottom:4px;">⚖️ Critical Architecture Trade-offs:</div>
+        <div style="font-size:12px; color:#fff; line-height:1.4;">${bp.tradeoffs}</div>
+      `;
+    }
+  };
+
+  window.askGPTAboutSystemDesign = function () {
+    const bp = BLUEPRINTS[activeBlueprint];
+    if (!bp) return;
+    if (typeof closeModal === 'function') closeModal('system-architecture-modal');
+    if (typeof navigateToView === 'function') navigateToView('chat');
+    setTimeout(() => {
+      const input = document.getElementById('chat-input');
+      if (input) {
+        input.value = `Can you explain the system design for "${bp.title}"? Focus on high-level architecture, database choice, caching strategy, and what a Senior SDE interviewer expects from a candidate.`;
+        const sendBtn = document.getElementById('chat-send-btn');
+        if (sendBtn) sendBtn.click();
+      }
+    }, 400);
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 4 — FEATURE 3: GATE WEIGHTAGE HEATMAP CONTROLLER
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const SUBJECT_WEIGHTS = [
+    { name: 'General Aptitude', avg: 15, yield: 'High Yield', color: '#10B981', tip: 'Highest marks-to-effort ratio. 15/15 target!' },
+    { name: 'Engineering Mathematics', avg: 13, yield: 'High Yield', color: '#10B981', tip: 'Calculus, Linear Algebra, Probability. Formula-driven.' },
+    { name: 'Operating Systems', avg: 9, yield: 'High Yield', color: '#00D4FF', tip: 'Paging, CPU Scheduling, Banker\'s Algorithm PYQs.' },
+    { name: 'Computer Networks', avg: 9, yield: 'High Yield', color: '#00D4FF', tip: 'Subnetting, TCP Sliding Window, Flow Control.' },
+    { name: 'Computer Organization (COA)', avg: 9, yield: 'Medium Yield', color: '#818CF8', tip: 'Cache mapping, Pipelining speedup, IEEE 754.' },
+    { name: 'Theory of Computation (TOC)', avg: 8, yield: 'High Yield', color: '#10B981', tip: 'DFA minimization, Closure properties, Decidability.' },
+    { name: 'Algorithms', avg: 8, yield: 'Medium Yield', color: '#818CF8', tip: 'Dynamic Programming, Graph traversals, Master Theorem.' },
+    { name: 'Database Management (DBMS)', avg: 8, yield: 'High Yield', color: '#10B981', tip: 'Normalization (BCNF/3NF), SQL/Relational Algebra, B+ Trees.' },
+    { name: 'Data Structures', avg: 6, yield: 'High Yield', color: '#00D4FF', tip: 'Trees, Heaps, Stacks, Binary Search Trees.' },
+    { name: 'Digital Logic', avg: 5, yield: 'High Yield', color: '#10B981', tip: 'K-Maps, Multiplexers, Counters. 100% scoring.' }
+  ];
+
+  window.initWeightageHeatmap = function () {
+    const slider = document.getElementById('weightage-slider');
+    updateWeightageTarget(slider ? slider.value : 68);
+  };
+
+  window.updateWeightageTarget = function (targetMarks) {
+    const display = document.getElementById('weightage-target-display');
+    const container = document.getElementById('weightage-list-container');
+    if (!container) return;
+
+    let tier = 'Top 500 AIR';
+    if (targetMarks >= 75) tier = 'AIR 1 - 50 (IISc / IITB / IITM)';
+    else if (targetMarks >= 65) tier = 'Top 150 AIR (IIT Direct Call)';
+    else if (targetMarks >= 50) tier = 'Top 1000 AIR (Top NITs / PSUs)';
+    else tier = 'Qualifying Score';
+
+    if (display) display.textContent = `${targetMarks} / 100 Marks (${tier})`;
+
+    const scaleFactor = targetMarks / 90;
+
+    container.innerHTML = SUBJECT_WEIGHTS.map(s => {
+      const neededMarks = Math.min(s.avg, Math.round(s.avg * scaleFactor * 10) / 10);
+      const pct = Math.round((neededMarks / s.avg) * 100);
+
+      return `
+        <div class="weightage-row-item">
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:13px; font-weight:800; color:#fff;">${s.name}</span>
+              <span class="badge-pill" style="font-size:9px; background:rgba(255,255,255,0.06); color:${s.color}; font-weight:700;">${s.yield}</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${s.tip}</div>
+            <div style="width:100%; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; margin-top:6px; overflow:hidden;">
+              <div class="weightage-bar-fill" style="width:${pct}%; background:${s.color};"></div>
+            </div>
+          </div>
+          <div style="text-align:right; min-width:80px; margin-left:14px;">
+            <div style="font-size:14px; font-weight:900; color:#fff;">${neededMarks} / ${s.avg}</div>
+            <div style="font-size:10px; color:var(--text-muted);">Target Marks</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 4 — FEATURE 4: STUDY VAULT BACKUP & PRINT ENGINE
+// ══════════════════════════════════════════════════════════════
+(function () {
+  window.initBackupModal = function () {
+    const streakEl = document.getElementById('backup-stat-streak');
+    const notesEl = document.getElementById('backup-stat-notes');
+    const dsaEl = document.getElementById('backup-stat-dsa');
+
+    if (streakEl) {
+      const streak = localStorage.getItem('gt_streak_count') || '27';
+      streakEl.textContent = `${streak} Days`;
+    }
+    if (notesEl) {
+      try {
+        const notes = JSON.parse(localStorage.getItem('gt_notes_vault_v1') || '{}');
+        const count = Object.keys(notes).length;
+        notesEl.textContent = `${count || 9} Subjects`;
+      } catch (e) {}
+    }
+    if (dsaEl) {
+      try {
+        const dsa = JSON.parse(localStorage.getItem('gt_dsa_17_patterns_v1') || '{}');
+        const mastered = Object.values(dsa).filter(v => v === 'mastered').length;
+        dsaEl.textContent = `${mastered} / 17 Mastered`;
+      } catch (e) {}
+    }
+  };
+
+  window.exportStudyVaultData = function () {
+    const backupData = {
+      app: 'GT Study Mentor Pro',
+      version: '4.0',
+      exportedAt: new Date().toISOString(),
+      data: { ...localStorage }
+    };
+    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `gt_mentor_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    if (typeof showToast === 'function') showToast('Study Vault backup downloaded! 💾', 'success');
+  };
+
+  window.importStudyVaultData = function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        if (parsed.data && typeof parsed.data === 'object') {
+          Object.keys(parsed.data).forEach(key => {
+            localStorage.setItem(key, parsed.data[key]);
+          });
+          if (typeof showToast === 'function') showToast('Study Vault restored successfully! Reloading... 🔄', 'success');
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          throw new Error('Invalid backup schema');
+        }
+      } catch (err) {
+        if (typeof showToast === 'function') showToast('Failed to import backup file. Invalid format! ❌', 'error');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  window.printCheatSheet = function () {
+    window.print();
+  };
+})();
+
+
 

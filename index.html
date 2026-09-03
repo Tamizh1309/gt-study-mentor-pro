@@ -240,6 +240,43 @@
             </div>
           </div>
         </div>
+        <!-- Wave 4 new studios -->
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('cs-blitz-modal'); startCSBlitz();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🥊</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">CS Blitz Speed Arena</div>
+              <div style="font-size:10px; color:#EF4444;">60s Rapid MCQ Sprint</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('system-architecture-modal'); initSystemDesign();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🧠</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">System Design Studio</div>
+              <div style="font-size:10px; color:var(--accent);">Interactive Blueprints</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('weightage-heatmap-modal'); initWeightageHeatmap();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">📈</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">GATE Weightage Radar</div>
+              <div style="font-size:10px; color:#10B981;">10-Year Mark Maximizer</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('backup-restore-modal'); initBackupModal();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">💾</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">Vault Backup &amp; Print</div>
+              <div style="font-size:10px; color:#818CF8;">JSON Sync &amp; PDF Print</div>
+            </div>
+          </div>
+        </div>
       </div>
 
 
@@ -4224,6 +4261,225 @@ Execution Time: 2.4ms</pre>
         </button>
         <button class="submit-btn" onclick="saveAIEngineSettings()" style="padding:8px 24px;">
           💾 Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 4 — FEATURE 1: CS BLITZ ARENA MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="cs-blitz-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:760px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">🥊</span>
+        <div>
+          <div class="modal-title">CS Blitz Speed Arena</div>
+          <div style="font-size:11px; color:#EF4444;">60-Second Rapid Fire MCQ Sprint • Streak Combo Multiplier</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('cs-blitz-modal'); stopCSBlitz();">✕</button>
+    </div>
+
+    <!-- Arena Stats Strip -->
+    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:10px 14px; border-radius:10px; border:1px solid var(--border-subtle);">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div>
+          <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Time Left</div>
+          <div style="font-size:20px; font-weight:900; color:#fff;" id="blitz-timer-text">60s</div>
+        </div>
+        <div>
+          <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Score</div>
+          <div style="font-size:20px; font-weight:900; color:var(--success);" id="blitz-score-text">0</div>
+        </div>
+      </div>
+      <div>
+        <span class="blitz-combo-badge" id="blitz-combo-badge">🔥 1x Combo</span>
+      </div>
+    </div>
+
+    <!-- Timer Bar -->
+    <div class="blitz-timer-container">
+      <div class="blitz-timer-bar" id="blitz-timer-bar"></div>
+    </div>
+
+    <!-- Question View -->
+    <div id="blitz-active-container">
+      <div style="margin-top:10px;">
+        <span class="badge-pill" style="font-size:10px; background:rgba(108,99,255,0.2); color:var(--primary); font-weight:800;" id="blitz-subj-tag">OS</span>
+      </div>
+      <div style="font-size:16px; font-weight:800; color:#fff; margin:12px 0 6px; line-height:1.4;" id="blitz-q-text">
+        Loading question...
+      </div>
+      <div class="blitz-options-grid" id="blitz-options-grid">
+        <!-- Injected via JS -->
+      </div>
+      <div id="blitz-feedback-text" style="margin-top:12px; font-size:12px; min-height:20px; color:var(--text-muted);"></div>
+    </div>
+
+    <!-- End Game View (Hidden by default) -->
+    <div id="blitz-end-container" style="display:none; text-align:center; padding:30px 20px;">
+      <div style="font-size:3rem; margin-bottom:8px;">🏆</div>
+      <div style="font-size:22px; font-weight:900; color:#fff;">Time's Up da, Tamizh!</div>
+      <div style="font-size:14px; color:var(--text-muted); margin:8px 0 16px;">
+        Final Score: <strong style="color:var(--success); font-size:18px;" id="blitz-final-score">0</strong> • 
+        Best Streak: <strong style="color:#F59E0B;" id="blitz-final-streak">0x</strong>
+      </div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button class="submit-btn" onclick="startCSBlitz()" style="padding:10px 24px;">🔄 Play Again</button>
+        <button class="formula-mini-btn" onclick="closeModal('cs-blitz-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 4 — FEATURE 2: SYSTEM DESIGN STUDIO MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="system-architecture-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:880px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">🧠</span>
+        <div>
+          <div class="modal-title">System Design &amp; Architecture Studio</div>
+          <div style="font-size:11px; color:var(--accent);">High-Level Architecture Blueprints for SDE-1 / SDE-2 Interviews</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('system-architecture-modal')">✕</button>
+    </div>
+
+    <!-- System Selector Tabs -->
+    <div class="formula-subject-tabs" id="sysdesign-system-tabs" style="margin-bottom:14px;">
+      <button class="formula-subj-btn active" onclick="loadSystemBlueprint('tinyurl')">🔗 URL Shortener</button>
+      <button class="formula-subj-btn" onclick="loadSystemBlueprint('ratelimit')">🛡️ Rate Limiter</button>
+      <button class="formula-subj-btn" onclick="loadSystemBlueprint('notify')">🔔 Notification Engine</button>
+      <button class="formula-subj-btn" onclick="loadSystemBlueprint('ecommerce')">🛒 E-Commerce Cart</button>
+      <button class="formula-subj-btn" onclick="loadSystemBlueprint('chat')">💬 Real-Time Chat</button>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div style="font-size:14px; font-weight:800; color:#fff;" id="sysdesign-title">TinyURL / URL Shortener Architecture</div>
+      <button class="formula-mini-btn" onclick="askGPTAboutSystemDesign()" style="color:#10B981; border-color:rgba(16,185,129,0.3);">
+        🤖 Ask GPT-5.4 Deep Dive
+      </button>
+    </div>
+
+    <!-- Architecture Nodes Grid -->
+    <div class="sysdesign-blueprint-grid" id="sysdesign-nodes-grid">
+      <!-- Injected via JS -->
+    </div>
+
+    <!-- Key Trade-offs Box -->
+    <div class="sysdesign-tradeoff-box" id="sysdesign-tradeoff-box">
+      <!-- Injected via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 4 — FEATURE 3: GATE WEIGHTAGE HEATMAP MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="weightage-heatmap-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:820px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">📈</span>
+        <div>
+          <div class="modal-title">GATE 2027 Subject Weightage Radar</div>
+          <div style="font-size:11px; color:#10B981;">10-Year Mark Distribution &amp; Target Score Maximizer</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('weightage-heatmap-modal')">✕</button>
+    </div>
+
+    <!-- Target Score Simulator Control -->
+    <div style="background:rgba(255,255,255,0.03); padding:14px; border-radius:10px; border:1px solid var(--border-subtle); margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:12px; font-weight:800; color:#fff;">🎯 Desired Target GATE Score:</span>
+        <span style="font-size:16px; font-weight:900; color:var(--accent);" id="weightage-target-display">68 / 100 Marks (Top 100 AIR)</span>
+      </div>
+      <input type="range" id="weightage-slider" min="30" max="90" value="68" step="1" 
+        style="width:100%; accent-color:var(--accent); cursor:pointer;" oninput="updateWeightageTarget(this.value)" />
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:4px;">
+        <span>30 Marks (Qualifying)</span>
+        <span>55 Marks (NITs / PSUs)</span>
+        <span>70+ Marks (IIT Bombay / Madras)</span>
+        <span>85+ Marks (AIR 1 - 10)</span>
+      </div>
+    </div>
+
+    <!-- Subject Weightage List -->
+    <div id="weightage-list-container" style="max-height:420px; overflow-y:auto; padding-right:4px;">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     WAVE 4 — FEATURE 4: BACKUP & PRINT CHEAT SHEET MODAL
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="backup-restore-modal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:720px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
+    <div class="modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.6rem;">💾</span>
+        <div>
+          <div class="modal-title">Study Vault Backup &amp; Print Engine</div>
+          <div style="font-size:11px; color:#818CF8;">Full Offline Data Portability • Printable 90-Day Cheat Sheet</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('backup-restore-modal')">✕</button>
+    </div>
+
+    <!-- Current Stats Grid -->
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:16px;">
+      <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border:1px solid var(--border-subtle); text-align:center;">
+        <div style="font-size:18px; font-weight:800; color:var(--primary);" id="backup-stat-streak">27 Days</div>
+        <div style="font-size:10px; color:var(--text-muted);">Active Streak</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border:1px solid var(--border-subtle); text-align:center;">
+        <div style="font-size:18px; font-weight:800; color:var(--success);" id="backup-stat-notes">9 Subjects</div>
+        <div style="font-size:10px; color:var(--text-muted);">Notes Vault Saved</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; border:1px solid var(--border-subtle); text-align:center;">
+        <div style="font-size:18px; font-weight:800; color:#F59E0B;" id="backup-stat-dsa">17 Patterns</div>
+        <div style="font-size:10px; color:var(--text-muted);">DSA Tracker Synced</div>
+      </div>
+    </div>
+
+    <!-- Export & Import Controls -->
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="background:rgba(255,255,255,0.02); padding:14px; border-radius:10px; border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:13px; font-weight:800; color:#fff;">⬇️ Export Full Study Backup</div>
+          <div style="font-size:11px; color:var(--text-muted);">Downloads a complete JSON package of your notes, streak, daily plans, and battle boards.</div>
+        </div>
+        <button class="submit-btn" onclick="exportStudyVaultData()" style="padding:8px 18px; font-size:12px;">
+          Export JSON
+        </button>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.02); padding:14px; border-radius:10px; border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:13px; font-weight:800; color:#fff;">⬆️ Restore From JSON</div>
+          <div style="font-size:11px; color:var(--text-muted);">Seamlessly restore your progress on any browser or phone without cloud login.</div>
+        </div>
+        <label class="formula-mini-btn" style="cursor:pointer; color:var(--accent); border-color:var(--accent);">
+          Upload File
+          <input type="file" id="backup-file-input" accept=".json" style="display:none;" onchange="importStudyVaultData(event)" />
+        </label>
+      </div>
+
+      <div style="background:rgba(108,99,255,0.06); border:1px solid rgba(108,99,255,0.25); padding:14px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:13px; font-weight:800; color:#fff;">🖨️ Printable 90-Day Cheat Sheet</div>
+          <div style="font-size:11px; color:var(--text-muted);">Clean, formatted A4 cheat sheet of your formulas, 17 DSA patterns, and roadmap for offline revision!</div>
+        </div>
+        <button class="formula-mini-btn" onclick="printCheatSheet()" style="color:#fff; background:var(--primary); border-color:var(--primary);">
+          🖨️ Print
         </button>
       </div>
     </div>
