@@ -4138,3 +4138,61 @@ Be concise, direct, and encourage the student in friendly Tanglish.`;
     panel.style.display = 'block';
   };
 })();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 7 — REAL-TIME STUDIO SEARCH & FILTER HUB
+// ══════════════════════════════════════════════════════════════
+window.searchStudioHub = function (query) {
+  const q = (query || '').toLowerCase().trim();
+  const clearBtn = document.getElementById('studio-search-clear-btn');
+  if (clearBtn) clearBtn.style.display = q.length > 0 ? 'block' : 'none';
+
+  const cards = document.querySelectorAll('#quick-studios-grid .magic-kpi-card');
+  let matchCount = 0;
+
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const cat = (card.getAttribute('data-category') || '').toLowerCase();
+    const matches = q.length === 0 || text.includes(q) || cat.includes(q);
+
+    if (matches) {
+      card.style.display = 'block';
+      card.style.opacity = '1';
+      card.style.transform = 'scale(1)';
+      matchCount++;
+    } else {
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        if (!card.textContent.toLowerCase().includes(document.getElementById('studio-search-input')?.value.toLowerCase().trim() || '')) {
+          card.style.display = 'none';
+        }
+      }, 150);
+    }
+  });
+
+  // Highlight all tab button if searching
+  if (q.length > 0) {
+    document.querySelectorAll('.studio-tab-btn').forEach(btn => btn.classList.remove('active'));
+    const allBtn = document.querySelector('.studio-tab-btn');
+    if (allBtn) allBtn.classList.add('active');
+  }
+};
+
+window.clearStudioSearch = function () {
+  const inp = document.getElementById('studio-search-input');
+  if (inp) inp.value = '';
+  searchStudioHub('');
+};
+
+// Keyboard shortcut '/' to focus studio search
+document.addEventListener('keydown', function (e) {
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    const inp = document.getElementById('studio-search-input');
+    if (inp) {
+      inp.focus();
+      inp.select();
+    }
+  }
+});

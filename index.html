@@ -26,9 +26,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   
-  <!-- Leaflet Map CSS & JS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -100,18 +98,28 @@
         </div>
       </div>
 
-      <!-- ══ STUDIO FILTER BAR (UI/UX CATEGORIZATION) ══ -->
-      <div class="studio-filter-bar" id="studio-filter-bar">
-        <span style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">Studios:</span>
-        <button class="studio-tab-btn active" onclick="filterStudioHub('all')">🌟 All (28)</button>
-        <button class="studio-tab-btn" onclick="filterStudioHub('ai')">⚡ AI &amp; Code</button>
-        <button class="studio-tab-btn" onclick="filterStudioHub('gate')">🎯 GATE 2027</button>
-        <button class="studio-tab-btn" onclick="filterStudioHub('career')">💼 Placement &amp; DSA</button>
-        <button class="studio-tab-btn" onclick="filterStudioHub('focus')">⏱️ Focus &amp; Plan</button>
-        <button class="studio-tab-btn" onclick="filterStudioHub('battle')">⚔️ Battle Mode</button>
+      <!-- ══ STUDIO FILTER & LIVE SEARCH BAR (UI/UX REDESIGN) ══ -->
+      <div class="studio-hub-header" style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+        <div class="studio-search-bar-wrap" style="position:relative; width:100%;">
+          <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:14px; color:var(--text-muted); pointer-events:none;">🔍</span>
+          <input type="text" id="studio-search-input" class="studio-search-input" 
+            placeholder="Search 28 power studios (e.g. mock interview, dsa, gate predictor, formula, ats resume, sql, battle)..." 
+            oninput="searchStudioHub(this.value)"
+            style="width:100%; padding:11px 40px 11px 40px; background:rgba(15, 23, 42, 0.7); border:1px solid rgba(108, 99, 255, 0.3); border-radius:12px; color:#fff; font-size:13px; outline:none; transition:var(--transition); box-sizing:border-box;">
+          <button id="studio-search-clear-btn" onclick="clearStudioSearch()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); font-size:14px; cursor:pointer; display:none;">✕</button>
+        </div>
+
+        <div class="studio-filter-bar" id="studio-filter-bar" style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;">
+          <span style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; align-self:center; margin-right:4px;">Category:</span>
+          <button class="studio-tab-btn active" onclick="filterStudioHub('all')">🌟 All <span class="studio-badge-tag">28</span></button>
+          <button class="studio-tab-btn" onclick="filterStudioHub('ai')">⚡ AI &amp; Code <span class="studio-badge-tag">6</span></button>
+          <button class="studio-tab-btn" onclick="filterStudioHub('gate')">🎯 GATE 2027 <span class="studio-badge-tag">7</span></button>
+          <button class="studio-tab-btn" onclick="filterStudioHub('career')">💼 Placement &amp; DSA <span class="studio-badge-tag">5</span></button>
+          <button class="studio-tab-btn" onclick="filterStudioHub('focus')">⏱️ Focus &amp; Plan <span class="studio-badge-tag">9</span></button>
+          <button class="studio-tab-btn" onclick="filterStudioHub('battle')">⚔️ Battle Mode <span class="studio-badge-tag">1</span></button>
+        </div>
       </div>
 
-      <!-- ══ QUICK-LAUNCH POWER STUDIOS GRID ══ -->
       <div id="quick-studios-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:12px;">
         <!-- AI & Code -->
         <div class="magic-kpi-card" data-category="ai" style="padding:12px 14px;" onclick="openModal('mock-interview-modal'); initMockInterview();">
@@ -956,151 +964,135 @@
        Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
   <aside id="sidebar" class="sidebar-closed" style="display:flex; flex-direction:column;">
 
-    <!-- Ã¢â€â‚¬Ã¢â€â‚¬ Modern Brand Header (MagicPatterns Style) Ã¢â€â‚¬Ã¢â€â‚¬ -->
-    <div class="sidebar-brand-header" style="padding:16px 14px 12px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--border-subtle); margin-bottom:8px;">
-      <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, var(--primary), #6C63FF); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; color:#fff; box-shadow:0 4px 12px rgba(99,216,255,0.25);">
-        GT
+    <!-- Brand Header -->
+    <div class="sidebar-brand-header" style="padding:16px 14px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-subtle); margin-bottom:8px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:38px; height:38px; border-radius:12px; background:linear-gradient(135deg, #6366F1, #06B6D4); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; color:#fff; box-shadow:0 0 16px rgba(99,102,241,0.4);">
+          GT
+        </div>
+        <div>
+          <div style="font-weight:900; font-size:14px; color:#fff; line-height:1.2; font-family:var(--font-display); letter-spacing:0.3px;">GT Mentor Pro</div>
+          <div style="font-size:10px; color:#06B6D4; font-weight:800; text-transform:uppercase; letter-spacing:0.8px;">90-Day Trajectory</div>
+        </div>
       </div>
-      <div>
-        <div style="font-weight:800; font-size:14px; color:#fff; line-height:1.2; font-family:var(--font-display);">GT Study Mentor Pro</div>
-        <div style="font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">90-Day Career Prep</div>
-      </div>
+      <button class="sidebar-collapse-toggle" onclick="document.getElementById('sidebar').classList.toggle('sidebar-closed')" title="Toggle Sidebar" style="background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-muted); border-radius:8px; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
     </div>
 
-    <!-- Ã¢â€â‚¬Ã¢â€â‚¬ Menu Label Ã¢â€â‚¬Ã¢â€â‚¬ -->
-    <div style="padding:6px 14px 4px; font-size:10px; font-weight:800; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase;">
-      Menu
-    </div>
-
-    <div class="sidebar-actions" style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+    <div class="sidebar-actions" style="display:flex; flex-direction:column; gap:4px; overflow-y:auto; flex:1; padding:0 8px 12px;">
       
       <!-- 1. HOME -->
       <div class="sidebar-nav-group" style="margin-top:0;">
         <button class="sidebar-nav-item active" id="nav-home-btn" onclick="navigateToView('home')">
-          <span class="nav-icon">Ã°Å¸ÂÂ </span><span>HOME</span>
+          <span class="nav-icon">🏠</span><span>Home Dashboard</span>
         </button>
       </div>
 
       <!-- 2. PREPARE -->
       <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>Ã°Å¸Å½Â¯ PREPARE</span></div>
+        <div class="sidebar-group-title"><span>🎯 TARGET TRACKS</span></div>
         <button class="sidebar-nav-item" id="nav-prep-gate-btn" onclick="navigateToView('prepare', 'gate')">
-          <span class="nav-icon">Ã¢Å¡Â¡</span><span>GATE 2027</span>
+          <span class="nav-icon">⚡</span><span>GATE CS 2027</span>
         </button>
         <button class="sidebar-nav-item" id="nav-prep-placement-btn" onclick="navigateToView('prepare', 'placement')">
-          <span class="nav-icon">Ã°Å¸â€™Â¼</span><span>Placements</span>
+          <span class="nav-icon">💼</span><span>Placement Prep</span>
         </button>
         <button class="sidebar-nav-item" id="nav-prep-swe-btn" onclick="navigateToView('prepare', 'swe')">
-          <span class="nav-icon">Ã°Å¸â€™Â»</span><span>Software Engineering</span>
+          <span class="nav-icon">💻</span><span>Software Engineering</span>
         </button>
         <button class="sidebar-nav-item" id="nav-prep-intern-btn" onclick="navigateToView('prepare', 'internship')">
-          <span class="nav-icon">Ã°Å¸Å¡â‚¬</span><span>Internship</span>
+          <span class="nav-icon">🚀</span><span>Internships</span>
         </button>
       </div>
 
       <!-- 3. PRACTICE -->
       <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>Ã°Å¸â€™Â» PRACTICE</span></div>
+        <div class="sidebar-group-title"><span>💻 PRACTICE &amp; ARENA</span></div>
         <button class="sidebar-nav-item" id="nav-prac-dsa-btn" onclick="navigateToView('practice', 'dsa')">
-          <span class="nav-icon">Ã°Å¸â€Â£</span><span>DSA (17 Patterns)</span>
+          <span class="nav-icon">🧩</span><span>DSA (17 Patterns)</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prac-battle-btn" onclick="openModal('dsa-battle-modal'); initDSABattle();">
+          <span class="nav-icon">⚔️</span><span>DSA Battle Arena</span>
         </button>
         <button class="sidebar-nav-item" id="nav-prac-pyq-btn" onclick="navigateToView('practice', 'pyq')">
-          <span class="nav-icon">Ã°Å¸â€œÅ“</span><span>GATE PYQ</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prac-aptitude-btn" onclick="navigateToView('practice', 'aptitude')">
-          <span class="nav-icon">Ã°Å¸â€œÅ </span><span>Aptitude</span>
+          <span class="nav-icon">📜</span><span>GATE PYQ Vault</span>
         </button>
         <button class="sidebar-nav-item" id="nav-prac-cscore-btn" onclick="navigateToView('practice', 'cscore')">
-          <span class="nav-icon">Ã°Å¸â€“Â¥Ã¯Â¸Â</span><span>CS Core</span>
+          <span class="nav-icon">🖥️</span><span>CS Core Topics</span>
         </button>
-        <button class="sidebar-nav-item" id="nav-prac-mock-btn" onclick="navigateToView('practice', 'mocks')">
-          <span class="nav-icon">Ã°Å¸â€œÂ</span><span>Mock Tests</span>
-        </button>
-      </div>
-
-      <!-- 4. CAREER -->
-      <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>Ã°Å¸â€™Â¼ CAREER</span></div>
-        <button class="sidebar-nav-item" id="nav-car-projects-btn" onclick="navigateToView('career', 'projects')">
-          <span class="nav-icon">Ã°Å¸â€œÂ¦</span><span>Projects</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-car-resume-btn" onclick="navigateToView('career', 'resume')">
-          <span class="nav-icon">Ã°Å¸â€œâ€ž</span><span>Resume Readiness</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-car-apps-btn" onclick="navigateToView('career', 'applications')">
-          <span class="nav-icon">Ã°Å¸â€œÂ¬</span><span>Applications</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-car-interviews-btn" onclick="navigateToView('career', 'interviews')">
-          <span class="nav-icon">Ã°Å¸Å½â„¢Ã¯Â¸Â</span><span>Interviews</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-car-companies-btn" onclick="navigateToView('career', 'companies')">
-          <span class="nav-icon">Ã°Å¸ÂÂ¢</span><span>Companies (1,024)</span>
+        <button class="sidebar-nav-item" id="nav-prac-formula-btn" onclick="openModal('formula-quiz-modal'); initFormulaQuiz();">
+          <span class="nav-icon">⚡</span><span>Formula Quiz Blitz</span>
         </button>
       </div>
 
-      <!-- 5. PROGRESS -->
+      <!-- 4. CAREER & STUDIOS -->
       <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>Ã°Å¸â€œË† PROGRESS</span></div>
-        <button class="sidebar-nav-item" id="nav-prog-mastery-btn" onclick="navigateToView('progress', 'mastery')">
-          <span class="nav-icon">Ã°Å¸Ââ€ </span><span>Mastery Matrix</span>
+        <div class="sidebar-group-title"><span>💼 CAREER &amp; STUDIOS</span></div>
+        <button class="sidebar-nav-item" id="nav-car-resume-btn" onclick="openModal('resume-ats-modal');">
+          <span class="nav-icon">📄</span><span>ATS Resume Studio</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-car-mock-btn" onclick="openModal('mock-interview-modal'); initMockInterview();">
+          <span class="nav-icon">🎙️</span><span>AI Mock Interview</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-car-companies-btn" onclick="openModal('company-board-modal'); renderCompanyBoard();">
+          <span class="nav-icon">🏢</span><span>Company Kanban</span>
+        </button>
+      </div>
+
+      <!-- 5. PROGRESS & HABITS -->
+      <div class="sidebar-nav-group">
+        <div class="sidebar-group-title"><span>📈 PROGRESS &amp; HABITS</span></div>
+        <button class="sidebar-nav-item" id="nav-prog-streak-btn" onclick="openModal('streak-calendar-modal'); initStreakCalendar();">
+          <span class="nav-icon">📅</span><span>Study Streak Heatmap</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prog-mindmap-btn" onclick="openModal('mindmap-modal'); initMindMap();">
+          <span class="nav-icon">🧩</span><span>CS Concept Mind Map</span>
+        </button>
+        <button class="sidebar-nav-item" id="nav-prog-standup-btn" onclick="openModal('standup-journal-modal'); initStandupJournal();">
+          <span class="nav-icon">📔</span><span>Daily Standup Journal</span>
         </button>
         <button class="sidebar-nav-item" id="nav-prog-analytics-btn" onclick="navigateToView('progress', 'analytics')">
-          <span class="nav-icon">Ã°Å¸â€œË†</span><span>Analytics</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prog-mistakes-btn" onclick="navigateToView('progress', 'mistakes')">
-          <span class="nav-icon">Ã°Å¸â€œâ€¢</span><span>Mistake Book</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prog-revision-btn" onclick="navigateToView('progress', 'revision')">
-          <span class="nav-icon">Ã°Å¸â€â€ž</span><span>Revision (FSRS)</span>
+          <span class="nav-icon">📊</span><span>Analytics Matrix</span>
         </button>
       </div>
 
-      <!-- 6. CSE LABS (Grouped Utilities) -->
+      <!-- 6. SANDBOX LABS -->
       <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>Ã°Å¸Â§Âª CSE LABS</span></div>
-        <button class="sidebar-nav-item" id="nav-lab-algo-btn" onclick="openModal('algo-visualizer-modal')">
-          <span class="nav-icon">Ã°Å¸â€Â</span><span>Algorithm Lab</span>
+        <div class="sidebar-group-title"><span>🧪 CSE SANDBOX LABS</span></div>
+        <button class="sidebar-nav-item" id="nav-lab-code-btn" onclick="openModal('code-studio-modal'); loadCodeStudioTemplate('sliding-window');">
+          <span class="nav-icon">💻</span><span>Multi-Lang Sandbox</span>
         </button>
-        <button class="sidebar-nav-item" id="nav-lab-sql-btn" onclick="openModal('sql-playground-modal')">
-          <span class="nav-icon">Ã°Å¸â€”â€žÃ¯Â¸Â</span><span>SQL Lab</span>
+        <button class="sidebar-nav-item" id="nav-lab-algo-btn" onclick="openModal('algo-visualizer-modal'); initAlgoVisualizer();">
+          <span class="nav-icon">💡</span><span>Algo Visualizer</span>
         </button>
-        <button class="sidebar-nav-item" id="nav-lab-toc-btn" onclick="openModal('toc-validator-modal')">
-          <span class="nav-icon">Ã°Å¸â€Â¤</span><span>TOC Lab</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-lab-net-btn" onclick="openModal('subnet-calc-modal')">
-          <span class="nav-icon">Ã°Å¸Å’Â</span><span>Network Lab</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-lab-sys-btn" onclick="openModal('sysdesign-modal')">
-          <span class="nav-icon">Ã°Å¸Ââ€”Ã¯Â¸Â</span><span>System Design</span>
+        <button class="sidebar-nav-item" id="nav-lab-sql-btn" onclick="openModal('sql-playground-modal');">
+          <span class="nav-icon">🗄️</span><span>SQL Sandbox Lab</span>
         </button>
       </div>
 
-      <!-- 7. RESOURCES & 8. SETTINGS -->
-      <div class="sidebar-nav-group" style="margin-bottom:18px;">
-        <button class="sidebar-nav-item" id="nav-resources-btn" onclick="navigateToView('resources')">
-          <span class="nav-icon">Ã°Å¸â€œÅ¡</span><span>RESOURCES</span>
-        </button>
+      <!-- 7. SYSTEM & AI -->
+      <div class="sidebar-nav-group" style="margin-bottom:12px;">
+        <div class="sidebar-group-title"><span>⚙️ SYSTEM</span></div>
         <button class="sidebar-nav-item" id="nav-settings-btn" onclick="navigateToView('settings')">
-          <span class="nav-icon">Ã¢Å¡â„¢Ã¯Â¸Â</span><span>SETTINGS</span>
+          <span class="nav-icon">⚙️</span><span>Settings &amp; Backup</span>
         </button>
-        <button class="sidebar-nav-item" id="nav-ai-mentor-btn" onclick="navigateToView('chat')" style="border:1px dashed rgba(99,216,255,0.4); margin-top:4px;">
-          <span class="nav-icon">Ã°Å¸Â¤â€“</span><span>AI Study Mentor</span>
+        <button class="sidebar-nav-item" id="nav-ai-mentor-btn" onclick="navigateToView('chat')" style="background:linear-gradient(135deg, rgba(99,102,241,0.15), rgba(6,182,212,0.15)); border:1px solid rgba(99,102,241,0.3); margin-top:4px;">
+          <span class="nav-icon">🤖</span><span style="font-weight:800; color:#fff;">AI Mentor Chat</span>
         </button>
       </div>
     </div>
   
-    <!-- Ã¢â€â‚¬Ã¢â€â‚¬ Modern User Profile Footer (MagicPatterns Style) Ã¢â€â‚¬Ã¢â€â‚¬ -->
-    <div class="sidebar-user-footer" style="margin-top:auto; padding:12px 14px; border-top:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border-radius:8px; margin:12px 10px 10px;">
+    <!-- Modern User Profile Footer -->
+    <div class="sidebar-user-footer" style="margin-top:auto; padding:12px 14px; border-top:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border-radius:10px; margin:8px 8px 10px;">
       <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px; color:#fff;">
+        <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, #10B981, #06B6D4); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px; color:#080B14; box-shadow:0 0 10px rgba(16,185,129,0.4);">
           T
         </div>
         <div>
-          <div style="font-size:12px; font-weight:700; color:#fff; line-height:1.2;">Tamizh</div>
-          <div style="font-size:10px; color:var(--text-muted);">4th Year B.E CSE</div>
+          <div style="font-size:12px; font-weight:800; color:#fff; line-height:1.2;">Tamizharasan</div>
+          <div style="font-size:10px; color:#10B981; font-weight:700;">Day 27 • Lv.8 Pro</div>
         </div>
       </div>
-      <span style="font-size:9px; padding:2px 6px; background:rgba(74, 222, 128, 0.15); color:var(--success); border-radius:4px; font-weight:700;">FREE</span>
+      <button onclick="openModal('profile-modal')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px;" title="Edit Profile">✏️</button>
     </div>
   </aside>
 
@@ -1260,156 +1252,12 @@
   <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        DASHBOARD PANEL (Evaluations)
        Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-  <main id="dashboard-panel" style="display:none; padding: 32px; overflow-y: auto;">
-    <header class="chat-header">
-      <div class="chat-header-left">
-        <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.toggle('sidebar-closed')">
-          <span></span><span></span><span></span>
-        </button>
-        <div class="mentor-info">
-          <h2>Daily Evaluation Engine</h2>
-          <p class="mentor-status">Log your daily progress and get your 100-mark score</p>
-        </div>
-      </div>
-    </header>
-    
-    <div style="max-width:800px; margin: 40px auto; background: var(--bg-card); padding: 32px; border-radius: 16px; border: 1px solid var(--border);">
-      <h2 style="margin-bottom:24px; display:flex; align-items:center; gap:8px;">Ã°Å¸â€™Â¯ Submit Today's Progress</h2>
-      
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-        <div>
-          <label class="modal-label">DSA Problems Solved (Max 30 pts)</label>
-          <input type="number" id="eval-dsa" class="modal-input" placeholder="e.g. 3" min="0">
-        </div>
-        <div>
-          <label class="modal-label">GATE Chapters Revised (Max 30 pts)</label>
-          <input type="number" id="eval-gate" class="modal-input" placeholder="e.g. 2" min="0">
-        </div>
-        <div>
-          <label class="modal-label">Projects/SWE Tasks (Max 20 pts)</label>
-          <input type="number" id="eval-proj" class="modal-input" placeholder="e.g. 1" min="0">
-        </div>
-        <div>
-          <label class="modal-label">Placement/Internship Prep Hours (Max 20 pts)</label>
-          <input type="number" id="eval-prep" class="modal-input" placeholder="e.g. 2" min="0" step="0.5">
-        </div>
-        <div style="grid-column: span 2;">
-          <label class="modal-label">How are you feeling today?</label>
-          <select id="eval-mood" class="modal-input">
-            <option value="Ã°Å¸â€Â¥">Ã°Å¸â€Â¥ Highly Motivated</option>
-            <option value="Ã°Å¸â„¢â€š">Ã°Å¸â„¢â€š Good</option>
-            <option value="Ã°Å¸ËœÂ´">Ã°Å¸ËœÂ´ Tired but pushed through</option>
-            <option value="Ã°Å¸Ëœâ€">Ã°Å¸Ëœâ€ Burnt out (Need a break)</option>
-          </select>
-        </div>
-      </div>
-      <button class="submit-btn" id="submit-eval-btn" style="width:100%; font-size:1.1rem; padding: 14px;">Evaluate My Day!</button>
-
-      <!-- Score Display & Charts -->
-      <div id="eval-result" style="display:none; margin-top: 32px; padding-top: 32px; border-top: 1px solid var(--border);">
-        <div style="text-align:center;">
-          <div style="font-size: 4rem; font-weight: 800; color: var(--accent); line-height: 1; font-family: var(--font-display);" id="eval-score-text">0/100</div>
-          <div style="font-size: 1.2rem; color: var(--text-sec); margin-top: 8px;">Total Score</div>
-          <div id="eval-feedback" style="margin-top: 16px; padding: 16px; background: rgba(108, 99, 255, 0.1); border-radius: 8px; color: var(--text);">Great job!</div>
-        </div>
-      </div>
-      
-      <div style="margin-top: 40px;">
-        <h3 style="margin-bottom:20px; font-family: var(--font-display);">Ã°Å¸â€œË† Performance Analytics (Last 7 Days)</h3>
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
-          <!-- Line Chart -->
-          <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle);">
-            <canvas id="scoreLineChart" height="200"></canvas>
-          </div>
-          <!-- Doughnut Chart -->
-          <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle); display:flex; flex-direction:column; align-items:center; justify-content:center;">
-            <canvas id="scoreDoughnutChart" height="200"></canvas>
-            <div style="margin-top:12px; font-size:0.9rem; color:var(--text-sec);">Today's Breakdown</div>
-          </div>
-        </div>
-
-        <h3 style="margin-top:40px; margin-bottom:20px; font-family: var(--font-display);">Ã°Å¸Å¸Â© Contribution Heatmap</h3>
-        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px; border: 1px solid var(--border-subtle); overflow-x: auto;">
-          <div id="heatmap-container" style="display:flex; flex-direction:column; gap: 4px;"></div>
-          <div style="margin-top:12px; font-size:0.8rem; color:var(--text-sec); display:flex; align-items:center; gap: 8px;">
-            <span>Less</span>
-            <div style="width:12px; height:12px; background:rgba(255,255,255,0.05); border-radius:2px;"></div>
-            <div style="width:12px; height:12px; background:rgba(0, 212, 255, 0.3); border-radius:2px;"></div>
-            <div style="width:12px; height:12px; background:rgba(0, 212, 255, 0.6); border-radius:2px;"></div>
-            <div style="width:12px; height:12px; background:rgba(0, 212, 255, 1); border-radius:2px;"></div>
-            <span>More</span>
-          </div>
-        </div>
-
-        <!-- Predictor UI -->
-        <h3 style="margin-top:40px; margin-bottom:20px; font-family: var(--font-display);">Ã°Å¸â€Â® AI Rank Predictor (GATE 2027)</h3>
-        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 24px; border: 1px solid var(--border-subtle); display:flex; flex-direction:column; align-items:center;">
-          <div style="font-size: 1.1rem; color: var(--text-sec); margin-bottom: 16px;">Based on your recent consistency and scores:</div>
-          <div style="display:flex; gap: 32px; width:100%; justify-content:center;">
-            <div style="text-align:center; padding: 24px; background: rgba(108,99,255,0.1); border-radius:12px; flex:1; border: 1px solid rgba(108,99,255,0.2);">
-              <div style="font-size: 3rem; font-weight:800; color: var(--primary);" id="predicted-rank">---</div>
-              <div style="color:var(--text-sec); margin-top:8px;">Predicted AIR</div>
-            </div>
-            <div style="text-align:center; padding: 24px; background: rgba(0,212,255,0.1); border-radius:12px; flex:1; border: 1px solid rgba(0,212,255,0.2);">
-              <div style="font-size: 3rem; font-weight:800; color: var(--accent);" id="placement-prob">--%</div>
-              <div style="color:var(--text-sec); margin-top:8px;">Top-Tier Placement Probability</div>
-            </div>
-          </div>
-          <p style="margin-top:20px; color:var(--text-sec); font-size:0.9rem;">Keep your daily XP above 75 to improve your prediction!</p>
-        </div>
-      </div>
-    </div>
-  </main>
+  
 
   <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
        MAP PANEL (Placements & Internships)
        Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-  <main id="map-panel" style="display:none; position: relative;">
-    <header class="chat-header" style="position:absolute; top:0; left:0; right:0; z-index:1000; background: rgba(15,15,25,0.85); backdrop-filter: blur(10px);">
-      <div class="chat-header-left">
-        <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.toggle('sidebar-closed')">
-          <span></span><span></span><span></span>
-        </button>
-        <div class="mentor-info">
-          <h2>Tamil Nadu Tech Opportunities Hub</h2>
-          <p class="mentor-status">Live Placement Drives & Internships across TN</p>
-        </div>
-      </div>
-      <div class="chat-header-right">
-        <button class="submit-btn" id="sync-map-btn" style="padding: 8px 16px; font-size: 0.9rem;">Ã°Å¸â€â€ž Sync Daily Data</button>
-      </div>
-    </header>
-    
-    <!-- Map Filters -->
-    <div style="position:absolute; top: 90px; left: 20px; right: 20px; z-index:1000; display:flex; gap: 8px; overflow-x:auto; padding-bottom:10px;">
-      <button class="day-type-badge college" style="cursor:pointer;" onclick="filterMap('All')">All</button>
-      <button class="day-type-badge leave" style="cursor:pointer;" onclick="filterMap('Placement')">Ã°Å¸â€™Â¼ Placements</button>
-      <button class="day-type-badge exam" style="cursor:pointer;" onclick="filterMap('Internship')">Ã°Å¸Å½â€œ Internships</button>
-      <button class="day-type-badge" style="cursor:pointer; background: #2A2A35; color:#fff;" onclick="filterMap('Frontend')">Frontend</button>
-      <button class="day-type-badge" style="cursor:pointer; background: #2A2A35; color:#fff;" onclick="filterMap('Backend')">Backend</button>
-      <button class="day-type-badge" style="cursor:pointer; background: #2A2A35; color:#fff;" onclick="filterMap('Full Stack')">Full Stack</button>
-      <button class="day-type-badge" style="cursor:pointer; background: #2A2A35; color:#fff;" onclick="filterMap('Data')">Data Science/AI</button>
-    </div>
-
-    <div id="tn-map" style="width:100%; height:100%; z-index:1;"></div>
-    
-    <div id="map-overlay-card" style="position:absolute; bottom: 32px; right: 32px; width: 350px; background: var(--bg-card); border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index:1000; border: 1px solid var(--border); display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 12px;">
-        <div>
-          <div style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--accent); margin-bottom:4px;" id="mo-type">Internship</div>
-          <div style="font-size:1.4rem; font-weight:700; line-height:1.2;" id="mo-role">Frontend Intern</div>
-        </div>
-        <button onclick="document.getElementById('map-overlay-card').style.display='none'" style="background:none; border:none; color:var(--text-sec); font-size:1.5rem; cursor:pointer;">Ã¢Å“â€¢</button>
-      </div>
-      <div style="font-size:1.1rem; color:var(--text-sec); margin-bottom:16px;">@ <span id="mo-company" style="color:var(--text); font-weight:600;">Freshworks</span></div>
-      
-      <div style="display:flex; gap:12px; margin-bottom:20px;">
-        <span class="day-type-badge college" style="margin:0;"><span id="mo-city">Chennai</span></span>
-        <span class="day-type-badge leave" style="margin:0;">Apply Now</span>
-      </div>
-      <button class="submit-btn" style="width:100%;" onclick="openChatWithContext()">Ã°Å¸â€™Â¬ Ask Mentor How to Crack This</button>
-    </div>
-  </main>
+  
 </div>
 
 <!-- Sidebar Overlay (mobile) -->
@@ -1769,78 +1617,17 @@
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: XP & Rank History
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="xp-modal">
-  <div class="modal modal-tall">
-    <button class="modal-close" data-close="xp-modal">Ã¢Å“â€¢</button>
-    <div class="modal-title">Ã¢Â­Â XP & Rank System</div>
-    <div class="modal-subtitle">Your learning journey visualized</div>
-    <div id="xp-rank-card" style="margin:16px 0;"></div>
-    <div class="section-label" style="margin:0 0 8px;">Activity Heatmap (90 Days)</div>
-    <div id="xp-heatmap" style="display:flex;flex-wrap:wrap;gap:3px;padding:8px 0;"></div>
-    <div class="section-label" style="margin:16px 0 8px;">XP History</div>
-    <div id="xp-history-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;"></div>
-  </div>
-</div>
+
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Habit Tracker
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="habits-modal">
-  <div class="modal">
-    <button class="modal-close" data-close="habits-modal">Ã¢Å“â€¢</button>
-    <div class="modal-title">Ã°Å¸Å½Â¯ Daily Habit Tracker</div>
-    <div class="modal-subtitle">Track your daily study habits Ã¢â‚¬â€ check off what you did today!</div>
-    <div id="habits-list" style="margin-top:16px;display:flex;flex-direction:column;gap:10px;"></div>
-    <button class="submit-btn" id="save-habits-btn" style="margin-top:16px;width:100%;">Ã°Å¸â€™Â¾ Save Today's Habits</button>
-  </div>
-</div>
+
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Live Code Editor
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="code-editor-modal">
-  <div class="modal modal-tall" style="max-width:760px;width:95vw;">
-    <button class="modal-close" data-close="code-editor-modal">Ã¢Å“â€¢</button>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <div class="modal-title" style="margin:0;">Ã°Å¸â€™Â» Live Code Editor</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <select id="code-lang-select" class="form-input" style="padding:6px 10px;font-size:12px;">
-          <option value="python">Python</option>
-          <option value="javascript">JavaScript</option>
-          <option value="c">C</option>
-          <option value="cpp">C++</option>
-          <option value="java">Java</option>
-          <option value="sql">SQL</option>
-        </select>
-        <button class="submit-btn" id="run-code-btn" style="padding:6px 14px;font-size:13px;">Ã¢â€“Â¶ Run</button>
-        <button class="submit-btn" id="ai-review-code-btn" style="padding:6px 14px;font-size:13px;background:linear-gradient(135deg,var(--primary),var(--accent));">Ã°Å¸Â¤â€“ AI Review</button>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;height:320px;">
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">// CODE EDITOR</div>
-        <textarea id="code-editor-textarea" class="form-input" style="flex:1;font-family:var(--font-mono);font-size:13px;resize:none;line-height:1.6;tab-size:2;" placeholder="// Write your code here da...
-// Example: Python
-def two_sum(nums, target):
-    seen = {}
-    for i, num in enumerate(nums):
-        if target - num in seen:
-            return [seen[target-num], i]
-        seen[num] = i
-    return []"></textarea>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">// OUTPUT / AI REVIEW</div>
-        <div id="code-output" class="form-input" style="flex:1;font-family:var(--font-mono);font-size:12px;overflow-y:auto;white-space:pre-wrap;color:var(--accent);line-height:1.6;">Click Ã¢â€“Â¶ Run or Ã°Å¸Â¤â€“ AI Review...</div>
-      </div>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:8px;">
-      <button class="submit-btn" id="copy-code-btn" style="flex:1;background:var(--card);color:var(--text);font-size:13px;">Ã°Å¸â€œâ€¹ Copy Code</button>
-      <button class="submit-btn" id="clear-code-btn" style="flex:1;background:var(--card);color:var(--text);font-size:13px;">Ã°Å¸â€”â€˜ Clear</button>
-      <button class="submit-btn" id="ask-about-code-btn" style="flex:2;font-size:13px;">Ã°Å¸â€™Â¬ Ask Mentor About This Code</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: AI Daily Insights
@@ -1921,25 +1708,7 @@ def two_sum(nums, target):
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: AI Resume & ATS Reviewer
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="resume-modal">
-  <div class="modal modal-tall" style="max-width:680px;">
-    <button class="modal-close" data-close="resume-modal">Ã¢Å“â€¢</button>
-    <div class="modal-title">Ã°Å¸â€œâ€ž AI Resume &amp; ATS Reviewer</div>
-    <div class="modal-subtitle">Get your resume ATS score and tailor for top companies</div>
-    <div style="display:flex;gap:10px;margin:16px 0 12px;">
-      <select id="resume-target-company" class="form-input" style="flex:1;">
-        <option value="Zoho">Target: Zoho (Product Development)</option>
-        <option value="TCS">Target: TCS Digital / Prime</option>
-        <option value="Amazon">Target: Amazon / SDE-1</option>
-        <option value="Microsoft">Target: Microsoft / SWE</option>
-        <option value="Startup">Target: High-Growth Tech Startup</option>
-      </select>
-      <button class="submit-btn" id="analyze-resume-btn" style="white-space:nowrap;padding:0 18px;">Ã¢Å“Â¨ Review Resume</button>
-    </div>
-    <textarea id="resume-text-input" class="form-input" rows="7" placeholder="Paste your resume content, skills, or project descriptions here da...&#10;&#10;Example:&#10;Skills: Java, Python, React, Spring Boot, MySQL, DSA, Docker&#10;Projects: Built full-stack e-commerce app with JWT auth and payment gateway..." style="width:100%;font-size:13px;line-height:1.5;box-sizing:border-box;resize:vertical;"></textarea>
-    <div id="resume-results" style="display:none;margin-top:16px;"></div>
-  </div>
-</div>
+
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: GATE Subject Mastery Hub
@@ -1965,15 +1734,7 @@ def two_sum(nums, target):
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: GATE & DSA Formula Sheet
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="formulas-modal">
-  <div class="modal modal-tall" style="max-width:700px;">
-    <button class="modal-close" data-close="formulas-modal">Ã¢Å“â€¢</button>
-    <div class="modal-title">Ã°Å¸â€œâ€“ GATE &amp; DSA Formula Hub</div>
-    <div class="modal-subtitle">Instant searchable cheat sheet for algorithms &amp; exam formulas</div>
-    <input type="text" class="formula-search-bar" id="formula-search-input" placeholder="Ã°Å¸â€Â Search formulas (e.g. Master Theorem, B+ Tree, Paging, Dijkstra, Normalization...)">
-    <div class="formula-grid" id="formula-grid"></div>
-  </div>
-</div>
+
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Ambient Lo-Fi Soundboard
@@ -2072,37 +1833,7 @@ def two_sum(nums, target):
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: GATE Score Predictor
      Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
-<div class="modal-overlay" id="predictor-modal">
-  <div class="modal modal-tall" style="max-width:640px;">
-    <button class="modal-close" data-close="predictor-modal">&#x2715;</button>
-    <div class="modal-title">Ã°Å¸Â§Â® GATE CS 2027 Score Predictor</div>
-    <div class="modal-subtitle">Enter your mock test data to predict AIR and college eligibility</div>
-    <div class="predictor-form">
-      <div class="predictor-row">
-        <div>
-          <div class="predictor-label">Your Mock Score (out of 100)</div>
-          <input type="number" id="predictor-mock-score" class="form-input" placeholder="e.g. 52" min="0" max="100">
-        </div>
-        <div>
-          <div class="predictor-label">No. of Mocks Attempted</div>
-          <input type="number" id="predictor-mock-count" class="form-input" placeholder="e.g. 3" min="1" max="20">
-        </div>
-      </div>
-      <div class="predictor-row">
-        <div>
-          <div class="predictor-label">Your GATE Subject Accuracy (%)</div>
-          <input type="number" id="predictor-accuracy" class="form-input" placeholder="e.g. 65" min="0" max="100">
-        </div>
-        <div>
-          <div class="predictor-label">Preparation Months Left</div>
-          <input type="number" id="predictor-months-left" class="form-input" placeholder="e.g. 5" min="0" max="12">
-        </div>
-      </div>
-      <button class="submit-btn" id="run-predictor-btn" style="width:100%;">Ã°Å¸â€Â® Predict My GATE Score & Rank</button>
-    </div>
-    <div class="predictor-result" id="predictor-result" style="display:none;"></div>
-  </div>
-</div>
+
 
 <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
      MODAL: Achievement & Badge Gallery

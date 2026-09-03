@@ -6411,3 +6411,81 @@ body {
   margin-bottom: 4px;
   font-size: 11px;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 7 — CYBERGLASS UI/UX REDESIGN & STUDIO SEARCH
+   ══════════════════════════════════════════════════════════════ */
+.studio-badge-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+  font-size: 9px;
+  font-weight: 900;
+  margin-left: 4px;
+  color: var(--primary-light);
+}
+.studio-tab-btn.active .studio-badge-tag {
+  background: #080B14;
+  color: #06B6D4;
+}
+.studio-search-input:focus {
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 0 20px rgba(99, 102, 241, 0.2);
+  background: rgba(20, 28, 55, 0.9) !important;
+}
+.sidebar-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #A0AEC0;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+}
+.sidebar-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  transform: translateX(3px);
+}
+.sidebar-nav-item.active {
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(6, 182, 212, 0.08) 100%);
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.18);
+}
+.sidebar-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: linear-gradient(180deg, #6366F1, #06B6D4);
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px #6366F1;
+}
+.sidebar-group-title {
+  padding: 8px 10px 4px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #64748B;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.sidebar-actions::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-actions::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
