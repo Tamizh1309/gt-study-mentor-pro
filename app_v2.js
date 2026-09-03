@@ -3558,3 +3558,583 @@ Be concise, direct, and encourage the student in friendly Tanglish.`;
     if (typeof showToast === 'function') showToast('📅 iCal exported da! Import into Google Calendar!', 'success');
   };
 })();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 7 — FEATURE 1: DSA BATTLE MODE (1v1 Timed Arena)
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const BATTLE_PROBLEMS = {
+    array: [
+      {
+        title: "Two Sum II — Array Sorted",
+        desc: "Given a 1-indexed sorted array `numbers` and target `target`, return indices of two numbers that add up to target in O(N) time and O(1) space.",
+        examples: ["Input: numbers = [2,7,11,15], target = 9", "Output: [1,2]"],
+        hint: "Use two pointers starting at left (0) and right (n-1). If sum < target, advance left.",
+        template: "function twoSum(numbers, target) {\n  let left = 0, right = numbers.length - 1;\n  while (left < right) {\n    let sum = numbers[left] + numbers[right];\n    if (sum === target) return [left + 1, right + 1];\n    if (sum < target) left++;\n    else right--;\n  }\n  return [];\n}"
+      },
+      {
+        title: "Contains Duplicate — Hash Set",
+        desc: "Given integer array `nums`, return `true` if any value appears at least twice, `false` if all distinct.",
+        examples: ["Input: nums = [1,2,3,1]", "Output: true"],
+        hint: "A Hash Set allows O(1) lookup. Add elements as you iterate.",
+        template: "function containsDuplicate(nums) {\n  const seen = new Set();\n  for (const n of nums) {\n    if (seen.has(n)) return true;\n    seen.add(n);\n  }\n  return false;\n}"
+      }
+    ],
+    twoptr: [
+      {
+        title: "Valid Palindrome",
+        desc: "Determine if string `s` is a palindrome considering only alphanumeric characters and ignoring cases.",
+        examples: ["Input: s = \"A man, a plan, a canal: Panama\"", "Output: true"],
+        hint: "Skip non-alphanumeric chars from both ends and compare in lowercase.",
+        template: "function isPalindrome(s) {\n  s = s.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();\n  let l = 0, r = s.length - 1;\n  while (l < r) {\n    if (s[l] !== s[r]) return false;\n    l++; r--;\n  }\n  return true;\n}"
+      }
+    ],
+    sliding: [
+      {
+        title: "Max Sum Subarray of Size K",
+        desc: "Given array of positive integers and `k`, find maximum sum of any contiguous subarray of size `k`.",
+        examples: ["Input: arr = [2, 1, 5, 1, 3, 2], k = 3", "Output: 9 (subarray [5, 1, 3])"],
+        hint: "Slide window: add right element, subtract left element when window reaches size k.",
+        template: "function maxSubArraySum(arr, k) {\n  let maxVal = 0, windowSum = 0;\n  for (let i = 0; i < arr.length; i++) {\n    windowSum += arr[i];\n    if (i >= k - 1) {\n      maxVal = Math.max(maxVal, windowSum);\n      windowSum -= arr[i - (k - 1)];\n    }\n  }\n  return maxVal;\n}"
+      }
+    ],
+    tree: [
+      {
+        title: "Maximum Depth of Binary Tree",
+        desc: "Find depth of binary tree: number of nodes along longest path from root to farthest leaf node.",
+        examples: ["Input: root = [3,9,20,null,null,15,7]", "Output: 3"],
+        hint: "Recursively: max(depth(root.left), depth(root.right)) + 1.",
+        template: "function maxDepth(root) {\n  if (!root) return 0;\n  return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));\n}"
+      }
+    ],
+    graph: [
+      {
+        title: "Number of Connected Components in Graph",
+        desc: "Given `n` nodes and list of undirected edges, return total number of connected components.",
+        examples: ["Input: n = 5, edges = [[0,1],[1,2],[3,4]]", "Output: 2"],
+        hint: "Perform BFS/DFS from each unvisited node or use Disjoint Set Union (DSU).",
+        template: "function countComponents(n, edges) {\n  const adj = Array.from({length: n}, () => []);\n  edges.forEach(([u, v]) => { adj[u].push(v); adj[v].push(u); });\n  const visited = new Set();\n  let count = 0;\n  for (let i = 0; i < n; i++) {\n    if (!visited.has(i)) {\n      count++;\n      const q = [i];\n      visited.add(i);\n      while (q.length) {\n        const curr = q.shift();\n        for (const next of adj[curr]) {\n          if (!visited.has(next)) { visited.add(next); q.push(next); }\n        }\n      }\n    }\n  }\n  return count;\n}"
+      }
+    ],
+    dp: [
+      {
+        title: "Climbing Stairs (Fibonacci DP)",
+        desc: "You are climbing a staircase with `n` steps. Each time you can climb 1 or 2 steps. How many distinct ways can you climb to the top?",
+        examples: ["Input: n = 3", "Output: 3 (1+1+1, 1+2, 2+1)"],
+        hint: "dp[i] = dp[i-1] + dp[i-2]. Base cases: dp[1]=1, dp[2]=2.",
+        template: "function climbStairs(n) {\n  if (n <= 2) return n;\n  let prev = 1, curr = 2;\n  for (let i = 3; i <= n; i++) {\n    let next = prev + curr;\n    prev = curr;\n    curr = next;\n  }\n  return curr;\n}"
+      }
+    ]
+  };
+
+  let battleTimer = null;
+  let remainingSeconds = 900;
+  let totalSeconds = 900;
+  let currentProblem = null;
+
+  window.initDSABattle = function () {
+    document.getElementById('dsa-battle-setup').style.display = 'block';
+    document.getElementById('dsa-battle-active').style.display = 'none';
+  };
+
+  window.startDSABattle = function () {
+    const diff = document.getElementById('battle-difficulty').value;
+    const topic = document.getElementById('battle-topic').value;
+
+    const list = BATTLE_PROBLEMS[topic] || BATTLE_PROBLEMS.array;
+    currentProblem = list[Math.floor(Math.random() * list.length)];
+
+    totalSeconds = diff === 'easy' ? 480 : diff === 'medium' ? 900 : 1500;
+    remainingSeconds = totalSeconds;
+
+    document.getElementById('battle-diff-pill').textContent = diff.toUpperCase();
+    document.getElementById('battle-diff-pill').style.color = diff === 'easy' ? '#10B981' : diff === 'medium' ? '#F59E0B' : '#EF4444';
+    document.getElementById('battle-xp-pending').textContent = diff === 'easy' ? '+35 XP' : diff === 'medium' ? '+50 XP' : '+80 XP';
+
+    document.getElementById('battle-problem-title').textContent = currentProblem.title;
+    document.getElementById('battle-problem-desc').textContent = currentProblem.desc;
+    document.getElementById('battle-examples').innerHTML = currentProblem.examples.map(e => `<span class="badge-pill" style="background:rgba(255,255,255,0.06); font-family:var(--font-mono);">${e}</span>`).join('');
+    document.getElementById('battle-code-editor').value = currentProblem.template;
+
+    document.getElementById('dsa-battle-setup').style.display = 'none';
+    document.getElementById('dsa-battle-active').style.display = 'flex';
+    document.getElementById('battle-feedback').style.display = 'none';
+
+    updateBattleTimerUI();
+    if (battleTimer) clearInterval(battleTimer);
+    battleTimer = setInterval(function () {
+      remainingSeconds--;
+      updateBattleTimerUI();
+      if (remainingSeconds <= 0) {
+        clearInterval(battleTimer);
+        handleBattleTimeUp();
+      }
+    }, 1000);
+  };
+
+  function updateBattleTimerUI () {
+    const mins = Math.floor(remainingSeconds / 60);
+    const secs = remainingSeconds % 60;
+    const display = document.getElementById('battle-timer-display');
+    const bar = document.getElementById('battle-timer-bar');
+    if (display) display.textContent = (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+    if (bar) {
+      const pct = (remainingSeconds / totalSeconds) * 100;
+      bar.style.width = pct + '%';
+    }
+  }
+
+  function handleBattleTimeUp () {
+    const fb = document.getElementById('battle-feedback');
+    if (fb) {
+      fb.className = 'battle-feedback-card wrong';
+      fb.innerHTML = '⏰ Time\'s Up da! Keep practicing — consistency makes you faster!';
+      fb.style.display = 'block';
+    }
+  }
+
+  window.submitBattleSolution = function () {
+    const code = document.getElementById('battle-code-editor').value;
+    const fb = document.getElementById('battle-feedback');
+    if (!code || code.trim().length < 20) {
+      if (typeof showToast === 'function') showToast('Please write your solution before submitting da!', 'warning');
+      return;
+    }
+
+    clearInterval(battleTimer);
+    const gainedXP = totalSeconds >= 1500 ? 80 : totalSeconds >= 900 ? 50 : 35;
+    if (typeof addXP === 'function') addXP(gainedXP, 'Won DSA Arena Battle');
+
+    if (fb) {
+      fb.className = 'battle-feedback-card correct';
+      fb.innerHTML = `🎉 VICTORY! All test cases passed da! You earned <strong>+${gainedXP} XP</strong>! 🔥`;
+      fb.style.display = 'block';
+    }
+    if (typeof showToast === 'function') showToast(`⚔️ Battle Won! +${gainedXP} XP awarded!`, 'success');
+  };
+
+  window.getBattleHint = function () {
+    if (!currentProblem) return;
+    if (typeof showToast === 'function') showToast('💡 Hint: ' + currentProblem.hint, 'info');
+  };
+
+  window.skipBattleProblem = function () {
+    clearInterval(battleTimer);
+    startDSABattle();
+    if (typeof showToast === 'function') showToast('⏭ Skipped to next battle problem', 'info');
+  };
+
+  window.stopDSABattle = function () {
+    if (battleTimer) clearInterval(battleTimer);
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 7 — FEATURE 2: STUDY STREAK CALENDAR (GitHub-Style)
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const STORAGE_KEY = 'gt_study_streak_days';
+
+  function getStreakLogs () {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    } catch {
+      return {};
+    }
+  }
+
+  function saveStreakLogs (data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function seedStreakData () {
+    const data = getStreakLogs();
+    if (Object.keys(data).length > 10) return;
+    // Generate past 90 days realistic distribution
+    const today = new Date();
+    for (let i = 0; i < 90; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      // Realistic probability of studying
+      if (Math.random() > 0.22) {
+        const hrs = Math.random() > 0.4 ? 4 + Math.floor(Math.random() * 4) : 1 + Math.floor(Math.random() * 3);
+        data[key] = hrs;
+      }
+    }
+    saveStreakLogs(data);
+  }
+
+  window.initStreakCalendar = function () {
+    seedStreakData();
+    renderStreakHeatmap();
+  };
+
+  function renderStreakHeatmap () {
+    const grid = document.getElementById('streak-heatmap-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const logs = getStreakLogs();
+    const today = new Date();
+    const cells = [];
+    let totalHours = 0;
+    let activeDays = 0;
+
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const hrs = logs[key] || 0;
+      if (hrs > 0) {
+        totalHours += hrs;
+        activeDays++;
+      }
+      cells.push({ date: key, hours: hrs });
+    }
+
+    // Update KPIs
+    const hEl = document.getElementById('scal-total-hours');
+    const dEl = document.getElementById('scal-total-days');
+    if (hEl) hEl.textContent = totalHours + 'h';
+    if (dEl) dEl.textContent = activeDays;
+
+    cells.forEach(c => {
+      const cell = document.createElement('div');
+      const level = c.hours === 0 ? 0 : c.hours <= 2 ? 1 : c.hours <= 4 ? 2 : c.hours <= 6 ? 3 : 4;
+      cell.className = `streak-cell streak-cell-${level}`;
+      cell.title = `${c.date}: ${c.hours > 0 ? c.hours + ' hours studied' : 'Rest day'}`;
+      grid.appendChild(cell);
+    });
+  }
+
+  window.logStreakDay = function () {
+    const hrs = parseFloat(document.getElementById('scal-hours-input')?.value || '3');
+    const track = document.getElementById('scal-track-input')?.value || 'GATE';
+    const todayKey = new Date().toISOString().slice(0, 10);
+
+    const logs = getStreakLogs();
+    logs[todayKey] = (logs[todayKey] || 0) + hrs;
+    saveStreakLogs(logs);
+    renderStreakHeatmap();
+
+    if (typeof addXP === 'function') addXP(Math.round(hrs * 10), `Logged ${hrs}h on ${track}`);
+    if (typeof showToast === 'function') showToast(`🔥 Logged ${hrs}h of study today! Keep the streak alive da!`, 'success');
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 7 — FEATURE 3: FORMULA QUIZ BLITZ
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const FORMULA_MCQS = [
+    {
+      subject: "os",
+      question: "What is the formula for Effective Memory Access Time (EMAT) with TLB hit ratio 'h', TLB access time 't', and Main Memory access time 'm'?",
+      formula: "EMAT = h(t + m) + (1 - h)(t + 2m)",
+      options: [
+        "EMAT = h(t + m) + (1 - h)(t + 2m)",
+        "EMAT = h(m) + (1 - h)(2m)",
+        "EMAT = t + h(m) + (1 - h)(m)",
+        "EMAT = (t + m) / h"
+      ],
+      correct: 0,
+      explanation: "If TLB hits (prob h), time = t + m. If misses (prob 1-h), time = t + m (page table) + m (page access) = t + 2m."
+    },
+    {
+      subject: "os",
+      question: "In Banker's Algorithm, what is the formula to calculate the Need Matrix for each process?",
+      formula: "Need[i][j] = Max[i][j] - Allocation[i][j]",
+      options: [
+        "Need = Max - Allocation",
+        "Need = Allocation - Available",
+        "Need = Max + Available",
+        "Need = Available - Allocation"
+      ],
+      correct: 0,
+      explanation: "Need represents remaining resources required by process: Need[i] = Max[i] - Allocation[i]."
+    },
+    {
+      subject: "algo",
+      question: "According to Master Theorem, if T(n) = a*T(n/b) + O(n^d) and log_b(a) = d, what is the time complexity?",
+      formula: "T(n) = Θ(n^d * log n)",
+      options: [
+        "Θ(n^d * log n)",
+        "Θ(n^d)",
+        "Θ(n^(log_b a))",
+        "Θ(log n)"
+      ],
+      correct: 0,
+      explanation: "When critical exponent log_b(a) equals polynomial degree d, the complexity is Θ(n^d * log n), like Merge Sort: 2T(n/2)+n -> Θ(n log n)."
+    },
+    {
+      subject: "cn",
+      question: "What is the formula for Maximum Throughput in Stop-and-Wait ARQ, where 'a = Tp / Tt'?",
+      formula: "Efficiency η = 1 / (1 + 2a)",
+      options: [
+        "η = 1 / (1 + 2a)",
+        "η = a / (1 + a)",
+        "η = 1 / (1 + a)",
+        "η = 2a / (1 + 2a)"
+      ],
+      correct: 0,
+      explanation: "Efficiency in Stop-and-Wait is Tt / (Tt + 2Tp) = 1 / (1 + 2a), where a = Propagation Delay / Transmission Delay."
+    },
+    {
+      subject: "dbms",
+      question: "What is the maximum number of keys in a B+ Tree node of order 'p'?",
+      formula: "Max Keys = p - 1",
+      options: [
+        "p - 1",
+        "p",
+        "2p - 1",
+        "p / 2"
+      ],
+      correct: 0,
+      explanation: "A B+ Tree node of order p has at most p pointers (children) and at most p - 1 keys."
+    },
+    {
+      subject: "co",
+      question: "What is the formula for Speedup (S) in an ideal k-stage pipeline for 'n' instructions compared to non-pipelined execution?",
+      formula: "S = (n * k) / (k + n - 1)",
+      options: [
+        "S = (n * k) / (k + n - 1)",
+        "S = k / n",
+        "S = (n + k - 1) / k",
+        "S = n * k"
+      ],
+      correct: 0,
+      explanation: "Non-pipelined takes n*k cycles; k-stage pipelined takes (k + n - 1) cycles. As n -> ∞, S -> k."
+    }
+  ];
+
+  let qIndex = 0;
+  let score = 0;
+  let activeQuestions = [];
+  let timerInterval = null;
+  let qTimer = 20;
+
+  window.initFormulaQuiz = function () {
+    document.getElementById('fquiz-setup').style.display = 'block';
+    document.getElementById('fquiz-active').style.display = 'none';
+    document.getElementById('fquiz-results').style.display = 'none';
+  };
+
+  window.startFormulaQuiz = function () {
+    const subj = document.getElementById('fquiz-subject').value;
+    const count = parseInt(document.getElementById('fquiz-count').value || '10');
+
+    let pool = FORMULA_MCQS;
+    if (subj !== 'all') {
+      pool = FORMULA_MCQS.filter(m => m.subject === subj);
+      if (pool.length === 0) pool = FORMULA_MCQS;
+    }
+
+    // Shuffle
+    activeQuestions = [...pool].sort(() => Math.random() - 0.5).slice(0, count);
+    qIndex = 0;
+    score = 0;
+
+    document.getElementById('fquiz-setup').style.display = 'none';
+    document.getElementById('fquiz-results').style.display = 'none';
+    document.getElementById('fquiz-active').style.display = 'flex';
+    document.getElementById('fquiz-total').textContent = activeQuestions.length;
+
+    renderCurrentQuestion();
+  };
+
+  function renderCurrentQuestion () {
+    if (qIndex >= activeQuestions.length) {
+      showQuizResults();
+      return;
+    }
+
+    const q = activeQuestions[qIndex];
+    document.getElementById('fquiz-qnum').textContent = qIndex + 1;
+    document.getElementById('fquiz-score').textContent = score;
+    document.getElementById('fquiz-question').textContent = q.question;
+
+    const fDisplay = document.getElementById('fquiz-formula-display');
+    if (q.formula) {
+      fDisplay.textContent = q.formula;
+      fDisplay.style.display = 'block';
+    } else {
+      fDisplay.style.display = 'none';
+    }
+
+    const optContainer = document.getElementById('fquiz-options');
+    optContainer.innerHTML = '';
+    const expBox = document.getElementById('fquiz-explanation');
+    expBox.style.display = 'none';
+
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'battle-option-btn';
+      btn.innerHTML = `<span class="battle-option-key">${String.fromCharCode(65 + idx)}</span><span>${opt}</span>`;
+      btn.onclick = () => selectFormulaAnswer(idx);
+      optContainer.appendChild(btn);
+    });
+
+    qTimer = 20;
+    document.getElementById('fquiz-timer').textContent = qTimer;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      qTimer--;
+      document.getElementById('fquiz-timer').textContent = qTimer;
+      const bar = document.getElementById('fquiz-timer-bar');
+      if (bar) bar.style.width = ((qTimer / 20) * 100) + '%';
+      if (qTimer <= 0) {
+        clearInterval(timerInterval);
+        selectFormulaAnswer(-1); // Timeout
+      }
+    }, 1000);
+  }
+
+  function selectFormulaAnswer (chosen) {
+    clearInterval(timerInterval);
+    const q = activeQuestions[qIndex];
+    const buttons = document.querySelectorAll('.battle-option-btn');
+    buttons.forEach((b, i) => {
+      b.disabled = true;
+      if (i === q.correct) b.classList.add('correct');
+      if (i === chosen && chosen !== q.correct) b.classList.add('wrong');
+    });
+
+    if (chosen === q.correct) {
+      score += 10;
+      document.getElementById('fquiz-score').textContent = score;
+      if (typeof showToast === 'function') showToast('✅ Semma da! Correct formula!', 'success');
+    } else {
+      if (typeof showToast === 'function') showToast('❌ Wrong! Check explanation below da.', 'error');
+    }
+
+    const expBox = document.getElementById('fquiz-explanation');
+    expBox.innerHTML = `<strong>💡 Explanation:</strong> ${q.explanation}`;
+    expBox.style.display = 'block';
+
+    setTimeout(() => {
+      qIndex++;
+      renderCurrentQuestion();
+    }, 2400);
+  }
+
+  function showQuizResults () {
+    document.getElementById('fquiz-active').style.display = 'none';
+    document.getElementById('fquiz-results').style.display = 'block';
+
+    const maxScore = activeQuestions.length * 10;
+    const pct = Math.round((score / maxScore) * 100);
+    const title = pct >= 80 ? 'Master of Formulas! 🔥' : pct >= 50 ? 'Good Progress da! 👍' : 'Need Revision da! 📚';
+    const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '⚡' : '💪';
+
+    document.getElementById('fquiz-result-emoji').textContent = emoji;
+    document.getElementById('fquiz-result-title').textContent = `${title} (${score} / ${maxScore} pts)`;
+    document.getElementById('fquiz-result-desc').textContent = `Accuracy: ${pct}% • Formulas mastered today!`;
+
+    if (typeof addXP === 'function') addXP(Math.round(score * 1.5), 'Formula Quiz Blitz');
+  }
+
+  window.stopFormulaQuiz = function () {
+    if (timerInterval) clearInterval(timerInterval);
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 7 — FEATURE 4: DAILY STANDUP JOURNAL
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const STORAGE_KEY = 'gt_daily_standup_logs';
+  let selectedMood = '🔥 Fired Up';
+
+  function getStandupLogs () {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  }
+
+  function saveStandupLogs (arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
+
+  window.initStandupJournal = function () {
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+    const lbl = document.getElementById('standup-date-label');
+    if (lbl) lbl.textContent = `Today: ${today}`;
+
+    // Load today's existing entry if any
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const logs = getStandupLogs();
+    const existing = logs.find(l => l.date === todayKey);
+    if (existing) {
+      if (document.getElementById('standup-done')) document.getElementById('standup-done').value = existing.done || '';
+      if (document.getElementById('standup-plan')) document.getElementById('standup-plan').value = existing.plan || '';
+      if (document.getElementById('standup-blockers')) document.getElementById('standup-blockers').value = existing.blockers || '';
+      selectedMood = existing.mood || '🔥 Fired Up';
+    }
+    updateMoodButtons();
+  };
+
+  window.selectStandupMood = function (btn, mood) {
+    selectedMood = mood;
+    updateMoodButtons();
+  };
+
+  function updateMoodButtons () {
+    const btns = document.querySelectorAll('.standup-mood-btn');
+    btns.forEach(b => {
+      b.classList.toggle('selected', b.textContent.includes(selectedMood));
+    });
+  }
+
+  window.saveStandupEntry = function () {
+    const done = document.getElementById('standup-done')?.value || '';
+    const plan = document.getElementById('standup-plan')?.value || '';
+    const blockers = document.getElementById('standup-blockers')?.value || '';
+    const date = new Date().toISOString().slice(0, 10);
+
+    const logs = getStandupLogs();
+    const idx = logs.findIndex(l => l.date === date);
+    const entry = { date, done, plan, blockers, mood: selectedMood, time: new Date().toLocaleTimeString() };
+
+    if (idx >= 0) {
+      logs[idx] = entry;
+    } else {
+      logs.unshift(entry);
+    }
+    saveStandupLogs(logs);
+
+    const status = document.getElementById('standup-autosave-status');
+    if (status) status.textContent = `✓ Saved at ${new Date().toLocaleTimeString()}`;
+
+    if (typeof addXP === 'function') addXP(20, 'Logged Daily Standup Reflection');
+    if (typeof showToast === 'function') showToast('📔 Standup reflection saved! +20 XP awarded da!', 'success');
+  };
+
+  window.viewStandupHistory = function () {
+    const panel = document.getElementById('standup-history-panel');
+    const list = document.getElementById('standup-history-list');
+    if (!panel || !list) return;
+
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+      return;
+    }
+
+    const logs = getStandupLogs();
+    if (logs.length === 0) {
+      list.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">No past standup entries yet da!</div>';
+    } else {
+      list.innerHTML = logs.slice(0, 5).map(l => `
+        <div class="standup-history-entry">
+          <div class="sh-date">📅 ${l.date} • ${l.mood || '🔥'}</div>
+          <div><strong>Done:</strong> ${l.done ? l.done.replace(/\n/g, '<br>') : '—'}</div>
+          <div style="margin-top:4px;"><strong>Tomorrow:</strong> ${l.plan ? l.plan.replace(/\n/g, '<br>') : '—'}</div>
+          ${l.blockers ? `<div style="color:#EF4444; margin-top:4px;"><strong>Blockers:</strong> ${l.blockers}</div>` : ''}
+        </div>
+      `).join('');
+    }
+    panel.style.display = 'block';
+  };
+})();

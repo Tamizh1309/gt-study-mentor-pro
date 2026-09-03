@@ -6202,3 +6202,212 @@ body {
   background: var(--primary);
   color: #000;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 7 — DSA BATTLE MODE
+   ══════════════════════════════════════════════════════════════ */
+.battle-timer-display {
+  font-size: 2rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: #fff;
+  letter-spacing: 2px;
+}
+.battle-timer-bar-wrap {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.battle-timer-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981, #F59E0B, #EF4444);
+  border-radius: 3px;
+  transition: width 1s linear;
+  width: 100%;
+}
+.battle-problem-card {
+  background: rgba(10, 14, 30, 0.8);
+  border: 1px solid rgba(108, 99, 255, 0.25);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.battle-code-editor {
+  width: 100%;
+  height: 160px;
+  background: rgba(5, 8, 18, 0.9);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  color: #10B981;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 14px;
+  resize: vertical;
+  outline: none;
+  line-height: 1.6;
+  transition: border-color 0.2s;
+}
+.battle-code-editor:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(108,99,255,0.2);
+}
+.battle-xp-badge {
+  padding: 4px 12px;
+  background: rgba(108,99,255,0.18);
+  border: 1px solid rgba(108,99,255,0.35);
+  color: var(--primary-light);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 800;
+}
+.battle-difficulty-pill {
+  padding: 4px 12px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  color: #F59E0B;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 800;
+}
+.battle-option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.battle-option-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: rgba(108, 99, 255, 0.1);
+  color: #fff;
+}
+.battle-option-btn.correct {
+  border-color: #10B981;
+  background: rgba(16,185,129,0.12);
+  color: #10B981;
+  font-weight: 700;
+}
+.battle-option-btn.wrong {
+  border-color: #EF4444;
+  background: rgba(239,68,68,0.08);
+  color: #EF4444;
+}
+.battle-option-key {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.battle-feedback-card {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  animation: slideUp 0.3s ease;
+}
+.battle-feedback-card.correct {
+  background: rgba(16,185,129,0.12);
+  border: 1px solid rgba(16,185,129,0.3);
+  color: #10B981;
+}
+.battle-feedback-card.wrong {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  color: #EF4444;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 7 — STUDY STREAK CALENDAR
+   ══════════════════════════════════════════════════════════════ */
+.streak-heatmap-wrap {
+  background: rgba(5, 5, 15, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 16px;
+  overflow-x: auto;
+}
+.streak-heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 4px;
+  min-width: 520px;
+}
+.streak-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+.streak-cell:hover {
+  transform: scale(1.3);
+  z-index: 10;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+.streak-cell-0 { background: rgba(16, 185, 129, 0.06); }
+.streak-cell-1 { background: rgba(16, 185, 129, 0.2); }
+.streak-cell-2 { background: rgba(16, 185, 129, 0.4); }
+.streak-cell-3 { background: rgba(16, 185, 129, 0.65); }
+.streak-cell-4 { background: #10B981; }
+.streak-legend-cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 7 — STANDUP JOURNAL
+   ══════════════════════════════════════════════════════════════ */
+.standup-mood-btn {
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 700;
+}
+.standup-mood-btn:hover {
+  border-color: var(--primary);
+  background: rgba(108, 99, 255, 0.12);
+}
+.standup-mood-btn.selected {
+  background: rgba(108, 99, 255, 0.2);
+  border-color: var(--primary);
+  color: var(--primary-light);
+  box-shadow: 0 0 12px rgba(108,99,255,0.2);
+}
+.standup-history-entry {
+  padding: 10px 12px;
+  background: rgba(15,23,42,0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.standup-history-entry .sh-date {
+  font-weight: 800;
+  color: var(--primary-light);
+  margin-bottom: 4px;
+  font-size: 11px;
+}
