@@ -4203,3 +4203,93 @@ window.updateSoundUI = function (label) {
   const el = document.getElementById('pomo-sound-now');
   if (el) el.textContent = label;
 };
+
+// ══════════════════════════════════════════════════════════════
+// HERO TARGET TRACK SWITCHER & HEADER STOPWATCH
+// ══════════════════════════════════════════════════════════════
+(function() {
+  let stopwatchInterval = null;
+  let stopwatchSeconds = 0;
+
+  window.toggleHeaderStopwatch = function() {
+    const btn = document.getElementById('header-stopwatch-btn');
+    const dot = document.getElementById('stopwatch-dot');
+    const display = document.getElementById('header-stopwatch-time');
+
+    if (stopwatchInterval) {
+      // Stop
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
+      if (btn) {
+        btn.textContent = '▶ Focus';
+        btn.style.background = 'var(--primary)';
+        btn.style.color = '#080B18';
+      }
+      if (dot) dot.classList.remove('active');
+
+      const mins = Math.round(stopwatchSeconds / 60);
+      if (mins > 0 && typeof addXP === 'function') {
+        addXP(10, 'Completed Study Focus Session');
+      }
+      if (typeof showToast === 'function') {
+        showToast(`Great session da! Logged ${Math.floor(stopwatchSeconds/60)}m ${stopwatchSeconds%60}s. +10 XP`, 'success', '⏱️');
+      }
+    } else {
+      // Start
+      stopwatchInterval = setInterval(() => {
+        stopwatchSeconds++;
+        const hrs = String(Math.floor(stopwatchSeconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((stopwatchSeconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(stopwatchSeconds % 60).padStart(2, '0');
+        if (display) display.textContent = `${hrs}:${mins}:${secs}`;
+      }, 1000);
+
+      if (btn) {
+        btn.textContent = '⏹ Stop';
+        btn.style.background = 'var(--danger)';
+        btn.style.color = '#fff';
+      }
+      if (dot) dot.classList.add('active');
+      if (typeof showToast === 'function') {
+        showToast('Deep Focus Timer Started! Stay locked in da.', 'info', '⚡');
+      }
+    }
+  };
+
+  const TRACK_QUOTES = {
+    all: '"Consistency beats intensity da — every day you show up, you compound!"',
+    gate: '"Master OS & Algorithms daily da — GATE CS AIR < 100 is within your reach!"',
+    placement: '"100+ top tech companies in your directory — crack Round 1 with speed & aptitude!"',
+    swe: '"17 core DSA patterns + clean LLD — Amazon and Microsoft want rock-solid problem solvers!"',
+    internship: '"Resume ATS 84/100 — apply to 2 more product roles this week da!"'
+  };
+
+  window.selectHeroTargetTrack = function(track) {
+    document.querySelectorAll('.hero-track-pill').forEach(p => p.classList.remove('active'));
+    const activePill = document.getElementById('track-pill-' + track);
+    if (activePill) activePill.classList.add('active');
+
+    const quoteEl = document.getElementById('greeting-hero-quote');
+    if (quoteEl && TRACK_QUOTES[track]) {
+      quoteEl.textContent = TRACK_QUOTES[track];
+    }
+
+    // Highlight target track card
+    document.querySelectorAll('.magic-kpi-card').forEach(c => c.classList.remove('track-selected'));
+    if (track === 'gate') {
+      document.querySelector('.magic-kpi-card[onclick*="gate"]')?.classList.add('track-selected');
+      if (typeof filterStudioHub === 'function') filterStudioHub('gate');
+    } else if (track === 'placement') {
+      document.querySelector('.magic-kpi-card[onclick*="placement"]')?.classList.add('track-selected');
+      if (typeof filterStudioHub === 'function') filterStudioHub('career');
+    } else if (track === 'swe') {
+      document.querySelector('.magic-kpi-card[onclick*="swe"]')?.classList.add('track-selected');
+      if (typeof filterStudioHub === 'function') filterStudioHub('ai');
+    } else if (track === 'internship') {
+      document.querySelector('.magic-kpi-card[onclick*="internship"]')?.classList.add('track-selected');
+      if (typeof filterStudioHub === 'function') filterStudioHub('career');
+    } else {
+      if (typeof filterStudioHub === 'function') filterStudioHub('all');
+    }
+  };
+})();

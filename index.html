@@ -218,6 +218,12 @@
           </p>
         </div>
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <!-- ── Live Header Study Stopwatch ── -->
+          <div class="header-stopwatch-wrap" id="header-stopwatch-wrap" style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); padding:4px 10px; border-radius:12px;">
+            <span class="stopwatch-dot" id="stopwatch-dot" style="width:8px; height:8px; border-radius:50%; background:#64748B; transition:all 0.3s ease;"></span>
+            <span style="font-size:12px; font-weight:800; font-family:var(--font-mono); color:#fff;" id="header-stopwatch-time">00:00:00</span>
+            <button class="action-btn" id="header-stopwatch-btn" onclick="toggleHeaderStopwatch()" style="font-size:11px; padding:3px 10px; font-weight:800; border-radius:6px; background:var(--primary); color:#080B18; border:none; cursor:pointer;">▶ Focus</button>
+          </div>
           <button class="header-badge-pill" onclick="openModal('ai-engine-modal'); initAIEngineModal();" style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#10B981; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:6px;">
             <span class="status-dot-active"></span>
             <span>⚡ GPT-5.4 Active</span>
@@ -273,6 +279,15 @@
 
         <!-- Four Preparation Tracks Summary Pills -->
         <!-- Four Preparation Tracks Summary KPI Cards (MagicPatterns Style) -->
+        <!-- ── Interactive Career Target Track Switcher Pills ── -->
+        <div class="hero-track-switcher" style="display:flex; gap:8px; margin:16px 0 14px; overflow-x:auto; padding-bottom:4px;">
+          <button type="button" class="hero-track-pill active" id="track-pill-all" onclick="selectHeroTargetTrack('all')">🌟 All Goals (4)</button>
+          <button type="button" class="hero-track-pill" id="track-pill-gate" onclick="selectHeroTargetTrack('gate')">⚡ GATE CS 2027</button>
+          <button type="button" class="hero-track-pill" id="track-pill-placement" onclick="selectHeroTargetTrack('placement')">💼 Placements</button>
+          <button type="button" class="hero-track-pill" id="track-pill-swe" onclick="selectHeroTargetTrack('swe')">💻 Software Eng</button>
+          <button type="button" class="hero-track-pill" id="track-pill-internship" onclick="selectHeroTargetTrack('internship')">🚀 Internships</button>
+        </div>
+
         <div class="magic-kpi-grid">
           <!-- GATE 2027 -->
           <div class="magic-kpi-card" onclick="navigateToView('prepare', 'gate')">

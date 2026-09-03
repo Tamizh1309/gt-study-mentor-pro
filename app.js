@@ -2687,27 +2687,27 @@ document.addEventListener('keydown', (e) => {
 
   // ? key for help (outside inputs)
   if (!inInput && e.key === '?' && !e.altKey) {
-    openModal('keyboard-shortcuts-modal');
+    openModal('command-palette-modal');
     return;
   }
 
   if (!e.altKey) return;
 
   switch(e.key.toLowerCase()) {
-    case 'c': e.preventDefault(); openModal('code-editor-modal'); break;
-    case 'i': e.preventDefault(); openModal('ai-insights-modal'); break;
+    case 'c': e.preventDefault(); openModal('code-studio-modal'); break;
+    case 'i': e.preventDefault(); openModal('ai-engine-modal'); if (window.initAIEngineModal) initAIEngineModal(); break;
     case 'e': e.preventDefault(); document.getElementById('export-chat-btn')?.click(); break;
-    case 'q': e.preventDefault(); openModal('quiz-modal'); startQuiz(); break;
-    case 'f': e.preventDefault(); openModal('flashcard-modal'); break;
-    case 'n': e.preventDefault(); openModal('notes-modal'); renderNotesList(); break;
-    case 'h': e.preventDefault(); openModal('habits-modal'); renderHabitsModal(); break;
-    case 'x': e.preventDefault(); openModal('xp-modal'); renderXPModal(); break;
-    case 'p': e.preventDefault(); togglePomodoro(); break;
-    case 'd': e.preventDefault(); switchView('dashboard'); break;
-    case 'r': e.preventDefault(); openModal('resume-modal'); break;
-    case 'm': e.preventDefault(); openModal('mastery-modal'); break;
-    case 'l': e.preventDefault(); openModal('lofi-modal'); break;
-    case 's': e.preventDefault(); openModal('formulas-modal'); break;
+    case 'q': e.preventDefault(); openModal('formula-quiz-modal'); if (window.initFormulaQuiz) initFormulaQuiz(); break;
+    case 'f': e.preventDefault(); openModal('formula-vault-modal'); if (window.initFormulaVault) initFormulaVault(); break;
+    case 'n': e.preventDefault(); openModal('notes-vault-modal'); if (window.initNotesVault) initNotesVault(); break;
+    case 'h': e.preventDefault(); openModal('streak-calendar-modal'); if (window.initStreakCalendar) initStreakCalendar(); break;
+    case 'x': e.preventDefault(); openModal('motivation-modal'); if (window.renderMotivationEngine) renderMotivationEngine(); break;
+    case 'p': e.preventDefault(); openModal('pomodoro-modal'); if (window.initPomoTimer) initPomoTimer(); break;
+    case 'd': e.preventDefault(); if (window.navigateToView) navigateToView('home'); break;
+    case 'r': e.preventDefault(); openModal('resume-ats-modal'); break;
+    case 'm': e.preventDefault(); openModal('mindmap-modal'); if (window.initMindMap) initMindMap(); break;
+    case 'l': e.preventDefault(); openModal('pomodoro-modal'); if (window.initPomoTimer) initPomoTimer(); break;
+    case 's': e.preventDefault(); openModal('dsa-battle-modal'); if (window.initDSABattle) initDSABattle(); break;
   }
 });
 
@@ -3602,11 +3602,11 @@ document.addEventListener('keydown', (e) => {
   const tag = document.activeElement.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
   switch(e.key.toLowerCase()) {
-    case 'a': e.preventDefault(); openModal('analytics-modal'); renderAnalyticsModal(); break;
-    case 'g': e.preventDefault(); openModal('predictor-modal'); break;
-    case 'b': e.preventDefault(); renderBadgeGallery(); openModal('badges-modal'); break;
-    case 'u': e.preventDefault(); openModal('doubt-solver-modal'); break;
-    case 'o': e.preventDefault(); openPomoLog(); break;
+    case 'a': e.preventDefault(); if (window.navigateToView) navigateToView('progress', 'mastery'); break;
+    case 'g': e.preventDefault(); openModal('gate-predictor-modal'); if (window.runGatePredictor) runGatePredictor(); break;
+    case 'b': e.preventDefault(); openModal('motivation-modal'); if (window.renderMotivationEngine) renderMotivationEngine(); break;
+    case 'u': e.preventDefault(); if (window.navigateToView) navigateToView('chat'); break;
+    case 'o': e.preventDefault(); openModal('pomodoro-modal'); if (window.initPomoTimer) initPomoTimer(); break;
   }
 });
 
