@@ -6489,3 +6489,25 @@ body {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
 }
+
+.fqab-battle:hover { background: rgba(239, 68, 68, 0.18); border-color: #EF4444; }
+.fqab-standup:hover { background: rgba(168, 85, 247, 0.18); border-color: #A855F7; }
+
+/* Responsive quick action dock on small screens */
+@media (max-width: 600px) {
+  .floating-qab {
+    bottom: 16px;
+    right: 12px;
+    left: 12px;
+    justify-content: space-around;
+    padding: 6px 8px;
+    border-radius: 16px;
+  }
+  .fqab-btn {
+    min-width: 44px;
+    padding: 6px 4px;
+  }
+  .fqab-label {
+    font-size: 8px;
+  }
+}
