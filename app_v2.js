@@ -3095,3 +3095,466 @@ Be concise, direct, and encourage the student in friendly Tanglish.`;
 
 
 
+// ══════════════════════════════════════════════════════════════
+// WAVE 6 — FEATURE D.1: ANIMATED TIME-AWARE GREETING HERO
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const GREETING_CONFIG = {
+    morning:   { emoji: '🌅', label: 'Good Morning', gradient: 'linear-gradient(135deg, rgba(255,180,0,0.08) 0%, rgba(108,99,255,0.06) 100%)' },
+    afternoon: { emoji: '☀️', label: 'Good Afternoon', gradient: 'linear-gradient(135deg, rgba(0,212,255,0.07) 0%, rgba(108,99,255,0.06) 100%)' },
+    evening:   { emoji: '🌆', label: 'Good Evening', gradient: 'linear-gradient(135deg, rgba(239,68,68,0.07) 0%, rgba(108,99,255,0.06) 100%)' },
+    night:     { emoji: '🌙', label: 'Good Night', gradient: 'linear-gradient(135deg, rgba(17,17,51,0.5) 0%, rgba(108,99,255,0.08) 100%)' }
+  };
+
+  const TANGLISH_QUOTES = [
+    '"Consistency beats intensity da — every day you show up, you compound!"',
+    '"GATE 2027 target fix pannunga — today\'s 6 hours is tomorrow\'s AIR da!"',
+    '"Oru topic-a complete panna 10 XP kidaikkum — start panunga da!"',
+    '"Amazon interview-ku prepare agara — every DSA problem counts da!"',
+    '"Sleep 10 PM, wake up sharp — that\'s the Tamizh way to GATE top rank da!"',
+    '"One subject at a time — OS today, DBMS tomorrow — namma win pannuvolam!"',
+    '"Your 90-day trajectory is on track — keep the momentum going da!"',
+    '"Revision is not repetition, it\'s consolidation — schedule-a follow pannunga!"'
+  ];
+
+  function getTimeOfDay () {
+    const h = new Date().getHours();
+    if (h < 12) return 'morning';
+    if (h < 17) return 'afternoon';
+    if (h < 20) return 'evening';
+    return 'night';
+  }
+
+  window.initAnimatedGreeting = function () {
+    const tod = getTimeOfDay();
+    const cfg = GREETING_CONFIG[tod];
+    const card = document.getElementById('greeting-hero');
+    const titleEl = document.getElementById('greeting-hero-title');
+    const quoteEl = document.getElementById('greeting-hero-quote');
+
+    if (card) {
+      card.style.background = cfg.gradient;
+      // Restore glassmorphic base
+      card.style.backdropFilter = 'blur(20px) saturate(180%)';
+      card.style.webkitBackdropFilter = 'blur(20px) saturate(180%)';
+    }
+    if (titleEl) titleEl.textContent = cfg.emoji + ' ' + cfg.label + ', Tamizh!';
+    if (quoteEl) quoteEl.textContent = TANGLISH_QUOTES[Math.floor(Math.random() * TANGLISH_QUOTES.length)];
+
+    // Live XP & streak from localStorage
+    const xpVal = parseInt(localStorage.getItem('gtXP') || '2450');
+    const streakVal = parseInt(localStorage.getItem('gtStreak') || '7');
+    const lvl = Math.floor(xpVal / 500) + 1;
+    const streakBadge = document.getElementById('greeting-streak-badge');
+    const xpBadge = document.getElementById('greeting-xp-badge');
+    if (streakBadge) streakBadge.textContent = '🔥 ' + streakVal + ' Day Streak';
+    if (xpBadge) xpBadge.textContent = '⚡ ' + xpVal.toLocaleString() + ' XP · Lv.' + lvl;
+  };
+
+  // Auto-run on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    initAnimatedGreeting();
+  });
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 6 — FLOATING QUICK-ACTION BAR VISIBILITY
+// ══════════════════════════════════════════════════════════════
+(function () {
+  // Show FAB only on home view
+  const origNav = window.navigateToView;
+  window.navigateToView = function (viewName, subtab) {
+    origNav && origNav(viewName, subtab);
+    const fab = document.getElementById('floating-qab');
+    if (fab) {
+      if (viewName === 'home') {
+        fab.classList.remove('fqab-dismissed');
+        fab.style.display = 'flex';
+      } else {
+        fab.style.display = 'none';
+      }
+    }
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 6 — FEATURE A: GATE MOCK EXAM HISTORY TRACKER
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const STORAGE_KEY = 'gt_gate_mock_history';
+
+  function getHistory () {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+  function saveHistory (arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+  function seedDemoData () {
+    const history = getHistory();
+    if (history.length > 0) return;
+    const demo = [
+      { date:'2026-08-01', total:42, os:6, dbms:4, cn:3, toc:5, co:4, algo:8, math:12 },
+      { date:'2026-08-10', total:51, os:8, dbms:5, cn:4, toc:6, co:5, algo:10, math:13 },
+      { date:'2026-08-18', total:58, os:9, dbms:6, cn:5, toc:7, co:5, algo:12, math:14 },
+      { date:'2026-08-25', total:63, os:10, dbms:7, cn:6, toc:7, co:6, algo:13, math:14 }
+    ];
+    saveHistory(demo);
+  }
+
+  window.initGateHistory = function () {
+    seedDemoData();
+    renderGateHistoryTable();
+    // Set today's date as default
+    const dateInput = document.getElementById('ghist-date');
+    if (dateInput) dateInput.value = new Date().toISOString().slice(0, 10);
+  };
+
+  window.addGateMockEntry = function () {
+    const date = document.getElementById('ghist-date')?.value;
+    const total = parseInt(document.getElementById('ghist-total')?.value || '0');
+    const os    = parseInt(document.getElementById('ghist-os')?.value || '0');
+    const dbms  = parseInt(document.getElementById('ghist-dbms')?.value || '0');
+    const cn    = parseInt(document.getElementById('ghist-cn')?.value || '0');
+    const toc   = parseInt(document.getElementById('ghist-toc')?.value || '0');
+    const co    = parseInt(document.getElementById('ghist-co')?.value || '0');
+    const algo  = parseInt(document.getElementById('ghist-algo')?.value || '0');
+    const math  = parseInt(document.getElementById('ghist-math')?.value || '0');
+
+    if (!date || isNaN(total)) {
+      if (typeof showToast === 'function') showToast('Please fill date and total score da!', 'error');
+      return;
+    }
+
+    const history = getHistory();
+    history.push({ date, total, os, dbms, cn, toc, co, algo, math });
+    history.sort((a, b) => a.date.localeCompare(b.date));
+    saveHistory(history);
+    renderGateHistoryTable();
+    if (typeof showToast === 'function') showToast('✅ Mock result saved! Keep going da!', 'success');
+    if (typeof addXP === 'function') addXP(15, 'Added GATE Mock Result');
+  };
+
+  window.renderGateHistoryTable = function () {
+    const history = getHistory();
+    const wrap = document.getElementById('gate-history-table-wrap');
+    if (!wrap) return;
+
+    if (history.length === 0) {
+      wrap.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">No mock data yet da! Add your first mock result above.</div>';
+      return;
+    }
+
+    // Update summary KPIs
+    const scores = history.map(h => h.total);
+    const best = Math.max(...scores);
+    const avg = Math.round(scores.reduce((a,b) => a+b, 0) / scores.length);
+    const trend = scores.length > 1 && scores[scores.length-1] > scores[0] ? '↑ Improving' : '→ Stable';
+
+    const setBest = document.getElementById('ghist-best-score');
+    const setAvg  = document.getElementById('ghist-avg-score');
+    const setTotal = document.getElementById('ghist-total-mocks');
+    const setTrend = document.getElementById('ghist-trend-air');
+    if (setBest) setBest.textContent = best + '/100';
+    if (setAvg)  setAvg.textContent  = avg + '/100';
+    if (setTotal) setTotal.textContent = history.length;
+    if (setTrend) {
+      setTrend.textContent = trend;
+      setTrend.style.color = trend.startsWith('↑') ? '#10B981' : '#F59E0B';
+    }
+
+    const SUBJS = [
+      { key:'os', label:'OS', max:15, color:'#818CF8' },
+      { key:'dbms', label:'DBMS', max:10, color:'#10B981' },
+      { key:'cn', label:'CN', max:10, color:'#00D4FF' },
+      { key:'toc', label:'TOC', max:10, color:'#F59E0B' },
+      { key:'co', label:'CO', max:10, color:'#A855F7' },
+      { key:'algo', label:'Algo', max:15, color:'#EF4444' },
+      { key:'math', label:'Math', max:20, color:'#EC4899' }
+    ];
+
+    const bestIdx = scores.indexOf(best);
+
+    const rows = history.map((h, i) => {
+      const isBest = i === bestIdx;
+      const bar = `<span class="ghist-score-bar" style="width:${Math.round((h.total/100)*80)}px;"></span>`;
+      const subjPills = SUBJS.map(s =>
+        `<span class="ghist-subj-pill" style="background:${s.color}22; color:${s.color}; border:1px solid ${s.color}44;">${s.label}: ${h[s.key]||0}/${s.max}</span>`
+      ).join('');
+
+      return `<tr class="${isBest ? 'best-row' : ''}">
+        <td>${h.date}${isBest ? ' 🏆' : ''}</td>
+        <td><strong>${h.total}/100</strong>${bar}</td>
+        <td style="font-size:10px; line-height:1.8;">${subjPills}</td>
+        <td>
+          <button onclick="document.getElementById('ghist-date').value=''; document.getElementById('ghist-total').value='';"
+            class="revision-add-plan-btn" style="font-size:10px; padding:3px 8px;" 
+            title="Analyse">📈 Analyse</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    wrap.innerHTML = `<table class="gate-hist-table">
+      <thead><tr>
+        <th>Date</th><th>Total Score</th><th>Subject Breakdown</th><th>Action</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 6 — FEATURE B: CS CONCEPT MIND MAP
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const SUBJECTS = [
+    { id:'os',   label:'🖥️ OS',         mastery:62, topics:['Process Scheduling','Deadlocks','Memory Mgmt','File Systems','IPC & Sync','Virtual Memory'] },
+    { id:'dbms', label:'🗄️ DBMS',       mastery:78, topics:['Normalization (BCNF)','SQL & Queries','Transaction & ACID','Indexing & B-Trees','ER Modelling','Concurrency Control'] },
+    { id:'cn',   label:'🌐 Networks',   mastery:55, topics:['OSI & TCP/IP','TCP 3-Way Handshake','Subnetting & CIDR','Routing Protocols','DNS & HTTP','Flow Control'] },
+    { id:'toc',  label:'🤖 TOC',        mastery:48, topics:['DFA & NFA','Regular Expr & CFG','PDA & TM','Pumping Lemma','Decidability','P vs NP'] },
+    { id:'co',   label:'⚙️ CO/COA',     mastery:71, topics:['IEEE 754 Float','Pipelining','Cache Hierarchy','RISC vs CISC','Instruction Formats','Memory Hierarchy'] },
+    { id:'algo', label:'📊 Algorithms', mastery:82, topics:['Sorting O(n logn)','Graph BFS/DFS','Dynamic Programming','Greedy Algorithms','Master Theorem','Hashing & B-Trees'] },
+    { id:'dm',   label:'∑ Disc Maths',  mastery:65, topics:['Propositional Logic','Set Theory','Graph Theory','Combinatorics','Relations & Functions','Proof Techniques'] },
+    { id:'em',   label:'📐 Engg Maths', mastery:73, topics:['Linear Algebra','Calculus (Limits)','Probability','Statistics & Mean','Differential Eqs','Complex Numbers'] },
+    { id:'dsa',  label:'🔣 DSA',        mastery:85, topics:['Two Pointers','Sliding Window','Binary Search','Linked Lists','Trees & Tries','Graphs & DP'] }
+  ];
+
+  function getMasteryColor (pct) {
+    if (pct >= 75) return '#10B981';
+    if (pct >= 40) return '#F59E0B';
+    return '#EF4444';
+  }
+
+  window.initMindMap = function () {
+    renderMindMapSVG();
+  };
+
+  function renderMindMapSVG () {
+    const svg = document.getElementById('mindmap-svg');
+    if (!svg) return;
+    svg.innerHTML = '';
+
+    const cx = 430, cy = 280;
+    const R = 180;
+    const total = SUBJECTS.length;
+
+    // Defs for glow filter
+    const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+    defs.innerHTML = `<filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+    svg.appendChild(defs);
+
+    // Centre node
+    const cg = document.createElementNS('http://www.w3.org/2000/svg','g');
+    cg.innerHTML = `
+      <circle cx="${cx}" cy="${cy}" r="46" fill="rgba(108,99,255,0.18)" stroke="#6C63FF" stroke-width="2.5" filter="url(#glow)"/>
+      <text x="${cx}" y="${cy-8}" text-anchor="middle" fill="#fff" font-size="13" font-weight="900" font-family="Outfit,sans-serif">GATE CS</text>
+      <text x="${cx}" y="${cy+8}" text-anchor="middle" fill="#9B94FF" font-size="11" font-weight="700" font-family="Outfit,sans-serif">2027</text>
+      <text x="${cx}" y="${cy+24}" text-anchor="middle" fill="#6C63FF" font-size="10" font-weight="800">9 SUBJECTS</text>
+    `;
+    svg.appendChild(cg);
+
+    SUBJECTS.forEach(function (subj, idx) {
+      const angle = (idx / total) * 2 * Math.PI - Math.PI / 2;
+      const nx = cx + R * Math.cos(angle);
+      const ny = cy + R * Math.sin(angle);
+      const color = getMasteryColor(subj.mastery);
+      const lx1 = cx + 46 * Math.cos(angle);
+      const ly1 = cy + 46 * Math.sin(angle);
+      const lx2 = nx - 28 * Math.cos(angle);
+      const ly2 = ny - 28 * Math.sin(angle);
+
+      // Connection line
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', lx1); line.setAttribute('y1', ly1);
+      line.setAttribute('x2', lx2); line.setAttribute('y2', ly2);
+      line.setAttribute('stroke', color + '66');
+      line.setAttribute('stroke-width','1.5');
+      line.setAttribute('stroke-dasharray','4 3');
+      svg.appendChild(line);
+
+      // Subject node group
+      const ng = document.createElementNS('http://www.w3.org/2000/svg','g');
+      ng.style.cursor = 'pointer';
+      ng.setAttribute('data-subj', subj.id);
+
+      // Mastery ring (background)
+      const ringR = 26;
+      const circ = 2 * Math.PI * ringR;
+      const dashOffset = circ - (subj.mastery / 100) * circ;
+
+      ng.innerHTML = `
+        <circle cx="${nx}" cy="${ny}" r="30" fill="rgba(15,23,42,0.9)" stroke="${color}22" stroke-width="1.5"/>
+        <circle cx="${nx}" cy="${ny}" r="${ringR}" fill="none" stroke="${color}33" stroke-width="3"/>
+        <circle cx="${nx}" cy="${ny}" r="${ringR}" fill="none" stroke="${color}" stroke-width="3"
+          stroke-dasharray="${circ}" stroke-dashoffset="${dashOffset}"
+          stroke-linecap="round" transform="rotate(-90 ${nx} ${ny})"/>
+        <text x="${nx}" y="${ny+4}" text-anchor="middle" fill="${color}" font-size="11" font-weight="900" font-family="JetBrains Mono,monospace">${subj.mastery}%</text>
+      `;
+
+      // Label below node
+      const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('x', nx);
+      label.setAttribute('y', ny + (ny > cy ? 48 : -38));
+      label.setAttribute('text-anchor','middle');
+      label.setAttribute('fill','#fff');
+      label.setAttribute('font-size','10');
+      label.setAttribute('font-weight','800');
+      label.setAttribute('font-family','Inter,sans-serif');
+      label.textContent = subj.label;
+      svg.appendChild(label);
+
+      ng.addEventListener('click', function () { expandMindMapNode(subj.id); });
+      svg.appendChild(ng);
+    });
+  }
+
+  window.expandMindMapNode = function (subjId) {
+    const subj = SUBJECTS.find(s => s.id === subjId);
+    if (!subj) return;
+    const panel = document.getElementById('mindmap-subtopic-panel');
+    const titleEl = document.getElementById('mindmap-subtopic-title');
+    const listEl = document.getElementById('mindmap-subtopic-list');
+    if (!panel || !titleEl || !listEl) return;
+
+    titleEl.textContent = subj.label + ' — Sub-Topics (Mastery: ' + subj.mastery + '%)';
+    const color = getMasteryColor(subj.mastery);
+
+    const MOCK_MASTERY = { 0:35, 1:55, 2:72, 3:88, 4:45, 5:91 };
+    listEl.innerHTML = subj.topics.map(function (t, i) {
+      const m = MOCK_MASTERY[i] || (40 + Math.floor(Math.random() * 50));
+      const c = getMasteryColor(m);
+      const status = m >= 75 ? '✅ Done' : m >= 40 ? '⚠️ Weak' : '❌ Not Started';
+      return `<span class="mindmap-subtopic-chip" style="background:${c}15; color:${c}; border-color:${c}33;">
+        ${t} — ${status} (${m}%)
+      </span>`;
+    }).join('');
+
+    panel.style.display = 'block';
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 6 — FEATURE C: SMART REVISION SCHEDULER
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const LEITNER_TOPICS = {
+    1: [ // Review Daily (Box 1 — weak)
+      { subject:'TOC', topic:'NFA to DFA Conversion', days:1 },
+      { subject:'OS', topic:'Banker\'s Algorithm', days:1 },
+      { subject:'CN', topic:'Subnetting & CIDR', days:1 },
+      { subject:'TOC', topic:'Pumping Lemma', days:1 },
+      { subject:'DBMS', topic:'Functional Dependencies', days:1 },
+      { subject:'CO', topic:'IEEE 754 Floating Point', days:1 },
+      { subject:'Networks', topic:'TCP Congestion Control', days:0 },
+      { subject:'OS', topic:'Page Replacement Algorithms', days:0 }
+    ],
+    2: [ // Every 3 Days
+      { subject:'DBMS', topic:'Normalization (BCNF)', days:2 },
+      { subject:'Algo', topic:'Dijkstra\'s Algorithm', days:1 },
+      { subject:'Algo', topic:'Bellman-Ford Algorithm', days:3 },
+      { subject:'OS', topic:'CPU Scheduling (SRTF)', days:2 },
+      { subject:'DSA', topic:'Sliding Window Maximum', days:4 },
+      { subject:'Networks', topic:'DNS Resolution Process', days:2 },
+      { subject:'Maths', topic:'Bayes\' Theorem', days:5 },
+      { subject:'CO', topic:'Pipeline Hazards', days:3 },
+      { subject:'DSA', topic:'Binary Search Trees', days:6 },
+      { subject:'DBMS', topic:'SQL Joins & Subqueries', days:7 },
+      { subject:'Disc Maths', topic:'Graph Theory Basics', days:4 },
+      { subject:'Algo', topic:'Floyd-Warshall Algorithm', days:5 }
+    ],
+    3: [ // Every Week
+      { subject:'OS', topic:'Virtual Memory & Paging', days:7 },
+      { subject:'CN', topic:'OSI vs TCP/IP Model', days:5 },
+      { subject:'Algo', topic:'Master Theorem', days:3 },
+      { subject:'DBMS', topic:'Indexing & B-Trees', days:8 },
+      { subject:'TOC', topic:'Turing Machine Basics', days:6 },
+      { subject:'CO', topic:'Cache Memory Design', days:7 }
+    ],
+    4: [ // Bi-Weekly (Box 4 — mastered)
+      { subject:'DSA', topic:'Two Pointers Pattern', days:10 },
+      { subject:'Algo', topic:'Merge Sort', days:12 },
+      { subject:'DBMS', topic:'ACID Properties', days:14 },
+      { subject:'OS', topic:'Process Synchronization', days:11 }
+    ]
+  };
+
+  function getStatusInfo (daysAgo) {
+    if (daysAgo <= 0) return { cls:'revision-status-overdue', label:'🔴 Overdue' };
+    if (daysAgo === 1) return { cls:'revision-status-today', label:'🟡 Due Today' };
+    return { cls:'revision-status-upcoming', label:'🟢 In ' + daysAgo + ' days' };
+  }
+
+  window.initRevisionScheduler = function () {
+    generateLeitnerSchedule();
+    // Update box counts
+    const counts = [1,2,3,4];
+    counts.forEach(function(b) {
+      const el = document.getElementById('leitner-box' + b + '-count');
+      if (el) el.textContent = (LEITNER_TOPICS[b] || []).length + ' topics';
+    });
+  };
+
+  window.generateLeitnerSchedule = function () {
+    const list = document.getElementById('revision-schedule-list');
+    if (!list) return;
+
+    // Flatten all topics sorted by urgency
+    const allItems = [];
+    Object.keys(LEITNER_TOPICS).forEach(function(box) {
+      LEITNER_TOPICS[box].forEach(function(t) {
+        allItems.push(Object.assign({ box: parseInt(box) }, t));
+      });
+    });
+    allItems.sort((a, b) => a.days - b.days);
+
+    list.innerHTML = allItems.slice(0, 20).map(function(item) {
+      const status = getStatusInfo(item.days);
+      const boxColor = item.box === 1 ? '#EF4444' : item.box === 2 ? '#F59E0B' : item.box === 3 ? '#818CF8' : '#10B981';
+      return `<div class="revision-item">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="revision-status-chip ${status.cls}">${status.label}</span>
+          <div>
+            <div style="font-size:13px; font-weight:700; color:#fff;">${item.topic}</div>
+            <div style="font-size:11px; color:var(--text-muted);">📚 ${item.subject} • Box ${item.box} 
+              <span style="color:${boxColor}; font-weight:700;">(${item.box === 1 ? 'Daily' : item.box === 2 ? 'Every 3 days' : item.box === 3 ? 'Weekly' : 'Bi-weekly'})</span>
+            </div>
+          </div>
+        </div>
+        <button class="revision-add-plan-btn" onclick="if(typeof showToast==='function') showToast('✅ Added ${item.topic} to Today\\'s Plan!', 'success');">
+          ➕ Add to Plan
+        </button>
+      </div>`;
+    }).join('');
+  };
+
+  window.regenerateRevisionSchedule = function () {
+    // Shuffle order for variety
+    Object.keys(LEITNER_TOPICS).forEach(function(box) {
+      LEITNER_TOPICS[box] = LEITNER_TOPICS[box].sort(() => Math.random() - 0.5);
+    });
+    generateLeitnerSchedule();
+    if (typeof showToast === 'function') showToast('🔄 Schedule regenerated da!', 'info');
+  };
+
+  window.exportRevisionToCalendar = function () {
+    // Create basic iCal string
+    const now = new Date();
+    let ical = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//GT Study Mentor Pro//Wave 6//EN\r\n';
+    const today = new Date();
+    const allItems = [];
+    Object.keys(LEITNER_TOPICS).forEach(function(box) {
+      LEITNER_TOPICS[box].forEach(function(t) { allItems.push(Object.assign({ box: parseInt(box) }, t)); });
+    });
+    allItems.slice(0, 10).forEach(function(item) {
+      const d = new Date(today);
+      d.setDate(d.getDate() + Math.max(0, item.days));
+      const dtStr = d.toISOString().replace(/-|:/g,'').slice(0,8);
+      ical += `BEGIN:VEVENT\r\nDTSTART;VALUE=DATE:${dtStr}\r\nSUMMARY:📚 Revise: ${item.topic} (${item.subject})\r\nDESCRIPTION:GT Mentor Leitner Box ${item.box} Revision\r\nEND:VEVENT\r\n`;
+    });
+    ical += 'END:VCALENDAR';
+    const blob = new Blob([ical], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'GT_Revision_Schedule.ics'; a.click();
+    URL.revokeObjectURL(url);
+    if (typeof showToast === 'function') showToast('📅 iCal exported da! Import into Google Calendar!', 'success');
+  };
+})();

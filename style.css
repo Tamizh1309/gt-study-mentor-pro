@@ -5772,3 +5772,433 @@ body {
   50% { height: 28px; background: var(--accent); }
   100% { height: 14px; background: var(--success); }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 6 — ANIMATED TIME-AWARE GREETING HERO
+   ══════════════════════════════════════════════════════════════ */
+.greeting-hero-card {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(108, 99, 255, 0.35);
+}
+.greeting-hero-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(108, 99, 255, 0.08) 0%,
+    rgba(0, 212, 255, 0.06) 50%,
+    rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  animation: greetingShimmer 6s ease-in-out infinite alternate;
+}
+@keyframes greetingShimmer {
+  0%   { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+.greeting-hero-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  margin: 8px 0 4px;
+  color: #fff;
+  font-family: var(--font-display);
+  background: linear-gradient(135deg, #fff 0%, var(--primary-light) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: slideUp 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.greeting-hero-quote {
+  color: var(--text-sub);
+  font-size: 13px;
+  margin: 0;
+  max-width: 640px;
+  font-style: italic;
+  animation: slideUp 0.7s 0.1s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.greeting-streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: rgba(255, 179, 0, 0.12);
+  border: 1px solid rgba(255, 179, 0, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 800;
+  color: #FFB300;
+  animation: popIn 0.5s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.greeting-xp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: rgba(108, 99, 255, 0.12);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary-light);
+  animation: popIn 0.5s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 6 — FLOATING QUICK-ACTION BAR
+   ══════════════════════════════════════════════════════════════ */
+.floating-qab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(10, 10, 24, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  border-radius: var(--radius-full);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 24px rgba(108, 99, 255, 0.15);
+  z-index: 900;
+  animation: floatUp 0.5s 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
+  transition: var(--transition);
+}
+.floating-qab.fqab-dismissed {
+  display: none;
+}
+@keyframes floatUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fqab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  cursor: pointer;
+  color: #fff;
+  transition: var(--transition);
+  position: relative;
+  min-width: 52px;
+}
+.fqab-btn:hover {
+  background: rgba(108, 99, 255, 0.2);
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(108, 99, 255, 0.25);
+}
+.fqab-icon { font-size: 1.3rem; line-height: 1; }
+.fqab-label { font-size: 9px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.fqab-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #EF4444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(10, 10, 24, 1);
+  line-height: 1.4;
+}
+.fqab-pomo:hover { background: rgba(236, 72, 153, 0.15); border-color: #EC4899; }
+.fqab-note:hover { background: rgba(0, 212, 255, 0.12); border-color: var(--accent); }
+.fqab-quiz:hover { background: rgba(16, 185, 129, 0.12); border-color: var(--success); }
+.fqab-mentor:hover { background: rgba(108, 99, 255, 0.2); border-color: var(--primary); }
+.fqab-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: var(--transition);
+  line-height: 1;
+  margin-left: 4px;
+}
+.fqab-dismiss:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 6 — CARD MICRO-ANIMATIONS
+   ══════════════════════════════════════════════════════════════ */
+@keyframes cardPop {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+#quick-studios-grid .magic-kpi-card {
+  animation: cardPop 0.4s ease both;
+}
+#quick-studios-grid .magic-kpi-card:nth-child(1)  { animation-delay: 0.02s; }
+#quick-studios-grid .magic-kpi-card:nth-child(2)  { animation-delay: 0.05s; }
+#quick-studios-grid .magic-kpi-card:nth-child(3)  { animation-delay: 0.08s; }
+#quick-studios-grid .magic-kpi-card:nth-child(4)  { animation-delay: 0.11s; }
+#quick-studios-grid .magic-kpi-card:nth-child(5)  { animation-delay: 0.14s; }
+#quick-studios-grid .magic-kpi-card:nth-child(6)  { animation-delay: 0.17s; }
+#quick-studios-grid .magic-kpi-card:nth-child(7)  { animation-delay: 0.20s; }
+#quick-studios-grid .magic-kpi-card:nth-child(8)  { animation-delay: 0.23s; }
+#quick-studios-grid .magic-kpi-card:nth-child(9)  { animation-delay: 0.26s; }
+#quick-studios-grid .magic-kpi-card:nth-child(10) { animation-delay: 0.29s; }
+#quick-studios-grid .magic-kpi-card:nth-child(11) { animation-delay: 0.32s; }
+#quick-studios-grid .magic-kpi-card:nth-child(12) { animation-delay: 0.35s; }
+#quick-studios-grid .magic-kpi-card:nth-child(n+13) { animation-delay: 0.38s; }
+
+.studio-card-new {
+  position: relative;
+  overflow: hidden;
+}
+.studio-card-new::after {
+  content: 'NEW';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: linear-gradient(90deg, #6C63FF, #00D4FF);
+  color: #000;
+  font-size: 8px;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.magic-kpi-card:hover {
+  --shimmer-pos: 120%;
+}
+@keyframes shimmerHover {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+#quick-studios-grid .magic-kpi-card:hover {
+  background: linear-gradient(90deg,
+    var(--card-hover) 0%,
+    rgba(108,99,255,0.15) 50%,
+    var(--card-hover) 100%);
+  background-size: 200% 100%;
+  animation: cardPop 0.4s ease both, shimmerHover 1s ease;
+  border-color: rgba(108, 99, 255, 0.5);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 6 — GATE MOCK HISTORY TRACKER
+   ══════════════════════════════════════════════════════════════ */
+.gate-hist-kpi-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  transition: var(--transition);
+}
+.gate-hist-kpi-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+.gate-hist-kpi-val {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--primary);
+  font-family: var(--font-display);
+}
+.gate-hist-kpi-lbl {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.gate-hist-add-form {
+  background: rgba(108, 99, 255, 0.06);
+  border: 1px solid rgba(108, 99, 255, 0.2);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.gate-hist-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.gate-hist-table th {
+  text-align: left;
+  padding: 8px 10px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.gate-hist-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text);
+}
+.gate-hist-table tr:hover td {
+  background: rgba(108, 99, 255, 0.06);
+}
+.gate-hist-table tr.best-row td {
+  background: rgba(0, 230, 118, 0.06);
+  color: #10B981;
+  font-weight: 700;
+}
+.ghist-score-bar {
+  display: inline-block;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  vertical-align: middle;
+  margin-left: 6px;
+  transition: width 0.4s ease;
+}
+.ghist-subj-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  margin: 1px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 6 — CS CONCEPT MIND MAP
+   ══════════════════════════════════════════════════════════════ */
+.mindmap-canvas {
+  flex: 1;
+  background: rgba(5, 5, 15, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 320px;
+  max-height: 400px;
+  cursor: pointer;
+}
+.mindmap-legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid;
+}
+.mindmap-subtopic-panel {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 10px;
+  animation: slideUp 0.3s ease;
+}
+.mindmap-subtopic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid;
+  cursor: default;
+  transition: var(--transition);
+}
+.mindmap-subtopic-chip:hover { transform: scale(1.03); }
+
+/* ══════════════════════════════════════════════════════════════
+   WAVE 6 — SMART REVISION SCHEDULER / LEITNER BOXES
+   ══════════════════════════════════════════════════════════════ */
+.leitner-box-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  transition: var(--transition);
+}
+.leitner-box-card:hover { transform: translateY(-3px); }
+.leitner-box-num {
+  font-size: 1.1rem;
+  font-weight: 900;
+  font-family: var(--font-display);
+}
+.leitner-box-lbl {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin: 2px 0;
+}
+.leitner-box-count {
+  font-size: 13px;
+  font-weight: 800;
+}
+.revision-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+  transition: var(--transition);
+}
+.revision-item:hover {
+  border-color: var(--primary);
+  background: rgba(108, 99, 255, 0.06);
+}
+.revision-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.revision-status-overdue {
+  background: rgba(239, 68, 68, 0.12);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.revision-status-today {
+  background: rgba(245, 158, 11, 0.12);
+  color: #F59E0B;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.revision-status-upcoming {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.revision-add-plan-btn {
+  padding: 4px 12px;
+  background: rgba(108, 99, 255, 0.15);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  color: var(--primary-light);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.revision-add-plan-btn:hover {
+  background: var(--primary);
+  color: #000;
+}
