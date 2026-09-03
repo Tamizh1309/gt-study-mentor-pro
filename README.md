@@ -31,6 +31,9 @@ An enterprise-grade, full-stack AI preparation and placement platform combining:
   - **System Design & Architecture Studio** with interactive blueprints (TinyURL, Rate Limiter, Notification Engine, E-Commerce, Real-Time Chat)
   - **GATE 2027 Weightage Radar & Mark Maximizer** with dynamic score calculator
   - **Study Vault Backup, Restore & Printable Cheat Sheet Engine** (Full offline JSON export/import)
+  - **Interactive Algorithm Visualizer Studio** with step-by-step pointer mechanics (Two Pointers, Binary Search, Sliding Window, Bubble Sort)
+  - **Tanglish Audio Mentor Podcast** with 2-minute bite-sized audio briefings, voice synthesizer, and animated equalizer
+  - **Studio Hub Category Filter Bar** (All 21, AI & Code, GATE 2027, Placement & DSA, Focus & Plan) for a decluttered UI/UX
 
 ---
 

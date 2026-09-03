@@ -2797,5 +2797,301 @@ Be concise, direct, and encourage the student in friendly Tanglish.`;
   };
 })();
 
+// ══════════════════════════════════════════════════════════════
+// WAVE 5 — UI/UX: STUDIO HUB CATEGORY FILTER
+// ══════════════════════════════════════════════════════════════
+(function () {
+  window.filterStudioHub = function (category) {
+    document.querySelectorAll('#studio-filter-bar .studio-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${category}'`));
+    });
+
+    const cards = document.querySelectorAll('#quick-studios-grid .magic-kpi-card');
+    cards.forEach(card => {
+      const cat = card.getAttribute('data-category');
+      if (category === 'all' || cat === category) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 5 — FEATURE 1: INTERACTIVE ALGORITHM VISUALIZER
+// ══════════════════════════════════════════════════════════════
+(function () {
+  let algoMode = 'twopointers';
+  let stepIndex = 0;
+  let autoPlayTimer = null;
+
+  const MODES = {
+    twopointers: {
+      title: 'Two Pointers (Target Sum = 30)',
+      arr: [2, 7, 11, 15, 19, 23, 29],
+      steps: [
+        { l: 0, r: 6, msg: 'Left=0 (2), Right=6 (29). Sum = 2 + 29 = 31 > 30. Sum is too big, move Right pointer left!' },
+        { l: 0, r: 5, msg: 'Left=0 (2), Right=5 (23). Sum = 2 + 23 = 25 < 30. Sum is too small, move Left pointer right!' },
+        { l: 1, r: 5, msg: 'Left=1 (7), Right=5 (23). Sum = 7 + 23 = 30 == 30! 🎯 Target found at indices [1, 5]!', match: true }
+      ]
+    },
+    binarysearch: {
+      title: 'Binary Search (Target = 35)',
+      arr: [3, 8, 14, 21, 35, 48, 62, 77],
+      steps: [
+        { low: 0, high: 7, mid: 3, msg: 'Search range [0, 7]. Mid index = 3 (val 21). 21 < 35, eliminate left half! Low = Mid + 1' },
+        { low: 4, high: 7, mid: 5, msg: 'Search range [4, 7]. Mid index = 5 (val 48). 48 > 35, eliminate right half! High = Mid - 1' },
+        { low: 4, high: 4, mid: 4, msg: 'Search range [4, 4]. Mid index = 4 (val 35). 35 == 35! 🎯 Element found in log₂(8) = 3 steps!', match: true }
+      ]
+    },
+    slidingwindow: {
+      title: 'Sliding Window (Max Sum Subarray of size k = 3)',
+      arr: [2, 1, 5, 1, 3, 2],
+      steps: [
+        { l: 0, r: 2, msg: 'Initial window [2, 1, 5]. Window Sum = 2+1+5 = 8. Max Sum so far = 8.' },
+        { l: 1, r: 3, msg: 'Shift window to [1, 5, 1]. Subtract 2, Add 1. Sum = 8 - 2 + 1 = 7. Max Sum = 8.' },
+        { l: 2, r: 4, msg: 'Shift window to [5, 1, 3]. Subtract 1, Add 3. Sum = 7 - 1 + 3 = 9. 🚀 New Max Sum = 9!', match: true },
+        { l: 3, r: 5, msg: 'Shift window to [1, 3, 2]. Subtract 5, Add 2. Sum = 9 - 5 + 2 = 6. Overall Max Sum = 9.', match: true }
+      ]
+    },
+    bubblesort: {
+      title: 'Bubble Sort (Step-by-Step Swaps)',
+      arr: [45, 12, 89, 34, 23],
+      steps: [
+        { l: 0, r: 1, msg: 'Compare 45 and 12. 45 > 12 ⇒ Swap them! Array becomes [12, 45, 89, 34, 23]', arrState: [12, 45, 89, 34, 23] },
+        { l: 1, r: 2, msg: 'Compare 45 and 89. 45 < 89 ⇒ In order, no swap!', arrState: [12, 45, 89, 34, 23] },
+        { l: 2, r: 3, msg: 'Compare 89 and 34. 89 > 34 ⇒ Swap them! Array becomes [12, 45, 34, 89, 23]', arrState: [12, 45, 34, 89, 23] },
+        { l: 3, r: 4, msg: 'Compare 89 and 23. 89 > 23 ⇒ Swap them! 89 bubbled to final position: [12, 45, 34, 23, 89]! 🎯', arrState: [12, 45, 34, 23, 89], match: true }
+      ]
+    }
+  };
+
+  window.initAlgoVisualizer = function () {
+    loadAlgoMode('twopointers');
+  };
+
+  window.loadAlgoMode = function (mode) {
+    algoMode = mode;
+    stepIndex = 0;
+    stopAlgoAnimation();
+
+    document.querySelectorAll('#algo-select-tabs .formula-subj-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('onclick').includes(mode));
+    });
+
+    renderAlgoCanvas();
+  };
+
+  function renderAlgoCanvas () {
+    const config = MODES[algoMode];
+    if (!config) return;
+
+    const row = document.getElementById('algo-array-row');
+    const statusText = document.getElementById('algo-status-text');
+    if (!row) return;
+
+    const curStep = config.steps[stepIndex] || config.steps[0];
+    const displayArr = curStep.arrState || config.arr;
+
+    row.innerHTML = displayArr.map((val, idx) => {
+      let isL = false, isR = false, isMid = false;
+      let badge = '';
+
+      if (algoMode === 'twopointers') {
+        isL = idx === curStep.l;
+        isR = idx === curStep.r;
+        if (isL) badge = '<span class="algo-ptr-badge algo-ptr-l">L</span>';
+        if (isR) badge = '<span class="algo-ptr-badge algo-ptr-r">R</span>';
+      } else if (algoMode === 'binarysearch') {
+        isMid = idx === curStep.mid;
+        if (idx === curStep.low) badge += '<span class="algo-ptr-badge algo-ptr-l">Low</span>';
+        if (idx === curStep.high) badge += '<span class="algo-ptr-badge algo-ptr-r">High</span>';
+        if (isMid) badge += '<span class="algo-ptr-badge algo-ptr-mid">Mid</span>';
+      } else if (algoMode === 'slidingwindow') {
+        const inWindow = idx >= curStep.l && idx <= curStep.r;
+        if (inWindow) isL = true;
+      } else if (algoMode === 'bubblesort') {
+        isL = idx === curStep.l;
+        isR = idx === curStep.r;
+      }
+
+      const matchClass = curStep.match && (isL || isR || isMid) ? 'match-found' : '';
+      const lClass = isL ? 'highlight-l' : '';
+      const rClass = isR ? 'highlight-r' : '';
+      const midClass = isMid ? 'highlight-mid' : '';
+
+      return `
+        <div class="algo-cell-card ${lClass} ${rClass} ${midClass} ${matchClass}">
+          ${badge}
+          <div>${val}</div>
+          <div style="font-size:9px; color:var(--text-muted); position:absolute; bottom:2px;">[${idx}]</div>
+        </div>
+      `;
+    }).join('');
+
+    if (statusText) statusText.textContent = curStep.msg;
+  }
+
+  window.stepAlgoAnimation = function () {
+    const config = MODES[algoMode];
+    if (!config) return;
+
+    stepIndex = (stepIndex + 1) % config.steps.length;
+    renderAlgoCanvas();
+
+    if (stepIndex === config.steps.length - 1) {
+      if (typeof showToast === 'function') showToast('Algorithm target achieved! 🎯', 'success');
+    }
+  };
+
+  window.resetAlgoAnimation = function () {
+    stopAlgoAnimation();
+    stepIndex = 0;
+    renderAlgoCanvas();
+  };
+
+  window.toggleAlgoAutoPlay = function () {
+    const playBtn = document.getElementById('algo-play-btn');
+    if (autoPlayTimer) {
+      stopAlgoAnimation();
+    } else {
+      if (playBtn) playBtn.textContent = '⏸ Pause';
+      const speed = parseInt(document.getElementById('algo-speed-select')?.value || '700');
+      autoPlayTimer = setInterval(() => {
+        stepAlgoAnimation();
+      }, speed);
+    }
+  };
+
+  window.stopAlgoAnimation = function () {
+    if (autoPlayTimer) {
+      clearInterval(autoPlayTimer);
+      autoPlayTimer = null;
+    }
+    const playBtn = document.getElementById('algo-play-btn');
+    if (playBtn) playBtn.textContent = '▶ Auto Play';
+  };
+})();
+
+// ══════════════════════════════════════════════════════════════
+// WAVE 5 — FEATURE 2: TANGLISH AUDIO MENTOR PODCAST
+// ══════════════════════════════════════════════════════════════
+(function () {
+  const PODCASTS = {
+    deadlocks: {
+      title: 'OS Deadlocks & Banker\'s Algorithm in 2 Minutes',
+      transcript: 'Vanakkam Tamizh! Innaiku Operating Systems-la most high-yield topic Deadlocks pathi easy-ah solren da. Four Coffman conditions romba mukkiyam: Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait. Ithu naanum nadantha thaan Deadlock varum. Banker\'s algorithm-la key formula enna theriyuma? Need = Max - Allocation. System safe state-la irukku na, every process mudikka pothumana resources irukkum. GATE exam-la 2-mark sure question da!'
+    },
+    bcnf: {
+      title: 'Why BCNF beats 3NF in Real-World DBs',
+      transcript: 'Database design-la Normalization romba essential da Tamizh. 3NF-la non-prime attribute Prime attribute mela depend aagalam. Aana BCNF-la oru strict rule: X tends to Y na, X MUST be a Super Key! No compromise! Top tech company like Zoho-la schema review panna pothu, BCNF follow panna redundancy zero aayidum.'
+    },
+    tcp: {
+      title: 'TCP 3-Way Handshake & SYN Flood Attacks',
+      transcript: 'Computer Networks interview-la TCS and Amazon-la kandippa kepaanga da. Client sends SYN with sequence x. Server responds with SYN-ACK, sequence y and ack x+1. Then client sends ACK y+1. Connection established! Aana SYN flood attack-la attacker last ACK send pannama server queue-ah exhaust pannuvaan. Countermeasure: SYN Cookies!'
+    },
+    zoho: {
+      title: 'Top 3 Zoho Interview Coding Traps',
+      transcript: 'Tamizh, Zoho round 2 coding-la time complexity strict-ah check pannuvaanga. Mudhal trap: O(N²) nested loop use panrathu. Two Pointers use panni O(N)-la solve panna try pannu. Rendaavathu trap: Array index out of bounds on edge cases like empty string or single element. Moonavathu: Custom string formatting without using built-in libraries!'
+    },
+    master: {
+      title: 'Master Theorem Divide & Conquer Hack',
+      transcript: 'Master Theorem formula: T(n) = a T(n/b) + f(n). Compare f(n) with n to the power of log_b(a). If f(n) is smaller: O(n^log_b a). If both equal: multiply by log n! If f(n) is larger: O(f(n)). Merge Sort-la a=2, b=2, so n^1 equals f(n)=n, which gives O(n log n) da!'
+    }
+  };
+
+  let activeEp = 'deadlocks';
+  let isPlaying = false;
+  let synthUtterance = null;
+
+  window.initAudioMentor = function () {
+    loadPodcastEpisode('deadlocks');
+  };
+
+  window.loadPodcastEpisode = function (epKey) {
+    pausePodcastAudio();
+    activeEp = epKey;
+    const ep = PODCASTS[epKey];
+    if (!ep) return;
+
+    const titleEl = document.getElementById('podcast-title');
+    const transcriptEl = document.getElementById('podcast-transcript-text');
+    if (titleEl) titleEl.textContent = ep.title;
+    if (transcriptEl) transcriptEl.textContent = `"${ep.transcript}"`;
+  };
+
+  window.togglePodcastAudio = function () {
+    if (isPlaying) {
+      pausePodcastAudio();
+    } else {
+      playPodcastAudio();
+    }
+  };
+
+  function playPodcastAudio () {
+    const ep = PODCASTS[activeEp];
+    if (!ep || !window.speechSynthesis) return;
+
+    window.speechSynthesis.cancel();
+
+    synthUtterance = new SpeechSynthesisUtterance(ep.transcript);
+    synthUtterance.rate = 1.05;
+    synthUtterance.pitch = 1.0;
+
+    // Pick best voice
+    const voices = window.speechSynthesis.getVoices();
+    const voice = voices.find(v => v.lang.includes('en-IN') || v.lang.includes('ta')) || voices[0];
+    if (voice) synthUtterance.voice = voice;
+
+    synthUtterance.onstart = () => {
+      isPlaying = true;
+      updateAudioUI(true);
+    };
+
+    synthUtterance.onend = () => {
+      isPlaying = false;
+      updateAudioUI(false);
+      if (typeof addXP === 'function') addXP(10, 'Listened to Tanglish Audio Podcast');
+    };
+
+    synthUtterance.onerror = () => {
+      isPlaying = false;
+      updateAudioUI(false);
+    };
+
+    window.speechSynthesis.speak(synthUtterance);
+  }
+
+  window.pausePodcastAudio = function () {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    isPlaying = false;
+    updateAudioUI(false);
+  };
+
+  window.seekPodcastAudio = function (seconds) {
+    // Restart audio with visual feedback
+    pausePodcastAudio();
+    playPodcastAudio();
+    if (typeof showToast === 'function') showToast(seconds > 0 ? '⏩ Forwarded 10s' : '⏪ Rewound 10s', 'info');
+  };
+
+  function updateAudioUI (active) {
+    const playBtn = document.getElementById('podcast-play-btn');
+    const statusPill = document.getElementById('podcast-status-pill');
+    const bars = document.querySelectorAll('#podcast-waveform .waveform-bar');
+
+    if (playBtn) playBtn.textContent = active ? '⏸' : '▶';
+    if (statusPill) {
+      statusPill.textContent = active ? 'Playing Now 🎙️' : 'Ready';
+      statusPill.style.color = active ? '#10B981' : '#A855F7';
+    }
+    bars.forEach(b => b.classList.toggle('active', active));
+  }
+})();
+
+
 
 

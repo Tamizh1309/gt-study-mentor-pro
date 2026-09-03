@@ -1783,7 +1783,7 @@ document.getElementById('open-roadmap-btn')?.addEventListener('click', () => ope
 document.getElementById('open-calendar-btn')?.addEventListener('click', () => openModal('calendar-modal'));
 document.getElementById('open-dailyplan-btn')?.addEventListener('click', () => openModal('dailyplan-modal'));
 document.getElementById('open-reminders-btn')?.addEventListener('click', () => openModal('reminders-modal'));
-document.getElementById('open-apikey-btn')?.addEventListener('click', () => openModal('apikey-modal'));
+document.getElementById('open-apikey-btn')?.addEventListener('click', () => { openModal('ai-engine-modal'); if (typeof initAIEngineModal === 'function') initAIEngineModal(); });
 document.getElementById('daily-mini-card')?.addEventListener('click', () => openModal('dailyplan-modal'));
 
 document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closeModal(btn.dataset.close)));
@@ -1800,35 +1800,13 @@ function openModal(id) {
   if (id === 'mastery-modal') renderMasteryGrid();
   if (id === 'formulas-modal') renderFormulas();
   if (id === 'xp-modal') renderXPModal();
-  if (id === 'apikey-modal') { document.getElementById('api-key-input').value = getApiKey(); }
+  if (id === 'ai-engine-modal' && typeof initAIEngineModal === 'function') { initAIEngineModal(); }
 }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
 
 // Profile & Settings saves
-document.getElementById('save-profile-btn').addEventListener('click', saveProfile);
-document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
-
-// API Key
-document.getElementById('save-api-key-btn').addEventListener('click', () => {
-  const key = document.getElementById('api-key-input').value.trim();
-  if (!key) { showToast('API key enter panunga da!', 'error', '❌'); return; }
-  
-  // Validate that it's a real Gemini API key
-  if (!key.startsWith('AIza')) {
-    alert("❌ Oru nimisham da! Idhu correct-ana API key illa.\n\nNeenga potrukka key 'AQ...' nu start aaguthu, adhu OAuth token. \nGemini API key always starts with 'AIza...'.\n\nPlease go to https://aistudio.google.com/apikey to get a FREE API key!");
-    return;
-  }
-  
-  setStorage('geminiApiKey', key);
-  closeModal('apikey-modal');
-  showToast('API Key saved! 🚀', 'success', '🚀');
-  setTimeout(handleFirstMessage, 600);
-});
-document.getElementById('toggle-key-btn').addEventListener('click', (e) => {
-  const input = document.getElementById('api-key-input');
-  if (input.type === 'password') { input.type = 'text'; e.target.textContent = '🙈'; }
-  else { input.type = 'password'; e.target.textContent = '👁️'; }
-});
+document.getElementById('save-profile-btn')?.addEventListener('click', saveProfile);
+document.getElementById('save-settings-btn')?.addEventListener('click', saveSettings);
 
 // Profile selectors
 document.querySelectorAll('.avatar-opt').forEach(btn => {
@@ -2450,9 +2428,6 @@ document.getElementById('export-chat-btn')?.addEventListener('click', () => {
 document.getElementById('open-ai-insights-btn')?.addEventListener('click', () => openModal('ai-insights-modal'));
 
 document.getElementById('generate-insights-btn')?.addEventListener('click', async () => {
-  const apiKey = getApiKey();
-  if (!apiKey) { openModal('apikey-modal'); return; }
-
   const contentEl = document.getElementById('insights-content');
   const btn = document.getElementById('generate-insights-btn');
   btn.disabled = true;
@@ -3887,7 +3862,7 @@ const COMMAND_PALETTE_ITEMS = [
   { icon: '🍅', title: 'Pomodoro Focus Timer', desc: '25/5 interval timer with automated session logging', badge: 'Productivity', action: () => { closeModal('command-palette-modal'); togglePomodoro(); } },
   { icon: '📝', title: 'Daily Study Plan', desc: 'Customized schedule tailored to today\'s week and day type', badge: 'Schedule', action: () => { closeModal('command-palette-modal'); openModal('dailyplan-modal'); } },
   { icon: '🗓️', title: '3-Month Master Roadmap', desc: 'Week-by-week curriculum for GATE CS & Placements', badge: 'Curriculum', action: () => { closeModal('command-palette-modal'); openModal('roadmap-modal'); } },
-  { icon: '🔑', title: 'Set Gemini API Key', desc: 'Configure your Google Gemini Flash AI key', badge: 'Settings', action: () => { closeModal('command-palette-modal'); openModal('apikey-modal'); } },
+  { icon: '⚡', title: 'AI Engine & Gateway Config', desc: 'Configure GPT-5.4 / FreeLLMAPI Gateway', badge: 'AI', action: () => { closeModal('command-palette-modal'); openModal('ai-engine-modal'); if (typeof initAIEngineModal === 'function') initAIEngineModal(); } },
   { icon: '⌨️', title: 'Keyboard Shortcuts Cheatsheet', desc: 'Quick keybindings for all functions', badge: 'Help', action: () => { closeModal('command-palette-modal'); openModal('keyboard-shortcuts-modal'); } },
 ];
 
