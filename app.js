@@ -5205,22 +5205,7 @@ function calculateSubnet() {
 //  FLOATING DOCK HANDLERS (v6.0)
 // ══════════════════════════════════════════════════
 
-function initFloatingDock() {
-  document.getElementById('dock-calc-btn')?.addEventListener('click', () => openModal('calculator-modal'));
-  document.getElementById('dock-palette-btn')?.addEventListener('click', () => {
-    openModal('command-palette-modal');
-    document.getElementById('palette-input')?.focus();
-  });
-  document.getElementById('dock-visualizer-btn')?.addEventListener('click', () => {
-    openModal('algo-visualizer-modal');
-    resetVisualizer();
-  });
-  document.getElementById('dock-sql-btn')?.addEventListener('click', () => {
-    openModal('sql-playground-modal');
-    executeMockSQL();
-  });
-  document.getElementById('dock-lofi-btn')?.addEventListener('click', () => openModal('lofi-modal'));
-}
+function initFloatingDock() { /* Retired in CyberGlass 2.0 */ }
 
 
 // ══════════════════════════════════════════════════════════════
