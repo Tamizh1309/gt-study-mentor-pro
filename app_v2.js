@@ -4196,3 +4196,10 @@ document.addEventListener('keydown', function (e) {
     }
   }
 });
+
+
+// Ambient Soundscape UI Helper
+window.updateSoundUI = function (label) {
+  const el = document.getElementById('pomo-sound-now');
+  if (el) el.textContent = label;
+};
