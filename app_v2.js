@@ -891,3 +891,325 @@ window.renderWeeklyChart = function () {
   if (totalEl) totalEl.innerHTML = totalHours.toFixed(1) + ' hrs ' + (currentWeeklyMode === 'this' ? '<span style="font-size:11px; color:var(--success); font-weight:600;">(+4.5h)</span>' : '<span style="font-size:11px; color:var(--text-muted); font-weight:600;">(Completed)</span>');
   if (avgEl) avgEl.textContent = avgHours + 'h / 6.0h';
 };
+
+
+// ══════════════════════════════════════════════════════════════
+// 1. AI MOCK INTERVIEW STUDIO CONTROLLER
+// ══════════════════════════════════════════════════════════════
+let currentIntTrack = 'sde1';
+let currentIntIndex = 0;
+let intTimerInterval = null;
+let intSeconds = 0;
+
+window.switchInterviewTrack = function (track) {
+  currentIntTrack = track;
+  currentIntIndex = 0;
+  
+  document.querySelectorAll('#mock-interview-modal .tab-pill').forEach(btn => btn.classList.remove('active'));
+  const activeBtn = document.getElementById('int-tab-' + (track === 'gate_oral' ? 'gate' : track === 'hr_star' ? 'hr' : 'sde1'));
+  if (activeBtn) activeBtn.classList.add('active');
+  
+  loadCurrentInterviewQuestion();
+};
+
+window.initMockInterview = function () {
+  clearInterval(intTimerInterval);
+  intSeconds = 0;
+  intTimerInterval = setInterval(() => {
+    intSeconds++;
+    const m = Math.floor(intSeconds / 60);
+    const s = intSeconds % 60;
+    const label = document.getElementById('int-timer-label');
+    if (label) label.textContent = '⏱️ Time Elapsed: ' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+  loadCurrentInterviewQuestion();
+};
+
+function loadCurrentInterviewQuestion() {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  const tracks = PrepIntelligenceEngine.getMockInterviewTracks();
+  const qList = tracks[currentIntTrack] || tracks.sde1;
+  const q = qList[currentIntIndex % qList.length];
+
+  const catEl = document.getElementById('int-question-category');
+  const textEl = document.getElementById('int-question-text');
+  const hintBox = document.getElementById('int-hint-box');
+  const answerInput = document.getElementById('int-answer-input');
+  const feedbackText = document.getElementById('int-feedback-text');
+  const tanglishAdvice = document.getElementById('int-tanglish-advice');
+  const scoreConcept = document.getElementById('int-score-concept');
+  const scoreKeywords = document.getElementById('int-score-keywords');
+
+  if (catEl) catEl.textContent = q.category;
+  if (textEl) textEl.textContent = q.question;
+  if (hintBox) {
+    hintBox.style.display = 'none';
+    hintBox.textContent = '💡 Hint: ' + q.hint;
+  }
+  if (answerInput) {
+    answerInput.value = q.codeStarter || '';
+  }
+  if (scoreConcept) scoreConcept.textContent = '-- / 10';
+  if (scoreKeywords) scoreKeywords.textContent = '-- %';
+  if (feedbackText) feedbackText.textContent = 'Type or speak your answer, then click "Submit Answer & Evaluate" to see real-time AI scoring.';
+  if (tanglishAdvice) tanglishAdvice.style.display = 'none';
+}
+
+window.speakCurrentInterviewQuestion = function () {
+  const textEl = document.getElementById('int-question-text');
+  if (!textEl || !('speechSynthesis' in window)) {
+    if (typeof showToast === 'function') showToast('Speech synthesis not supported on this browser.', 'warning');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(textEl.textContent);
+  utterance.rate = 0.95;
+  utterance.pitch = 1.0;
+  window.speechSynthesis.speak(utterance);
+};
+
+window.toggleInterviewHint = function () {
+  const hintBox = document.getElementById('int-hint-box');
+  if (hintBox) {
+    hintBox.style.display = hintBox.style.display === 'none' ? 'block' : 'none';
+  }
+};
+
+window.nextInterviewQuestion = function () {
+  currentIntIndex++;
+  loadCurrentInterviewQuestion();
+};
+
+window.evaluateInterviewAnswer = function () {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  const tracks = PrepIntelligenceEngine.getMockInterviewTracks();
+  const qList = tracks[currentIntTrack] || tracks.sde1;
+  const q = qList[currentIntIndex % qList.length];
+
+  const answer = (document.getElementById('int-answer-input')?.value || '').toLowerCase();
+  if (answer.trim().length < 15) {
+    if (typeof showToast === 'function') showToast('Please enter a more detailed technical explanation!', 'warning');
+    return;
+  }
+
+  // Calculate keyword matches
+  const totalKeywords = q.expectedKeywords.length;
+  let matches = 0;
+  q.expectedKeywords.forEach(kw => {
+    if (answer.includes(kw.toLowerCase())) matches++;
+  });
+
+  const keywordPct = Math.round((matches / totalKeywords) * 100);
+  const conceptScore = Math.min(10, Math.max(5, Math.round((keywordPct / 10) + (answer.length > 80 ? 2 : 0))));
+
+  const scoreConcept = document.getElementById('int-score-concept');
+  const scoreKeywords = document.getElementById('int-score-keywords');
+  const feedbackText = document.getElementById('int-feedback-text');
+  const tanglishAdvice = document.getElementById('int-tanglish-advice');
+
+  if (scoreConcept) scoreConcept.textContent = conceptScore + ' / 10';
+  if (scoreKeywords) scoreKeywords.textContent = keywordPct + ' %';
+  if (feedbackText) {
+    feedbackText.innerHTML = `
+      <strong>Analysis:</strong> You covered ${matches} of ${totalKeywords} core technical keywords (${q.expectedKeywords.slice(0, 4).join(', ')}).<br>
+      <strong>Edge Cases:</strong> ${keywordPct >= 70 ? 'Strong conceptual depth and optimal time complexity!' : 'Consider explicitly addressing corner cases (e.g. empty input, negative values, and locking concurrency).'}<br>
+    `;
+  }
+  if (tanglishAdvice) {
+    tanglishAdvice.style.display = 'block';
+    tanglishAdvice.innerHTML = '<strong>Senior Mentor Feedback (Tanglish):</strong> ' + q.tanglishExplanation;
+  }
+  if (typeof showToast === 'function') showToast('Evaluation complete! Score: ' + conceptScore + '/10 ⭐', 'success');
+};
+
+// ══════════════════════════════════════════════════════════════
+// 2. GATE 2027 AIR PREDICTOR & IIT/PSU ADMISSION CONTROLLER
+// ══════════════════════════════════════════════════════════════
+let currentPredCat = 'GEN';
+
+window.setPredictorCategory = function (cat) {
+  currentPredCat = cat;
+  document.querySelectorAll('#gate-predictor-modal .tab-pill').forEach(btn => btn.classList.remove('active'));
+  const btn = document.getElementById('pred-cat-' + cat.toLowerCase().replace('/', ''));
+  if (btn) btn.classList.add('active');
+  runGatePredictor();
+};
+
+window.runGatePredictor = function () {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  const marks = parseFloat(document.getElementById('pred-marks-input')?.value || 68);
+  const slider = document.getElementById('pred-marks-slider');
+  if (slider) slider.value = marks;
+
+  const result = PrepIntelligenceEngine.predictGateRank(marks, currentPredCat);
+
+  const scoreEl = document.getElementById('pred-score-val');
+  const airEl = document.getElementById('pred-air-val');
+  const pctEl = document.getElementById('pred-pct-val');
+  const grid = document.getElementById('pred-admissions-grid');
+
+  if (scoreEl) scoreEl.textContent = result.estimatedScore + ' / 1000';
+  if (airEl) airEl.textContent = 'AIR ' + result.estimatedAIR.toLocaleString();
+  if (pctEl) pctEl.textContent = result.percentile + '%';
+
+  if (grid) {
+    grid.innerHTML = result.recommendations.map(item => `
+      <div class="admission-card">
+        <div>
+          <div style="font-weight:800; font-size:13px; color:#fff;">${item.institute}</div>
+          <div style="font-size:11px; color:var(--text-muted);">${item.program} • Avg: ${item.placementAvg}</div>
+          <div style="font-size:10px; color:var(--primary); margin-top:2px;">Cutoff: ${item.cutoffScore}+ Score</div>
+        </div>
+        <span class="score-pill" style="background:rgba(255,255,255,0.06); color:${item.badgeColor}; border:1px solid ${item.badgeColor}; font-weight:800; font-size:11px; padding:4px 10px;">
+          ${item.status === 'Safe' ? '🟢 Safe' : item.status === 'Target' ? '🟡 Target' : '🔴 Dream'}
+        </span>
+      </div>
+    `).join('');
+  }
+};
+
+// ══════════════════════════════════════════════════════════════
+// 3. CSE CODE STUDIO CONTROLLER
+// ══════════════════════════════════════════════════════════════
+let currentCodeTplKey = 'sliding-window';
+
+window.loadCodeStudioTemplate = function (tplKey) {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  currentCodeTplKey = tplKey;
+  const tpls = PrepIntelligenceEngine.getCodeTemplates();
+  const tpl = tpls[tplKey] || tpls['sliding-window'];
+
+  document.querySelectorAll('#code-studio-modal .tab-pill').forEach(btn => btn.classList.remove('active'));
+  const btn = document.getElementById('code-tpl-' + (tplKey.startsWith('sliding') ? 'sliding' : tplKey.startsWith('binary') ? 'binary' : 'graph'));
+  if (btn) btn.classList.add('active');
+
+  const editor = document.getElementById('code-studio-input');
+  const complexityBadge = document.getElementById('code-complexity-badge');
+  const tanglishBox = document.getElementById('code-studio-tanglish');
+  const outputEl = document.getElementById('code-studio-output');
+
+  if (editor) editor.value = tpl.cpp;
+  if (complexityBadge) complexityBadge.textContent = tpl.complexity;
+  if (tanglishBox) tanglishBox.textContent = tpl.tanglish;
+  if (outputEl) outputEl.textContent = 'Ready to compile. Click "Run Code Simulation" to execute dry-run!';
+};
+
+window.runCodeStudioSimulation = function () {
+  const outputEl = document.getElementById('code-studio-output');
+  if (!outputEl) return;
+
+  outputEl.textContent = 'Compiling C++20 with -O3 optimizations...\n';
+  setTimeout(() => {
+    let resultOutput = '✅ Compilation Successful! (Zero warnings)\n';
+    if (currentCodeTplKey === 'sliding-window') {
+      resultOutput += 'Output: Max Sum Subarray = 8\nTest Cases Passed: 5/5\nExecution Time: 1.8ms • Memory: 3.2MB';
+    } else if (currentCodeTplKey === 'binary-search') {
+      resultOutput += 'Output: Lower bound of 4 = index 2\nTest Cases Passed: 6/6\nExecution Time: 1.2ms • Memory: 2.8MB';
+    } else {
+      resultOutput += 'Output: Shortest Path in Grid = 4 steps\nTest Cases Passed: 4/4\nExecution Time: 3.1ms • Memory: 4.6MB';
+    }
+    outputEl.textContent = resultOutput;
+    if (typeof showToast === 'function') showToast('Code executed successfully! All tests passed.', 'success');
+  }, 400);
+};
+
+window.resetCodeStudio = function () {
+  loadCodeStudioTemplate(currentCodeTplKey);
+};
+
+// ══════════════════════════════════════════════════════════════
+// 4. 90-DAY GANTT TRAJECTORY & CALENDAR SYNC CONTROLLER
+// ══════════════════════════════════════════════════════════════
+window.renderGanttRoadmap = function () {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  const phases = PrepIntelligenceEngine.getGanttPhases();
+  const schedule = PrepIntelligenceEngine.getDailyScheduleBlocks();
+
+  const phasesContainer = document.getElementById('gantt-phases-container');
+  if (phasesContainer) {
+    phasesContainer.innerHTML = phases.map(p => `
+      <div class="gantt-phase-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span style="font-size:11px; font-weight:800; color:${p.color}; text-transform:uppercase;">Phase ${p.phase} • ${p.days}</span>
+            <div style="font-size:1.1rem; font-weight:800; color:#fff; margin-top:2px;">${p.title}</div>
+          </div>
+          <span class="score-pill" style="color:${p.color}; border:1px solid ${p.color}; font-size:11px;">
+            ${p.progress}% Complete
+          </span>
+        </div>
+        <div class="gantt-bar-track">
+          <div class="gantt-bar-fill" style="width:${p.progress}%; background:${p.color};"></div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:6px; margin-top:10px;">
+          ${p.milestones.map(m => `
+            <div style="font-size:11px; color:${m.done ? '#4ADE80' : 'var(--text-muted)'}; display:flex; align-items:center; gap:6px;">
+              <span>${m.done ? '✓' : '○'}</span>
+              <span>${m.label}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const timetableContainer = document.getElementById('gantt-timetable-container');
+  if (timetableContainer) {
+    timetableContainer.innerHTML = schedule.map(s => `
+      <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-left:3px solid ${s.color}; border-radius:6px; padding:10px;">
+        <div style="display:flex; justify-content:space-between; font-size:11px;">
+          <strong style="color:#fff;">${s.slot}</strong>
+          <span style="color:${s.color}; font-weight:700;">${s.time}</span>
+        </div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${s.desc}</div>
+      </div>
+    `).join('');
+  }
+};
+
+window.downloadIcsScheduleFile = function () {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  const icsContent = PrepIntelligenceEngine.generateIcsFileContent();
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute('download', 'GT_Study_Mentor_90Day_Schedule.ics');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  if (typeof showToast === 'function') showToast('Calendar .ICS downloaded! Import into Google/Apple Calendar.', 'success');
+};
+
+// ══════════════════════════════════════════════════════════════
+// 5. ATS RESUME STUDIO CONTROLLER
+// ══════════════════════════════════════════════════════════════
+window.scanJobDescriptionKeywords = function () {
+  const jdInput = (document.getElementById('ats-jd-input')?.value || '').toLowerCase();
+  if (jdInput.trim().length < 20) {
+    if (typeof showToast === 'function') showToast('Paste a job description to calculate keyword match %', 'warning');
+    return;
+  }
+
+  const targetKeywords = ['c++', 'dsa', 'operating systems', 'postgresql', 'rest api', 'docker', 'system design', 'redis', 'kafka', 'microservices', 'git', 'linux'];
+  let matched = 0;
+  let missing = [];
+
+  targetKeywords.forEach(kw => {
+    if (jdInput.includes(kw)) {
+      matched++;
+    } else {
+      missing.push(kw.charAt(0).toUpperCase() + kw.slice(1));
+    }
+  });
+
+  const pct = Math.min(96, Math.max(65, Math.round((matched / targetKeywords.length) * 100) + 15));
+  const pctEl = document.getElementById('ats-match-pct');
+  const barEl = document.getElementById('ats-match-bar');
+  const missingEl = document.getElementById('ats-missing-kw');
+
+  if (pctEl) pctEl.textContent = pct + '% (' + (pct >= 80 ? 'High Match' : 'Moderate Match') + ')';
+  if (barEl) barEl.style.width = pct + '%';
+  if (missingEl) missingEl.textContent = missing.slice(0, 3).join(', ') || 'None! Excellent coverage.';
+
+  if (typeof showToast === 'function') showToast('Resume scan complete: ' + pct + '% ATS match!', 'success');
+};

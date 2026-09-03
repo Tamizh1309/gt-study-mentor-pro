@@ -4462,3 +4462,160 @@ body {
   color: var(--text-muted);
   font-weight: 600;
 }
+
+
+/* ══════════════════════════════════════════════════
+   NEXT-GENERATION CSE FEATURES DESIGN SYSTEM
+   ══════════════════════════════════════════════════ */
+
+/* Audio Wave Visualizer Animation */
+.audio-wave-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+}
+.audio-wave-bar {
+  width: 3px;
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  animation: audioWave 1.2s ease-in-out infinite alternate;
+}
+.audio-wave-bar:nth-child(2) { animation-delay: 0.2s; height: 60%; background: #6C63FF; }
+.audio-wave-bar:nth-child(3) { animation-delay: 0.4s; height: 80%; background: #38BDF8; }
+.audio-wave-bar:nth-child(4) { animation-delay: 0.6s; height: 40%; background: #4ADE80; }
+.audio-wave-bar:nth-child(5) { animation-delay: 0.8s; height: 90%; background: var(--primary); }
+
+@keyframes audioWave {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
+}
+
+/* Interview Pad & Code Editor */
+.code-editor-textarea {
+  width: 100%;
+  height: 220px;
+  background: #0D1117;
+  color: #E6EDF3;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+.code-editor-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 12px rgba(99, 216, 255, 0.2);
+}
+
+/* Scorecard Radar Matrix Grid */
+.scorecard-metric-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.scorecard-metric-val {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+/* IIT Admission Predictor Grid */
+.admission-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+.admission-card:hover {
+  border-color: var(--border-active);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* 90-Day Gantt Timeline */
+.gantt-phase-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.gantt-bar-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.gantt-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+/* Single Page ATS Resume Print Layout */
+.ats-resume-sheet {
+  background: #FFFFFF;
+  color: #1E293B;
+  border-radius: 8px;
+  padding: 32px;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  max-width: 740px;
+  margin: 0 auto;
+}
+.ats-resume-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.5px;
+}
+.ats-resume-header-links {
+  font-size: 11px;
+  color: #64748B;
+  display: flex;
+  gap: 12px;
+  margin: 6px 0 16px;
+  border-bottom: 2px solid #E2E8F0;
+  padding-bottom: 10px;
+}
+.ats-section-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #0F172A;
+  border-bottom: 1px solid #CBD5E1;
+  padding-bottom: 4px;
+  margin: 14px 0 8px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .ats-resume-sheet, .ats-resume-sheet * {
+    visibility: visible;
+  }
+  .ats-resume-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    padding: 0;
+  }
+}

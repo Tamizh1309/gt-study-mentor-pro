@@ -96,6 +96,56 @@
         </div>
       </div>
 
+      
+      <!-- ── QUICK-LAUNCH 5 POWER STUDIOS (Section 12) ── -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:16px;">
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('mock-interview-modal'); initMockInterview();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🎙️</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">AI Mock Interview</div>
+              <div style="font-size:10px; color:var(--primary);">Voice &amp; Coding Pad</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('gate-predictor-modal'); runGatePredictor();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">🎯</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">GATE AIR Predictor</div>
+              <div style="font-size:10px; color:var(--success);">IIT &amp; PSU Chances</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('code-studio-modal'); loadCodeStudioTemplate('sliding-window');">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">💻</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">CSE Code Studio</div>
+              <div style="font-size:10px; color:#818CF8;">Multi-Language Sandbox</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('roadmap-gantt-modal'); renderGanttRoadmap();">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">📅</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">90-Day Trajectory</div>
+              <div style="font-size:10px; color:var(--warning);">iCal Calendar Sync</div>
+            </div>
+          </div>
+        </div>
+        <div class="magic-kpi-card" style="padding:12px 14px;" onclick="openModal('resume-ats-modal');">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:1.4rem;">📄</span>
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#fff;">ATS Resume Studio</div>
+              <div style="font-size:10px; color:var(--primary);">JD Matcher &amp; Print</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Main Command Card -->
       <div class="v2-command-card">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
@@ -3238,6 +3288,313 @@ WHERE p.package_lpa >= 10.0;</textarea>
     <span class="mob-label">Menu</span>
   </button>
 </nav>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     1. AI MOCK INTERVIEW STUDIO (VOICE & REAL-TIME EVALUATOR)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="mock-interview-modal">
+  <div class="modal modal-tall" style="max-width: 960px;">
+    <button class="modal-close" data-close="mock-interview-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; gap:10px;">
+      <span>🎙️</span> AI Mock Interviewer Studio
+      <span class="badge-pill" style="font-size:10px; background:rgba(99,216,255,0.15); color:var(--primary); border:1px solid rgba(99,216,255,0.3);">Voice Enabled • Speech API</span>
+    </div>
+    <div class="modal-subtitle">Simulated technical &amp; behavioral interviews with real-time scoring and Tanglish feedback.</div>
+
+    <!-- Role Track Selector -->
+    <div class="placement-tabs-row" style="margin: 12px 0;">
+      <button class="tab-pill active" id="int-tab-sde1" onclick="switchInterviewTrack('sde1')">💻 SDE 1 (Amazon/Zoho)</button>
+      <button class="tab-pill" id="int-tab-gate" onclick="switchInterviewTrack('gate_oral')">⚡ GATE / BARC Oral</button>
+      <button class="tab-pill" id="int-tab-hr" onclick="switchInterviewTrack('hr_star')">🤝 HR STAR Behavioral</button>
+    </div>
+
+    <!-- Question & Voice Player Card -->
+    <div class="track-card" style="margin-bottom:14px; background:rgba(0,0,0,0.25);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-size:11px; font-weight:800; color:var(--primary); text-transform:uppercase;" id="int-question-category">SDE 1 (Product Tier)</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button class="action-btn" onclick="speakCurrentInterviewQuestion()" style="padding:4px 10px; font-size:11px;">
+            🔊 Read Question
+          </button>
+          <button class="action-btn" onclick="toggleInterviewHint()" style="padding:4px 10px; font-size:11px;">
+            💡 Hint
+          </button>
+        </div>
+      </div>
+      <div id="int-question-text" style="font-size:1.1rem; font-weight:700; color:#fff; line-height:1.4; margin-bottom:8px;">
+        Loading question...
+      </div>
+      <div id="int-hint-box" style="display:none; font-size:12px; color:var(--warning); background:rgba(251,191,36,0.08); padding:8px 12px; border-radius:6px; border-left:3px solid var(--warning);">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+
+    <!-- Answer Box & Coding Pad -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:14px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-muted);">📝 Your Explanation / Live Code:</label>
+          <span style="font-size:11px; color:var(--success); font-weight:600;" id="int-timer-label">⏱️ Time Elapsed: 01:24</span>
+        </div>
+        <textarea id="int-answer-input" class="code-editor-textarea" placeholder="Type your algorithmic approach, code, or STAR framework response here..."></textarea>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="submit-btn" onclick="evaluateInterviewAnswer()" style="flex:1;">⚡ Submit Answer &amp; Evaluate</button>
+          <button class="action-btn" onclick="nextInterviewQuestion()">Next Question ➔</button>
+        </div>
+      </div>
+
+      <!-- Instant AI Scorecard Output -->
+      <div id="int-feedback-container" style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:10px; padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:10px;">📊 Real-time AI Evaluation Matrix</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <div class="scorecard-metric-card">
+              <div style="font-size:10px; color:var(--text-muted);">Conceptual Score</div>
+              <div class="scorecard-metric-val" id="int-score-concept">-- / 10</div>
+            </div>
+            <div class="scorecard-metric-card">
+              <div style="font-size:10px; color:var(--text-muted);">Keyword Coverage</div>
+              <div class="scorecard-metric-val" id="int-score-keywords">-- %</div>
+            </div>
+          </div>
+          <div id="int-feedback-text" style="font-size:12px; color:var(--text-muted); line-height:1.5;">
+            Submit your answer on the left to see detailed score breakdowns, missed edge cases, and Tanglish senior mentor advice!
+          </div>
+        </div>
+        <div id="int-tanglish-advice" style="margin-top:12px; padding:10px; background:rgba(99,216,255,0.08); border-radius:6px; border-left:3px solid var(--primary); font-size:11px; color:#fff; display:none;">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     2. GATE 2027 AIR PREDICTOR & IIT/PSU ADMISSION ENGINE
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="gate-predictor-modal">
+  <div class="modal modal-tall" style="max-width: 920px;">
+    <button class="modal-close" data-close="gate-predictor-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; gap:10px;">
+      <span>🎯</span> GATE 2027 AIR &amp; IIT / PSU Admission Predictor
+      <span class="badge-pill" style="font-size:10px; background:rgba(74,222,128,0.15); color:var(--success); border:1px solid rgba(74,222,128,0.3);">Normalized Statistical Model</span>
+    </div>
+    <div class="modal-subtitle">Enter your expected or mock test marks (out of 100) to simulate your All India Rank and Top IIT / PSU admission probability.</div>
+
+    <!-- Inputs Row -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin:16px 0; background:rgba(0,0,0,0.25); padding:16px; border-radius:10px; border:1px solid var(--border-subtle);">
+      <div>
+        <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Marks (out of 100):</label>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <input type="number" id="pred-marks-input" class="form-input" value="68" min="0" max="100" style="font-size:1.4rem; font-weight:800; width:90px; text-align:center;" oninput="runGatePredictor()">
+          <input type="range" id="pred-marks-slider" min="0" max="100" value="68" style="flex:1; cursor:pointer;" oninput="document.getElementById('pred-marks-input').value = this.value; runGatePredictor();">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:6px;">Category:</label>
+        <div style="display:flex; gap:6px;">
+          <button class="tab-pill active" id="pred-cat-gen" onclick="setPredictorCategory('GEN')">GEN</button>
+          <button class="tab-pill" id="pred-cat-obc" onclick="setPredictorCategory('OBC')">OBC</button>
+          <button class="tab-pill" id="pred-cat-scst" onclick="setPredictorCategory('SC')">SC / ST</button>
+          <button class="tab-pill" id="pred-cat-ews" onclick="setPredictorCategory('EWS')">EWS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prediction Outcome Summary Bar -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:16px;">
+      <div class="scorecard-metric-card" style="border-color:rgba(99,216,255,0.3); background:rgba(99,216,255,0.05);">
+        <div style="font-size:11px; color:var(--primary); font-weight:700;">ESTIMATED GATE SCORE</div>
+        <div class="scorecard-metric-val" id="pred-score-val" style="color:var(--primary);">745 / 1000</div>
+      </div>
+      <div class="scorecard-metric-card" style="border-color:rgba(74,222,128,0.3); background:rgba(74,222,128,0.05);">
+        <div style="font-size:11px; color:var(--success); font-weight:700;">ESTIMATED ALL INDIA RANK</div>
+        <div class="scorecard-metric-val" id="pred-air-val" style="color:var(--success);">AIR 380</div>
+      </div>
+      <div class="scorecard-metric-card">
+        <div style="font-size:11px; color:var(--text-muted);">ESTIMATED PERCENTILE</div>
+        <div class="scorecard-metric-val" id="pred-pct-val">99.68%</div>
+      </div>
+    </div>
+
+    <!-- Admission Chances Grid -->
+    <div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:10px;">🏛️ Top IIT / NIT / PSU Admission Probability:</div>
+    <div id="pred-admissions-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(270px, 1fr)); gap:10px; max-height:260px; overflow-y:auto; padding-right:4px;">
+      <!-- Populated dynamically via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     3. CSE CODE STUDIO & ALGORITHMIC SANDBOX
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="code-studio-modal">
+  <div class="modal modal-tall" style="max-width: 980px;">
+    <button class="modal-close" data-close="code-studio-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; gap:10px;">
+      <span>💻</span> CSE Code Studio &amp; Algorithmic Sandbox
+      <span class="badge-pill" style="font-size:10px; background:rgba(129,140,248,0.15); color:#818CF8; border:1px solid rgba(129,140,248,0.3);">C++ / Java / Python</span>
+    </div>
+    <div class="modal-subtitle">Practice core Striver DSA patterns, test dry runs, analyze Big-O complexity, and read Tanglish breakdowns.</div>
+
+    <!-- Templates & Language Select Bar -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin:12px 0;">
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="tab-pill active" id="code-tpl-sliding" onclick="loadCodeStudioTemplate('sliding-window')">🪟 Sliding Window</button>
+        <button class="tab-pill" id="code-tpl-binary" onclick="loadCodeStudioTemplate('binary-search')">🔍 Binary Search</button>
+        <button class="tab-pill" id="code-tpl-graph" onclick="loadCodeStudioTemplate('graph-bfs')">🕸️ Graph BFS</button>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="badge-pill" id="code-complexity-badge" style="background:rgba(255,255,255,0.06); color:#fff; font-size:11px;">Time: O(N) | Space: O(1)</span>
+      </div>
+    </div>
+
+    <!-- Code Editor & Simulation Output -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:14px;">
+      <div>
+        <textarea id="code-studio-input" class="code-editor-textarea" style="height:280px;"></textarea>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="submit-btn" onclick="runCodeStudioSimulation()" style="flex:1;">▶️ Run Code Simulation</button>
+          <button class="action-btn" onclick="resetCodeStudio()">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- Execution Console & Tanglish Breakdown -->
+      <div style="background:#0D1117; border:1px solid var(--border-subtle); border-radius:8px; padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">🖥️ Output Console:</div>
+          <pre id="code-studio-output" style="background:rgba(0,0,0,0.5); padding:10px; border-radius:6px; font-family:'JetBrains Mono', monospace; font-size:12px; color:#4ADE80; margin:0 0 12px; min-height:80px; overflow-x:auto;">
+Program compiled successfully!
+Output: Max Sum Subarray = 8
+Execution Time: 2.4ms</pre>
+
+          <div style="font-size:11px; font-weight:800; color:var(--primary); text-transform:uppercase; margin-bottom:4px;">💡 Senior Mentor Tanglish Breakdown:</div>
+          <div id="code-studio-tanglish" style="font-size:12px; color:#E2E8F0; line-height:1.5; background:rgba(99,216,255,0.06); padding:10px; border-radius:6px; border-left:3px solid var(--primary);">
+            Loading explanation...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     4. 90-DAY VISUAL GANTT TRAJECTORY & CALENDAR SYNC (.ICS)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="roadmap-gantt-modal">
+  <div class="modal modal-tall" style="max-width: 940px;">
+    <button class="modal-close" data-close="roadmap-gantt-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span>📅</span> 90-Day Gantt Trajectory &amp; Daily Schedule
+        <span class="badge-pill" style="font-size:10px; background:rgba(99,216,255,0.15); color:var(--primary);">Day 27 / 90 (Phase 1)</span>
+      </div>
+      <button class="action-btn" onclick="downloadIcsScheduleFile()" style="font-size:12px; padding:6px 12px; background:linear-gradient(135deg,var(--primary),#6C63FF); color:#fff; border:none;">
+        📲 Sync to Google Calendar (.ICS)
+      </button>
+    </div>
+    <div class="modal-subtitle">Visual phase milestones, high-leverage milestones, and daily schedule blocks.</div>
+
+    <!-- 3 Phase Cards -->
+    <div id="gantt-phases-container" style="margin:14px 0;">
+      <!-- Populated via JS -->
+    </div>
+
+    <!-- Daily 6-Hour Timetable Schedule -->
+    <div style="font-size:13px; font-weight:800; color:#fff; margin:16px 0 8px;">⏰ Daily 6-Hour Routine &amp; Non-Negotiable Time Blocks:</div>
+    <div id="gantt-timetable-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:10px; max-height:220px; overflow-y:auto;">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     5. ATS RESUME STUDIO & JOB KEYWORD SCANNER
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="resume-ats-modal">
+  <div class="modal modal-tall" style="max-width: 1040px;">
+    <button class="modal-close" data-close="resume-ats-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span>📄</span> ATS Resume Studio &amp; Job Description Scanner
+        <span class="badge-pill" style="font-size:10px; background:rgba(74,222,128,0.15); color:var(--success);">ATS Score: 88/100</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="action-btn" onclick="window.print()" style="font-size:12px; padding:6px 12px;">🖨️ Print / Save PDF</button>
+      </div>
+    </div>
+    <div class="modal-subtitle">Clean single-page CSE resume template + real-time ATS keyword matching against target job descriptions.</div>
+
+    <!-- Dual Column: Scanner + Live Sheet -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-top:14px;">
+      <!-- Left: JD Keyword Scanner -->
+      <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-subtle); border-radius:10px; padding:16px;">
+        <div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">🎯 Target Job Description Matcher:</div>
+        <textarea id="ats-jd-input" class="form-input" style="height:120px; font-size:12px; line-height:1.4; width:100%; box-sizing:border-box;" placeholder="Paste Amazon / Google / Zoho SDE Job Description here to scan for missing keywords..."></textarea>
+        <button class="submit-btn" onclick="scanJobDescriptionKeywords()" style="width:100%; margin-top:8px;">⚡ Scan Resume vs Job Description</button>
+
+        <div style="margin-top:14px;" id="ats-match-results">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:12px; color:var(--text-muted);">Keyword Match Compatibility:</span>
+            <span style="font-size:13px; font-weight:800; color:var(--success);" id="ats-match-pct">88% (High Match)</span>
+          </div>
+          <div style="width:100%; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden;">
+            <div id="ats-match-bar" style="width:88%; height:100%; background:linear-gradient(90deg, var(--primary), var(--success)); border-radius:4px;"></div>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:10px;">
+            ✅ Matched: <strong>C++, DSA, Operating Systems, PostgreSQL, REST APIs, Git, Docker, System Design</strong><br>
+            ⚠️ Recommended to add: <span style="color:var(--warning);" id="ats-missing-kw">Kafka, Redis Caching, Microservices Architecture</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Live ATS Resume Sheet Preview -->
+      <div style="max-height:480px; overflow-y:auto; border:1px solid var(--border-subtle); border-radius:8px;">
+        <div class="ats-resume-sheet" id="ats-resume-preview-sheet">
+          <div class="ats-resume-name">TAMIZHARASAN E</div>
+          <div class="ats-resume-header-links">
+            <span>📧 tamizh.cse@college.edu</span>
+            <span>📱 +91 98765 43210</span>
+            <span>🔗 github.com/Tamizh1309</span>
+            <span>💻 leetcode.com/tamizh</span>
+          </div>
+
+          <div class="ats-section-title">Education</div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700;">
+            <span>B.E. Computer Science &amp; Engineering — Anna University</span>
+            <span>2023 – 2027</span>
+          </div>
+          <div style="font-size:11px; color:#64748B;">CGPA: 8.82 / 10 • Relevant: Operating Systems, DBMS, Networks, DSA, TOC, Compilers</div>
+
+          <div class="ats-section-title">Technical Skills</div>
+          <div style="font-size:11px; line-height:1.6;">
+            <strong>Languages:</strong> C++, Java, Python, C, JavaScript, SQL<br>
+            <strong>Core CS:</strong> Operating Systems, DBMS, Computer Networks, System Design, TOC<br>
+            <strong>Frameworks &amp; Tools:</strong> Node.js, Express, Docker, Redis, Git, Linux, SQLite
+          </div>
+
+          <div class="ats-section-title">Key Projects</div>
+          <div style="margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700;">
+              <span>GT Study Mentor Pro — AI Preparation Platform</span>
+              <span>Full Stack / System Design</span>
+            </div>
+            <div style="font-size:11px; color:#475569;">
+              • Engineered spaced-repetition preparation platform supporting 90-day structured GATE &amp; placement trajectory.<br>
+              • Built offline-first PWA with in-browser SQL playground and visual DSA visualizer serving 1,000+ mock questions.
+            </div>
+          </div>
+
+          <div class="ats-section-title">Achievements &amp; Competitive Programming</div>
+          <div style="font-size:11px; line-height:1.6; color:#475569;">
+            • <strong>GATE CS 2027 Aspirant</strong> — Consistent top 1% mock percentile (Score 740+).<br>
+            • Solved <strong>350+ DSA problems</strong> across LeetCode and Codeforces (Knight / Top 5%).
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

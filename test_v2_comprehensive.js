@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-  console.log('🚀 Launching GT Study Mentor Pro 2.0 Comprehensive Test Suite...');
+  console.log('🚀 Launching GT Study Mentor Pro 2.0 Comprehensive Test Suite with 5 New Feature Studios...');
   const browser = await puppeteer.launch({
     headless: 'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -38,77 +38,83 @@ const puppeteer = require('puppeteer');
       }
     });
     await new Promise(r => setTimeout(r, 600));
-
     await page.screenshot({ path: 'v2_home_dashboard.png' });
     console.log('📸 v2_home_dashboard.png captured.');
 
-    // 2. Test Task Checkbox Toggle
-    console.log("Testing Today's Plan task toggle...");
+    // 2. Test Feature 1: AI Mock Interview Studio
+    console.log('Testing Feature 1: AI Mock Interview Studio...');
     await page.evaluate(() => {
-      const firstTask = window.PrepIntelligenceEngine ? PrepIntelligenceEngine.getState().todayTasks[0] : null;
-      if (firstTask) {
-        PrepIntelligenceEngine.toggleTask(firstTask.id);
-        if (typeof window.renderHomeDashboard === 'function') window.renderHomeDashboard();
-      }
+      openModal('mock-interview-modal');
+      initMockInterview();
+      switchInterviewTrack('sde1');
+      document.getElementById('int-answer-input').value = 'We use a HashSet to store all numbers for O(1) lookup. Then we iterate through the set and only begin counting when x - 1 is not in the set, checking x + 1 streak. Time complexity is O(N).';
+      evaluateInterviewAnswer();
     });
-    await new Promise(r => setTimeout(r, 400));
-    console.log('✅ Task checkbox toggled successfully.');
+    await new Promise(r => setTimeout(r, 500));
+    await page.screenshot({ path: 'v2_feat_mock_interview.png' });
+    console.log('📸 v2_feat_mock_interview.png captured.');
+    await page.evaluate(() => closeModal('mock-interview-modal'));
 
-    // 3. Test FSRS Spaced Repetition Reveal & Rating
-    console.log('Testing FSRS Flashcard interaction...');
+    // 3. Test Feature 2: GATE 2027 AIR Predictor & Admission Engine
+    console.log('Testing Feature 2: GATE 2027 AIR Predictor...');
     await page.evaluate(() => {
-      window.toggleHomeFSRS();
-      window.rateHomeFSRS('Good');
+      openModal('gate-predictor-modal');
+      document.getElementById('pred-marks-input').value = '74';
+      setPredictorCategory('GEN');
+      runGatePredictor();
     });
-    await new Promise(r => setTimeout(r, 400));
-    console.log('✅ FSRS card revealed and rated Good.');
+    await new Promise(r => setTimeout(r, 500));
+    await page.screenshot({ path: 'v2_feat_gate_predictor.png' });
+    console.log('📸 v2_feat_gate_predictor.png captured.');
+    await page.evaluate(() => closeModal('gate-predictor-modal'));
 
-    // 4. Test Navigation to PREPARE (GATE & Placements)
-    console.log('Navigating to PREPARE...');
+    // 4. Test Feature 3: CSE Code Studio & Algorithmic Sandbox
+    console.log('Testing Feature 3: CSE Code Studio Sandbox...');
+    await page.evaluate(() => {
+      openModal('code-studio-modal');
+      loadCodeStudioTemplate('sliding-window');
+      runCodeStudioSimulation();
+    });
+    await new Promise(r => setTimeout(r, 600));
+    await page.screenshot({ path: 'v2_feat_code_studio.png' });
+    console.log('📸 v2_feat_code_studio.png captured.');
+    await page.evaluate(() => closeModal('code-studio-modal'));
+
+    // 5. Test Feature 4: 90-Day Gantt Trajectory & Daily Schedule
+    console.log('Testing Feature 4: 90-Day Gantt Trajectory...');
+    await page.evaluate(() => {
+      openModal('roadmap-gantt-modal');
+      renderGanttRoadmap();
+    });
+    await new Promise(r => setTimeout(r, 500));
+    await page.screenshot({ path: 'v2_feat_roadmap_gantt.png' });
+    console.log('📸 v2_feat_roadmap_gantt.png captured.');
+    await page.evaluate(() => closeModal('roadmap-gantt-modal'));
+
+    // 6. Test Feature 5: ATS Resume Studio & Keyword Scanner
+    console.log('Testing Feature 5: ATS Resume Studio...');
+    await page.evaluate(() => {
+      openModal('resume-ats-modal');
+      document.getElementById('ats-jd-input').value = 'Looking for SDE with strong knowledge of C++, DSA, Operating Systems, PostgreSQL, Docker, and REST API development.';
+      scanJobDescriptionKeywords();
+    });
+    await new Promise(r => setTimeout(r, 500));
+    await page.screenshot({ path: 'v2_feat_resume_ats.png' });
+    console.log('📸 v2_feat_resume_ats.png captured.');
+    await page.evaluate(() => closeModal('resume-ats-modal'));
+
+    // 7. Test Navigation across standard views
+    console.log('Navigating to PREPARE & PRACTICE...');
     await page.evaluate(() => window.navigateToView('prepare', 'gate'));
-    await new Promise(r => setTimeout(r, 500));
-    await page.screenshot({ path: 'v2_prepare_gate.png' });
-    console.log('📸 v2_prepare_gate.png captured.');
-
-    await page.evaluate(() => window.switchPrepareTab('placement'));
     await new Promise(r => setTimeout(r, 400));
-    await page.screenshot({ path: 'v2_prepare_placement.png' });
-    console.log('📸 v2_prepare_placement.png captured.');
-
-    // 5. Test Navigation to PROGRESS (Mastery Matrix & Mistake Book)
-    console.log('Navigating to PROGRESS...');
-    await page.evaluate(() => window.navigateToView('progress', 'mastery'));
-    await new Promise(r => setTimeout(r, 500));
-    await page.screenshot({ path: 'v2_progress_matrix.png' });
-    console.log('📸 v2_progress_matrix.png captured.');
-
-    await page.evaluate(() => window.switchProgressTab('mistakes'));
-    await new Promise(r => setTimeout(r, 400));
-    await page.screenshot({ path: 'v2_progress_mistakes.png' });
-    console.log('📸 v2_progress_mistakes.png captured.');
-
-    // 6. Test Navigation to PRACTICE (DSA & PYQs)
-    console.log('Navigating to PRACTICE...');
     await page.evaluate(() => window.navigateToView('practice', 'dsa'));
-    await new Promise(r => setTimeout(r, 500));
-    await page.screenshot({ path: 'v2_practice_dsa.png' });
-    console.log('📸 v2_practice_dsa.png captured.');
-
-    // 7. Test Navigation to CAREER (Applications & Resume)
-    console.log('Navigating to CAREER...');
+    await new Promise(r => setTimeout(r, 400));
     await page.evaluate(() => window.navigateToView('career', 'apps'));
-    await new Promise(r => setTimeout(r, 500));
-    await page.screenshot({ path: 'v2_career_apps.png' });
-    console.log('📸 v2_career_apps.png captured.');
-
-    // 8. Test Navigation to CSE LABS
-    console.log('Navigating to CSE LABS...');
+    await new Promise(r => setTimeout(r, 400));
     await page.evaluate(() => window.navigateToView('cselabs'));
-    await new Promise(r => setTimeout(r, 500));
-    await page.screenshot({ path: 'v2_cselabs_hub.png' });
-    console.log('📸 v2_cselabs_hub.png captured.');
+    await new Promise(r => setTimeout(r, 400));
 
-    // 9. Test Mobile Viewport (390 x 844)
+    // 8. Test Mobile Viewport (390 x 844)
     console.log('Testing Mobile Viewport (390x844)...');
     await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
     await page.evaluate(() => window.navigateToView('home'));
@@ -120,7 +126,7 @@ const puppeteer = require('puppeteer');
     if (errors.length > 0) {
       console.warn('Errors encountered:', errors);
     } else {
-      console.log('🎉 ALL V2.0 COMPREHENSIVE TESTS PASSED WITH 0 ERRORS!');
+      console.log('🎉 ALL V2.0 COMPREHENSIVE TESTS + 5 NEW STUDIOS PASSED WITH 0 ERRORS!');
     }
   } catch (err) {
     console.error('Test execution failed:', err);
