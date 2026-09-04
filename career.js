@@ -264,12 +264,12 @@ const CareerModule = (function () {
       'Closed': 'var(--text-muted)'
     };
     const stageIcons = {
-      'Recommended': '??',
-      'Eligible': '?',
-      'Skill Gap': '??',
-      'Applied': '??',
-      'Interviewing': '???',
-      'Closed': '??'
+      'Recommended': '⭐',
+      'Eligible': '✅',
+      'Skill Gap': '⚠️',
+      'Applied': '📬',
+      'Interviewing': '🎙️',
+      'Closed': '📁'
     };
 
     container.innerHTML = `
@@ -348,7 +348,7 @@ const CareerModule = (function () {
       <!-- 9-Step Pipeline Indicator -->
       <div class="nd-card" style="padding:16px;margin-bottom:20px;overflow-x:auto;">
         <div style="font-size:11px;font-weight:800;color:var(--primary-light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">
-          ?? 9-Stage Career Pipeline
+          🎯 9-Stage Career Pipeline
         </div>
         <div style="display:flex;gap:4px;align-items:center;min-width:700px;">
           ${[
@@ -404,7 +404,7 @@ const CareerModule = (function () {
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:20px;">
           <div style="padding:14px;background:var(--depth-4);border-radius:var(--radius-sm);border:1px solid var(--border-subtle);">
             <div style="font-size:11px;font-weight:800;color:var(--success);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">
-              ? Eligibility &amp; Strengths (${matchedSkills.length} Matched)
+              ✅ Eligibility &amp; Strengths (${matchedSkills.length} Matched)
             </div>
             <div style="font-size:12px;color:var(--text);margin-bottom:8px;">
               Min CGPA: <strong>${opp.requiredCGPA}</strong> (You: <strong>8.4</strong>) &bull; Status: <span style="color:var(--success);font-weight:700;">Eligible</span>
@@ -416,7 +416,7 @@ const CareerModule = (function () {
 
           <div style="padding:14px;background:var(--depth-4);border-radius:var(--radius-sm);border:1px solid var(--border-subtle);">
             <div style="font-size:11px;font-weight:800;color:var(--warning);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">
-              ?? Missing Skills &amp; Gaps (${missingSkills.length} to cover)
+              ⚠️ Missing Skills &amp; Gaps (${missingSkills.length} to cover)
             </div>
             <div class="skill-gap-list">
               ${missingSkills.length ? missingSkills.map(s => `<span class="skill-gap-tag">${s}</span>`).join('') : '<span style="color:var(--success);font-size:12px;">All essential skills matched!</span>'}
@@ -427,7 +427,7 @@ const CareerModule = (function () {
         <!-- 7-Day Preparation Sprint -->
         <div style="margin-bottom:20px;">
           <div style="font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">
-            ?? 7-Day Targeted Preparation Sprint
+            ⚡ 7-Day Targeted Preparation Sprint
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             ${(opp.sprint || []).map(s => `
@@ -439,7 +439,7 @@ const CareerModule = (function () {
                   <span style="font-size:13px;color:var(--text);font-weight:600;">${s.topic}</span>
                 </div>
                 <button onclick="window.FocusSession && FocusSession.startTask('${s.topic}', 45)" class="submit-btn" style="padding:4px 12px;font-size:11px;font-weight:700;">
-                  ? Focus
+                  ⚡ Focus
                 </button>
               </div>
             `).join('')}
@@ -449,13 +449,13 @@ const CareerModule = (function () {
         <!-- Pipeline Action Buttons -->
         <div style="display:flex;gap:10px;flex-wrap:wrap;border-top:1px solid var(--border-subtle);padding-top:16px;">
           <button onclick="openModal('resume-ats-modal')" class="action-btn" style="flex:1;min-width:180px;padding:10px;">
-            ?? Step 6: Resume ATS Check
+            📄 Step 6: Resume ATS Check
           </button>
           <button onclick="openModal('mock-interview-modal')" class="action-btn" style="flex:1;min-width:180px;padding:10px;color:#A78BFA;border-color:rgba(167,139,250,0.3);">
-            ??? Step 7: Mock Interview
+            🎙️ Step 7: Mock Interview
           </button>
           <button onclick="CareerModule.moveOpportunity('${opp.id}', 'Applied')" class="submit-btn" style="flex:1;min-width:180px;padding:10px;">
-            ?? Step 8: Mark as Applied
+            📬 Step 8: Mark as Applied
           </button>
         </div>
       </div>`;
@@ -489,10 +489,10 @@ const CareerModule = (function () {
             <div style="display:flex;gap:8px;border-top:1px solid var(--border-subtle);padding-top:12px;margin-top:auto;flex-wrap:wrap;">
               ${p.is3D ? `
                 <button onclick="openVortex3DModal()" class="submit-btn" style="width:100%;font-size:12px;padding:8px;margin-bottom:4px;background:linear-gradient(135deg, var(--primary), var(--accent));">
-                  ?? Launch 3D Simulation
+                  🚀 Launch 3D Simulation
                 </button>
               ` : ''}
-              <button onclick="window.open('${p.github}','_blank')" class="action-btn" style="flex:1;font-size:11px;padding:6px;">GitHub ?</button>
+              <button onclick="window.open('${p.github}','_blank')" class="action-btn" style="flex:1;font-size:11px;padding:6px;">GitHub &#x2197;</button>
               <button onclick="openModal('resume-ats-modal')" class="action-btn" style="flex:1;font-size:11px;padding:6px;color:var(--success);">ATS Scan</button>
             </div>
           </div>
@@ -500,7 +500,7 @@ const CareerModule = (function () {
       </div>`;
   }
 
-  // ?? 4. Applications Tracker Full View ??
+  // 4. Applications Tracker Full View
   function renderApplications(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -508,7 +508,7 @@ const CareerModule = (function () {
     if (state.applications.length === 0) {
       container.innerHTML = `
         <div style="text-align:center;padding:48px 20px;">
-          <div style="font-size:48px;margin-bottom:12px;">??</div>
+          <div style="font-size:48px;margin-bottom:12px;">📬</div>
           <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">No applications tracked yet</div>
           <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Move an opportunity from the board to "Applied" to track here.</div>
           <button onclick="CareerModule.renderOpportunityBoard('career-content-area')" class="submit-btn" style="padding:8px 20px;">Browse Opportunity Board</button>

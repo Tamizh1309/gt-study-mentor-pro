@@ -7567,12 +7567,12 @@ function startScaffoldedDoubtSolver() {
     mentorBubble.className = 'chat-bubble mentor';
     mentorBubble.innerHTML = `
       <div class="chat-text">
-        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">?? Scaffolded Socratic Doubt Solver</div>
+        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">💡 Scaffolded Socratic Doubt Solver</div>
         <p style="margin-bottom:8px;">Great question da! Let's solve this together so it sticks forever.</p>
         <p><strong>Step 1:</strong> What core CS concept do you think this relates to, and what approach have you tried so far?</p>
         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-          <button onclick="provideDoubtHint()" class="action-btn" style="font-size:11px;padding:4px 10px;">?? Give me Hint 1</button>
-          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">?? Show Full Solution</button>
+          <button onclick="provideDoubtHint()" class="action-btn" style="font-size:11px;padding:4px 10px;">💡 Give me Hint 1</button>
+          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">🔍 Show Full Solution</button>
         </div>
       </div>`;
     container.appendChild(mentorBubble);
@@ -7592,21 +7592,21 @@ function provideDoubtHint() {
   if (currentScaffoldState.hintCount === 1) {
     mentorBubble.innerHTML = `
       <div class="chat-text">
-        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">?? Hint 1 (Concept Anchor)</div>
+        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">💡 Hint 1 (Concept Anchor)</div>
         <p style="margin-bottom:8px;">Consider the mathematical invariant or boundary conditions. For "${escapeHtml(currentScaffoldState.question)}", identify whether the state transitions depend on previous subproblems (overlapping) or greedy choices.</p>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
-          <button onclick="provideDoubtHint()" class="action-btn" style="font-size:11px;padding:4px 10px;">?? Hint 2 (Detailed Clue)</button>
-          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">?? Show Full Solution</button>
+          <button onclick="provideDoubtHint()" class="action-btn" style="font-size:11px;padding:4px 10px;">💡 Hint 2 (Detailed Clue)</button>
+          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">🔍 Show Full Solution</button>
         </div>
       </div>`;
   } else {
     mentorBubble.innerHTML = `
       <div class="chat-text">
-        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">?? Hint 2 (Structural Breakdown)</div>
+        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">💡 Hint 2 (Structural Breakdown)</div>
         <p style="margin-bottom:8px;">Break the problem down into Base Case and Inductive Step. Try writing out the recurrence relation or step-by-step state change on paper now.</p>
         <p>Now attempt your solution and type it below!</p>
         <div style="display:flex;gap:8px;margin-top:10px;">
-          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">?? Show Full Solution</button>
+          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">🔍 Show Full Solution</button>
         </div>
       </div>`;
   }
@@ -7623,7 +7623,7 @@ function showFullDoubtSolution() {
   mentorBubble.className = 'chat-bubble mentor';
   mentorBubble.innerHTML = `
     <div class="chat-text">
-      <div style="font-weight:800;color:var(--success);margin-bottom:6px;">?? Full Verified Solution &amp; Theory</div>
+      <div style="font-weight:800;color:var(--success);margin-bottom:6px;">✅ Full Verified Solution &amp; Theory</div>
       <p style="margin-bottom:8px;"><strong>Question:</strong> ${escapeHtml(currentScaffoldState.question)}</p>
       <div style="background:var(--depth-4);padding:12px;border-radius:6px;border:1px solid var(--border-subtle);font-size:12px;line-height:1.6;margin-bottom:10px;">
         1. <strong>Core Concept:</strong> Analyzed from fundamental principles.<br>
@@ -7631,7 +7631,7 @@ function showFullDoubtSolution() {
         3. <strong>Complexity:</strong> Time Complexity O(N) or O(V+E), Space Complexity O(1) or O(N).
       </div>
       <div style="padding:10px;background:rgba(91,91,214,0.1);border-radius:6px;border:1px solid rgba(91,91,214,0.25);margin-top:8px;">
-        <strong>?? Quick Verification Check:</strong> Can you explain what would happen if the input size is 0 or negative?
+        <strong>💡 Quick Verification Check:</strong> Can you explain what would happen if the input size is 0 or negative?
       </div>
     </div>`;
   container.appendChild(mentorBubble);
@@ -8121,7 +8121,7 @@ window.switchProgressTab = function (tab) {
     container.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
         <div class="nd-card" style="padding:20px;">
-          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px;">?? Weekly Accuracy Trends</div>
+          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px;">📊 Weekly Accuracy Trends</div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div>
               <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
@@ -8147,7 +8147,7 @@ window.switchProgressTab = function (tab) {
           </div>
         </div>
         <div class="nd-card" style="padding:20px;">
-          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px;">?? Focus Time Breakdown</div>
+          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px;">⏱️ Focus Time Breakdown</div>
           <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
             <div style="display:flex;justify-content:space-between;">
               <span style="color:var(--text-sub);">Deep Focus Time:</span>
@@ -8184,9 +8184,9 @@ window.switchProgressTab = function (tab) {
                   ${m.mistakeType}
                 </span>
               </div>
-              <div style="font-size:12px;color:var(--danger);margin-bottom:4px;">? Your Answer: ${m.userWrongAnswer}</div>
-              <div style="font-size:12px;color:var(--success);margin-bottom:8px;">? Correct: ${m.correctAnswer}</div>
-              <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">?? ${m.concept}</div>
+              <div style="font-size:12px;color:var(--danger);margin-bottom:4px;">❌ Your Answer: ${m.userWrongAnswer}</div>
+              <div style="font-size:12px;color:var(--success);margin-bottom:8px;">✅ Correct: ${m.correctAnswer}</div>
+              <div style="font-size:11px;color:var(--text-muted);line-height:1.5;">💡 ${m.concept}</div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;border-top:1px solid var(--border-subtle);padding-top:10px;">
                 <span style="font-size:11px;color:var(--primary-light);font-weight:700;">Stage: ${m.stage || (m.resolved ? 'Mastered' : 'Smart Revision')}</span>
                 <div style="display:flex;gap:6px;">
