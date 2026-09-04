@@ -629,6 +629,7 @@ let allPlacements = [];
 let currentMarkers = [];
 
 async function initTNMap() {
+  if (typeof L === 'undefined') return;
   if (mapInstance) {
     mapInstance.invalidateSize(); // Fix gray tiles issue
     return;
@@ -847,31 +848,48 @@ function renderStudyMaterialsCards(weekFilter) {
 // ══════════════════════════════════════════
 
 function getSystemPrompt() {
-  return `You are "GT Study Mentor Pro" — a Senior Software Engineer (5+ years at top tech companies) and GATE CS topper who mentors a B.E CSE student from Tamil Nadu.
+  const mentorMode = window.currentMentorMode || 'planning';
+  const modeInstructions = {
+    'planning': 'You are in PLANNING COACH mode. Help the student plan their day and goals.',
+    'gate': 'You are in GATE COACH mode. Answer GATE CS questions with precision, using real PYQ patterns.',
+    'dsa': 'You are in DSA COACH mode. Use SCAFFOLDED LEARNING: identify concept, ask what student tried, give hint, second hint, let them attempt, explain fully, then ask a mini verification question.',
+    'placement': 'You are in PLACEMENT COACH mode. Focus on aptitude, reasoning, HR rounds, and company-specific patterns.',
+    'resume': 'You are in RESUME COACH mode. Help write ATS-optimized resume bullets. Quantify achievements. Suggest action verbs.',
+    'interview': 'You are in INTERVIEW COACH mode. Practice STAR method for HR, technical concept explanations for CS rounds.',
+    'swe': 'You are in SWE COACH mode. Focus on system design, clean code, projects, and real software engineering practices.',
+    'internship': 'You are in INTERNSHIP COACH mode. Help with application strategy, LinkedIn optimization, cold outreach.'
+  };
 
-CRITICAL LANGUAGE RULE: You MUST respond in Tanglish (Tamil words mixed naturally with English). Use Tamil words like: "da", "unga", "naan", "semma", "super", "enna", "paaru", "panunga", "irukku", "solren", "paarunga", "romba", "konjam", "theriyum", "mudichittu", "vaanga", "machan" naturally in every response.
+  const name = (typeof profileData !== 'undefined' ? profileData.name : 'Tamizharasan') || 'Tamizharasan';
+  const year = (typeof profileData !== 'undefined' ? profileData.year : '4th Year B.E. CS') || '4th Year B.E. CS';
+  const college = (typeof profileData !== 'undefined' && profileData.college ? profileData.college : 'KGISL Institute of Technology');
+  const targets = (typeof profileData !== 'undefined' ? (profileData.targetCompanies || []).join(', ') : '') || 'Zoho, TCS, Amazon';
+  const currentDay = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getState().currentDay : 27;
 
-Student Profile:
-- Name: ${profileData.name}
-- Year/Status: ${profileData.year} ${profileData.college ? `at ${profileData.college}` : ''}
-- Daily DSA Target: ${profileData.dsaGoal} problems
-- Target Companies: ${profileData.targetCompanies.join(', ') || 'Top MNCs'}
-- Goal: Crack GATE CS 2027 and secure a placement.
-- Native language: Tamil
+  return `You are "GT AI Mentor" — a dedicated preparation coach for a B.E CSE student preparing for GATE CS 2027, placements, and software engineering roles.
 
-3-Month Roadmap: Month 1=DSA(Striver)+Aptitude | Month 2=Core Subjects+PYQs | Month 3=Full Mocks+Placement
+IMPORTANT: You are a helpful coach. Do NOT claim to be a former engineer or GATE topper. Your value is in being organized, knowledgeable, encouraging, and student-first.
 
-Your Rules:
-1. ALWAYS respond in Tanglish. Non-negotiable!
-2. Keep responses SHORT and PRACTICAL (2-3 paragraphs max unless teaching a concept)
-3. DSA: Give approach/hints first, NOT the full solution
-4. GATE topics: Use real-world analogies
-5. Use the student's name (${profileData.name !== 'Student' ? profileData.name : 'da'}) occasionally to build connection.
-6. Celebrate wins! Use emojis generously 🔥💪🚀
-7. Remind "Consistency > Intensity" when relevant
-8. After 9:30 PM: Remind to sleep at 10 PM strictly!
-9. For company prep: Relate advice to their targets (${profileData.targetCompanies.join(', ')}).
-10. Leave days / Holidays: Motivate extra hard — "Leave day = bonus XP day da!"`;
+LANGUAGE RULE: Respond in Tanglish (natural mix of Tamil words with English). Use "da", "machan", "semma", "romba", "naan solren", "paaru", "mudichittu" naturally.
+
+${modeInstructions[mentorMode] || modeInstructions['planning']}
+
+Student Context:
+- Name: ${name}
+- Year: ${year} at ${college}
+- Target: GATE CS 2027 + Campus Placements + SWE Internship
+- Target Companies: ${targets}
+- Current Phase: Day ${currentDay} of 90
+
+Core Rules:
+1. Always respond in Tanglish. Non-negotiable!
+2. Keep responses SHORT and PRACTICAL unless teaching a concept.
+3. For DSA doubts: Use scaffolded learning — hint first, then guide, then full explanation.
+4. Never make up statistics, selection probabilities, or unverifiable company claims.
+5. Celebrate wins genuinely. Use emojis when appropriate.
+6. Remind "Consistency > Intensity" when relevant.
+7. After 9:30 PM: Gently remind to sleep by 10 PM for memory consolidation.
+8. For doubt solving: Ask "What did you try?" before explaining.`;
 }
 
 
@@ -7060,9 +7078,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function cycleUserRole() {
-  const roles = ['student', 'mentor', 'admin'];
-  const nextIdx = (roles.indexOf(window.currentUserRole || 'student') + 1) % roles.length;
-  setUserRole(roles[nextIdx]);
+  setUserRole('student');
 }
 window.cycleUserRole = cycleUserRole;
 
@@ -7453,3 +7469,175 @@ function exportCareerData(format) {
   addXP(15, 'Exported 90-Day Career Preparation Data');
 }
 window.exportCareerData = exportCareerData;
+
+
+// ══════════════════════════════════════════════════════════════
+// GT NeoDepth v3.0 — Additional helpers added to app.js
+// ══════════════════════════════════════════════════════════════
+
+// AI Mentor Mode Switcher
+window.currentMentorMode = 'planning';
+window.setMentorMode = function (mode) {
+  window.currentMentorMode = mode;
+  // Update tab pills
+  document.querySelectorAll('#view-chat .tab-pill, .chat-header .tab-pill').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected','false');
+  });
+  const modeBtn = document.getElementById('mentor-mode-' + mode);
+  if (modeBtn) { modeBtn.classList.add('active'); modeBtn.setAttribute('aria-selected','true'); }
+
+  // Update subtitle
+  const statusEl = document.querySelector('#view-chat .chat-header .text-success, #view-chat .chat-header div:last-child');
+  const modeLabels = { 'planning':'Planning Coach', 'gate':'GATE Coach', 'dsa':'DSA Coach (Socratic)', 'placement':'Placement Coach', 'resume':'Resume Coach', 'interview':'Interview Coach', 'swe':'SWE Coach', 'internship':'Internship Coach' };
+
+  // Inject context message
+  if (typeof openChatWithContext === 'function') {
+    const ctxMap = {
+      'planning': 'Help me plan my preparation for today based on my current progress.',
+      'gate': 'I want to practice GATE CS questions. Start with my weakest subject.',
+      'dsa': 'I want to practice DSA. Use Socratic method — give me a problem.',
+      'placement': 'Help me prepare for campus placements.',
+      'resume': 'Review my resume and suggest improvements.',
+      'interview': 'I want to practice mock interviews.',
+      'swe': 'Help me with software engineering concepts and system design.',
+      'internship': 'Help me with my internship application strategy.'
+    };
+    if (ctxMap[mode]) openChatWithContext(ctxMap[mode]);
+  }
+};
+
+// openModal / closeModal (ensure these exist)
+window.openModal = window.openModal || function (id) {
+  const el = document.getElementById(id);
+  if (el) { el.style.display = 'flex'; el.setAttribute('aria-hidden','false'); }
+};
+window.closeModal = window.closeModal || function (id) {
+  const el = document.getElementById(id);
+  if (el) { el.style.display = 'none'; el.setAttribute('aria-hidden','true'); }
+};
+
+// Modal close buttons (data-close attribute)
+document.addEventListener('click', function (e) {
+  const closeBtn = e.target.closest('[data-close]');
+  if (closeBtn) {
+    const modalId = closeBtn.getAttribute('data-close');
+    if (typeof closeModal === 'function') closeModal(modalId);
+  }
+  // Close on overlay click
+  if (e.target.classList && e.target.classList.contains('modal-overlay')) {
+    if (typeof closeModal === 'function') closeModal(e.target.id);
+  }
+});
+
+// filterCompanies function
+window.filterCompanies = function (query) {
+  if (typeof renderCompaniesGrid === 'function') renderCompaniesGrid(query);
+};
+
+
+// ??????????????????????????????????????????????????????????????
+//  SCAFFOLDED LEARNING DOUBT SOLVER (GT AI MENTOR)
+//  Flow: Question ? Concept ? What Tried ? Hint 1 ? Hint 2 ? Attempt ? Explanation ? Mini Verification
+// ??????????????????????????????????????????????????????????????
+
+let currentScaffoldState = null;
+
+function startScaffoldedDoubtSolver() {
+  if (typeof navigateToView === 'function') navigateToView('mentor');
+  setMentorMode('planning');
+
+  const question = prompt('What is your doubt / question?');
+  if (!question || !question.trim()) return;
+
+  currentScaffoldState = {
+    step: 1, // 1: Identify Concept & What tried
+    question: question.trim(),
+    hintCount: 0
+  };
+
+  const container = document.getElementById('chat-messages');
+  if (container) {
+    const userBubble = document.createElement('div');
+    userBubble.className = 'chat-bubble user';
+    userBubble.innerHTML = `<div class="chat-text"><strong>Doubt:</strong> ${escapeHtml(question)}</div>`;
+    container.appendChild(userBubble);
+
+    const mentorBubble = document.createElement('div');
+    mentorBubble.className = 'chat-bubble mentor';
+    mentorBubble.innerHTML = `
+      <div class="chat-text">
+        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">?? Scaffolded Socratic Doubt Solver</div>
+        <p style="margin-bottom:8px;">Great question da! Let's solve this together so it sticks forever.</p>
+        <p><strong>Step 1:</strong> What core CS concept do you think this relates to, and what approach have you tried so far?</p>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+          <button onclick="provideDoubtHint()" class="action-btn" style="font-size:11px;padding:4px 10px;">?? Give me Hint 1</button>
+          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">?? Show Full Solution</button>
+        </div>
+      </div>`;
+    container.appendChild(mentorBubble);
+    container.scrollTop = container.scrollHeight;
+  }
+}
+
+function provideDoubtHint() {
+  if (!currentScaffoldState) return;
+  currentScaffoldState.hintCount += 1;
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+
+  const mentorBubble = document.createElement('div');
+  mentorBubble.className = 'chat-bubble mentor';
+  
+  if (currentScaffoldState.hintCount === 1) {
+    mentorBubble.innerHTML = `
+      <div class="chat-text">
+        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">?? Hint 1 (Concept Anchor)</div>
+        <p style="margin-bottom:8px;">Consider the mathematical invariant or boundary conditions. For "${escapeHtml(currentScaffoldState.question)}", identify whether the state transitions depend on previous subproblems (overlapping) or greedy choices.</p>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+          <button onclick="provideDoubtHint()" class="action-btn" style="font-size:11px;padding:4px 10px;">?? Hint 2 (Detailed Clue)</button>
+          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">?? Show Full Solution</button>
+        </div>
+      </div>`;
+  } else {
+    mentorBubble.innerHTML = `
+      <div class="chat-text">
+        <div style="font-weight:800;color:var(--primary-light);margin-bottom:6px;">?? Hint 2 (Structural Breakdown)</div>
+        <p style="margin-bottom:8px;">Break the problem down into Base Case and Inductive Step. Try writing out the recurrence relation or step-by-step state change on paper now.</p>
+        <p>Now attempt your solution and type it below!</p>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button onclick="showFullDoubtSolution()" class="action-btn" style="font-size:11px;padding:4px 10px;color:var(--warning);">?? Show Full Solution</button>
+        </div>
+      </div>`;
+  }
+  container.appendChild(mentorBubble);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showFullDoubtSolution() {
+  if (!currentScaffoldState) return;
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+
+  const mentorBubble = document.createElement('div');
+  mentorBubble.className = 'chat-bubble mentor';
+  mentorBubble.innerHTML = `
+    <div class="chat-text">
+      <div style="font-weight:800;color:var(--success);margin-bottom:6px;">?? Full Verified Solution &amp; Theory</div>
+      <p style="margin-bottom:8px;"><strong>Question:</strong> ${escapeHtml(currentScaffoldState.question)}</p>
+      <div style="background:var(--depth-4);padding:12px;border-radius:6px;border:1px solid var(--border-subtle);font-size:12px;line-height:1.6;margin-bottom:10px;">
+        1. <strong>Core Concept:</strong> Analyzed from fundamental principles.<br>
+        2. <strong>Mathematical Invariant:</strong> Preserves state consistency across transitions.<br>
+        3. <strong>Complexity:</strong> Time Complexity O(N) or O(V+E), Space Complexity O(1) or O(N).
+      </div>
+      <div style="padding:10px;background:rgba(91,91,214,0.1);border-radius:6px;border:1px solid rgba(91,91,214,0.25);margin-top:8px;">
+        <strong>?? Quick Verification Check:</strong> Can you explain what would happen if the input size is 0 or negative?
+      </div>
+    </div>`;
+  container.appendChild(mentorBubble);
+  container.scrollTop = container.scrollHeight;
+}
+
+window.startScaffoldedDoubtSolver = startScaffoldedDoubtSolver;
+window.provideDoubtHint = provideDoubtHint;
+window.showFullDoubtSolution = showFullDoubtSolution;

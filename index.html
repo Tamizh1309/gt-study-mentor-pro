@@ -3,1271 +3,625 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>GT Study Mentor Pro — 90-Day Career Preparation</title>
-  <meta name="description" content="AI-powered GATE CS 2027 + Placement mentor. Daily plans, reminders, holiday calendar, study materials, and Tanglish guidance da!" />
-
-  <!-- PWA / App -->
-  <meta name="theme-color" content="#6C63FF" />
+  <title>GT Study Mentor Pro — 90-Day Preparation OS</title>
+  <meta name="description" content="Your personal 90-day preparation OS for GATE CS 2027, Placements, Software Engineering and Internships." />
+  <meta name="theme-color" content="#5B5BD6" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="application-name" content="GT Mentor Pro" />
-  <!-- iOS Safari PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="GT Mentor" />
   <link rel="apple-touch-icon" href="icon.svg" />
-  <!-- Windows / MS Edge PWA -->
-  <meta name="msapplication-TileColor" content="#6C63FF" />
+  <meta name="msapplication-TileColor" content="#5B5BD6" />
   <meta name="msapplication-TileImage" content="icon.svg" />
-  <!-- Manifest -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  
-  
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   <link rel="stylesheet" href="style.css" />
   <script src="prepIntelligence.js"></script>
   <script src="mistakeBook.js"></script>
 </head>
 <body>
 
-<!-- ─── SECTION DIVIDER ─── -->
+<!-- PWA Install Banner -->
 <div class="install-banner hidden" id="install-banner" style="display:none !important;" aria-hidden="true">
   <div class="install-banner-content">
     <span class="install-icon">&#x1F4F1;</span>
     <div>
       <div class="install-title">Install GT Mentor Pro</div>
-      <div class="install-sub">Works offline on all devices!</div>
+      <div class="install-sub">Works fully offline on all devices!</div>
     </div>
   </div>
   <div class="install-banner-btns">
     <button class="install-btn" id="install-btn">Install Free</button>
-    <button class="install-dismiss" id="install-dismiss-btn">✕</button>
+    <button class="install-dismiss" id="install-dismiss-btn" aria-label="Dismiss">&#x2715;</button>
   </div>
 </div>
-
-<!-- ─── SECTION DIVIDER ─── -->
-<div class="ios-install-guide hidden" id="ios-install-guide">
+<div class="ios-install-guide hidden" id="ios-install-guide" role="alert">
   <div class="ios-guide-content">
     <span>&#x1F4F1; Install on iPhone: Tap <strong>Share</strong> &rarr; <strong>Add to Home Screen</strong></span>
     <button class="ios-guide-close" id="ios-guide-close">Got it &#x2713;</button>
   </div>
 </div>
 
-<!-- ─── SECTION DIVIDER ─── -->
+<!-- Focus Session Overlay -->
+<div id="focus-session-overlay" role="dialog" aria-modal="true" aria-label="Focus Session">
+  <div class="focus-session-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+      <div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-weight:700;margin-bottom:4px;">&#x26A1; Focus Session Active</div>
+        <div id="focus-task-title" style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;color:var(--text);line-height:1.3;">Loading task...</div>
+      </div>
+      <button id="focus-pause-btn" onclick="window.FocusSession&&FocusSession.pause()" style="background:var(--surface-mid);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-muted);padding:6px 12px;cursor:pointer;font-size:12px;">&#x23F8;&#xFE0F; Pause</button>
+    </div>
+    <div class="focus-goal-text" id="focus-goal-text">Loading goal...</div>
+    <div class="focus-timer-display" id="focus-timer-display" aria-live="polite">25:00</div>
+    <div style="background:var(--depth-4);border-radius:var(--radius-full);height:4px;margin-bottom:20px;overflow:hidden;">
+      <div id="focus-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:var(--radius-full);width:0%;transition:width 1s linear;"></div>
+    </div>
+    <label for="focus-notes" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">&#x1F4DD; Quick Notes</label>
+    <textarea id="focus-notes" class="focus-quick-notes" placeholder="Key ideas, stuck points, formulas to remember..."></textarea>
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">How did it go?</div>
+    <div class="focus-rating-row" role="group" aria-label="Session difficulty rating">
+      <button class="focus-rating-btn" data-rating="easy" onclick="window.FocusSession&&FocusSession.finish('easy')">&#x1F49A; Easy<br><span style="font-size:9px;color:var(--success);">Mastered</span></button>
+      <button class="focus-rating-btn" data-rating="good" onclick="window.FocusSession&&FocusSession.finish('good')">&#x1F44D; Good<br><span style="font-size:9px;color:var(--accent);">Solid</span></button>
+      <button class="focus-rating-btn" data-rating="hard" onclick="window.FocusSession&&FocusSession.finish('hard')">&#x26A0;&#xFE0F; Hard<br><span style="font-size:9px;color:var(--warning);">Need more</span></button>
+      <button class="focus-rating-btn" data-rating="revision" onclick="window.FocusSession&&FocusSession.finish('revision')">&#x1F504; Revise<br><span style="font-size:9px;color:var(--danger);">Schedule</span></button>
+    </div>
+    <div class="focus-controls">
+      <button onclick="window.FocusSession&&FocusSession.stuck()" style="flex:1;padding:10px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.28);border-radius:var(--radius-sm);color:var(--warning);font-size:13px;font-weight:700;cursor:pointer;">&#x1F914; I'm Stuck &mdash; Ask GT AI</button>
+      <button onclick="window.FocusSession&&FocusSession.abort()" style="padding:10px 16px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-muted);font-size:12px;cursor:pointer;">Abandon</button>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette (Ctrl+K) -->
+<div id="command-palette-overlay" role="dialog" aria-modal="true" aria-label="Command palette" onclick="if(event.target===this)window.CommandPalette&&CommandPalette.close()">
+  <div class="command-palette-box">
+    <div class="command-palette-input-wrap">
+      <span class="command-palette-icon" aria-hidden="true">&#x2318;</span>
+      <input type="search" id="command-palette-input" class="command-palette-input"
+        placeholder="Search commands, topics, companies..." autocomplete="off" spellcheck="false"
+        aria-label="Search commands"
+        oninput="window.CommandPalette&&CommandPalette.filter(this.value)"
+        onkeydown="window.CommandPalette&&CommandPalette.keyNav(event)" />
+      <span class="command-palette-kbd">Esc</span>
+    </div>
+    <div class="command-list" id="command-list" role="listbox" aria-label="Commands"></div>
+  </div>
+</div>
 <div id="app">
 
-  <aside id="sidebar" class="sidebar-closed" style="display:flex; flex-direction:column;">
-
-    <!-- Brand Header -->
-    <div class="sidebar-brand-header" style="padding:16px 14px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border-subtle); margin-bottom:8px;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:38px; height:38px; border-radius:12px; background:linear-gradient(135deg, #6366F1, #06B6D4); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; color:#fff; box-shadow:0 0 16px rgba(99,102,241,0.4);">
-          GT
-        </div>
-        <div>
-          <div style="font-weight:900; font-size:14px; color:#fff; line-height:1.2; font-family:var(--font-display); letter-spacing:0.3px;">GT Mentor Pro</div>
-          <div style="font-size:10px; color:#06B6D4; font-weight:800; text-transform:uppercase; letter-spacing:0.8px;">90-Day Trajectory</div>
-        </div>
-      </div>
-      <button class="sidebar-collapse-toggle" onclick="document.getElementById('sidebar').classList.toggle('sidebar-closed')" title="Toggle Sidebar" style="background:rgba(255,255,255,0.06); border:1px solid var(--border-subtle); color:var(--text-muted); border-radius:8px; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+<aside id="sidebar" role="navigation" aria-label="Main navigation">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo-mark" aria-hidden="true">GT</div>
+    <div class="sidebar-logo-text">
+      <div class="sidebar-logo-title">GT Mentor Pro</div>
+      <div class="sidebar-logo-sub">90-Day OS</div>
     </div>
-
-    <div class="sidebar-actions" style="display:flex; flex-direction:column; gap:4px; overflow-y:auto; flex:1; padding:0 8px 12px;">
-      
-      <!-- 1. HOME -->
-      <div class="sidebar-nav-group" style="margin-top:0;">
-        <button class="sidebar-nav-item active" id="nav-home-btn" onclick="navigateToView('home')">
-          <span class="nav-icon">🏠</span><span>Home Dashboard</span>
-        </button>
-      </div>
-
-      <!-- 2. PREPARE -->
-      <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>🎯 TARGET TRACKS</span></div>
-        <button class="sidebar-nav-item" id="nav-prep-gate-btn" onclick="navigateToView('prepare', 'gate')">
-          <span class="nav-icon">⚡</span><span>GATE CS 2027</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prep-placement-btn" onclick="navigateToView('prepare', 'placement')">
-          <span class="nav-icon">💼</span><span>Placement Prep</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prep-swe-btn" onclick="navigateToView('prepare', 'swe')">
-          <span class="nav-icon">💻</span><span>Software Engineering</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prep-intern-btn" onclick="navigateToView('prepare', 'internship')">
-          <span class="nav-icon">🚀</span><span>Internships</span>
-        </button>
-      </div>
-
-      <!-- 3. PRACTICE -->
-      <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>💻 PRACTICE &amp; ARENA</span></div>
-        <button class="sidebar-nav-item" id="nav-prac-dsa-btn" onclick="navigateToView('practice', 'dsa')">
-          <span class="nav-icon">🧩</span><span>DSA (17 Patterns)</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prac-battle-btn" onclick="openModal('dsa-battle-modal'); initDSABattle();">
-          <span class="nav-icon">⚔️</span><span>DSA Battle Arena</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prac-pyq-btn" onclick="navigateToView('practice', 'pyq')">
-          <span class="nav-icon">📜</span><span>GATE PYQ Vault</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prac-cscore-btn" onclick="navigateToView('practice', 'cscore')">
-          <span class="nav-icon">🖥️</span><span>CS Core Topics</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prac-formula-btn" onclick="openModal('formula-quiz-modal'); initFormulaQuiz();">
-          <span class="nav-icon">⚡</span><span>Formula Quiz Blitz</span>
-        </button>
-      </div>
-
-      <!-- 4. CAREER & STUDIOS -->
-      <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>💼 CAREER &amp; STUDIOS</span></div>
-        <button class="sidebar-nav-item" id="nav-car-resume-btn" onclick="openModal('resume-ats-modal');">
-          <span class="nav-icon">📄</span><span>ATS Resume Studio</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-car-mock-btn" onclick="openModal('mock-interview-modal'); initMockInterview();">
-          <span class="nav-icon">🎙️</span><span>AI Mock Interview</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-car-companies-btn" onclick="openModal('company-board-modal'); renderCompanyBoard();">
-          <span class="nav-icon">🏢</span><span>Company Kanban</span>
-        </button>
-      </div>
-
-      <!-- 5. PROGRESS & HABITS -->
-      <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>📈 PROGRESS &amp; HABITS</span></div>
-        <button class="sidebar-nav-item" id="nav-prog-streak-btn" onclick="openModal('streak-calendar-modal'); initStreakCalendar();">
-          <span class="nav-icon">📅</span><span>Study Streak Heatmap</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prog-mindmap-btn" onclick="openModal('mindmap-modal'); initMindMap();">
-          <span class="nav-icon">🧩</span><span>CS Concept Mind Map</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prog-standup-btn" onclick="openModal('standup-journal-modal'); initStandupJournal();">
-          <span class="nav-icon">📔</span><span>Daily Standup Journal</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-prog-analytics-btn" onclick="navigateToView('progress', 'analytics')">
-          <span class="nav-icon">📊</span><span>Analytics Matrix</span>
-        </button>
-      </div>
-
-      <!-- 6. SANDBOX LABS -->
-      <div class="sidebar-nav-group">
-        <div class="sidebar-group-title"><span>🧪 CSE SANDBOX LABS</span></div>
-        <button class="sidebar-nav-item" id="nav-lab-code-btn" onclick="openModal('code-studio-modal'); loadCodeStudioTemplate('sliding-window');">
-          <span class="nav-icon">💻</span><span>Multi-Lang Sandbox</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-lab-algo-btn" onclick="openModal('algo-visualizer-modal'); initAlgoVisualizer();">
-          <span class="nav-icon">💡</span><span>Algo Visualizer</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-lab-sql-btn" onclick="openModal('sql-playground-modal');">
-          <span class="nav-icon">🗄️</span><span>SQL Sandbox Lab</span>
-        </button>
-      </div>
-
-      <!-- 7. SYSTEM & AI -->
-      <div class="sidebar-nav-group" style="margin-bottom:12px;">
-        <div class="sidebar-group-title"><span>⚙️ SYSTEM</span></div>
-        <button class="sidebar-nav-item" id="nav-settings-btn" onclick="navigateToView('settings')">
-          <span class="nav-icon">⚙️</span><span>Settings &amp; Backup</span>
-        </button>
-        <button class="sidebar-nav-item" id="nav-ai-mentor-btn" onclick="navigateToView('chat')" style="background:linear-gradient(135deg, rgba(99,102,241,0.15), rgba(6,182,212,0.15)); border:1px solid rgba(99,102,241,0.3); margin-top:4px;">
-          <span class="nav-icon">🤖</span><span style="font-weight:800; color:#fff;">AI Mentor Chat</span>
-        </button>
-      </div>
-    </div>
-  
-    <!-- Modern User Profile Footer -->
-    <div class="sidebar-user-footer" style="margin-top:auto; padding:12px 14px; border-top:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border-radius:10px; margin:8px 8px 10px;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, #10B981, #06B6D4); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px; color:#080B14; box-shadow:0 0 10px rgba(16,185,129,0.4);">
-          T
-        </div>
-        <div>
-          <div style="font-size:12px; font-weight:800; color:#fff; line-height:1.2;">Tamizharasan</div>
-          <div style="font-size:10px; color:#10B981; font-weight:700;">Day 27 • Lv.8 Pro</div>
-        </div>
-      </div>
-      <button onclick="openModal('profile-modal')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px;" title="Edit Profile">✏️</button>
-    </div>
-  </aside>
-
-
-  
-  <!-- ─── 1. HOME DASHBOARD (SECTION 8: WHAT SHOULD I DO TODAY?) ─── -->
-  <main id="view-home" class="app-view-panel active-view">
-    <div class="v2-home-grid">
-      <!-- Title Header Strip -->
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <h1 style="font-size:1.6rem; font-weight:900; margin:0; font-family:var(--font-display); color:#fff;">
-              GT Study Mentor Pro
-            </h1>
-            <span class="badge-pill" style="background:rgba(99,216,255,0.15); color:var(--primary); border:1px solid rgba(99,216,255,0.3); font-size:11px;">
-              90-Day Career Preparation
-            </span>
-          </div>
-          <p style="margin:4px 0 0; color:var(--text-muted); font-size:13px;">
-            One focused system. Four career goals. 90 days. (Placement • GATE 2027 • Software Engineering • Internship)
-          </p>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-          <!-- ── Live Header Study Stopwatch ── -->
-          <div class="header-stopwatch-wrap" id="header-stopwatch-wrap" style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); padding:4px 10px; border-radius:12px;">
-            <span class="stopwatch-dot" id="stopwatch-dot" style="width:8px; height:8px; border-radius:50%; background:#64748B; transition:all 0.3s ease;"></span>
-            <span style="font-size:12px; font-weight:800; font-family:var(--font-mono); color:#fff;" id="header-stopwatch-time">00:00:00</span>
-            <button class="action-btn" id="header-stopwatch-btn" onclick="toggleHeaderStopwatch()" style="font-size:11px; padding:3px 10px; font-weight:800; border-radius:6px; background:var(--primary); color:#080B18; border:none; cursor:pointer;">▶ Focus</button>
-          </div>
-          <button class="header-badge-pill" onclick="openModal('ai-engine-modal'); initAIEngineModal();" style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#10B981; cursor:pointer; font-weight:700; display:flex; align-items:center; gap:6px;">
-            <span class="status-dot-active"></span>
-            <span>⚡ GPT-5.4 Active</span>
-          </button>
-          <button class="header-badge-pill" onclick="openModal('command-palette-modal')" style="background:rgba(99,216,255,0.1); border:1px solid var(--border-active); color:var(--primary); cursor:pointer;">
-            <span>⚡</span><span>Ctrl + K</span>
-          </button>
-          <button class="header-badge-pill" onclick="navigateToView('chat')" style="background:rgba(255,255,255,0.06); cursor:pointer;">
-            <span>💬</span><span>Ask Mentor</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- ══ STUDIO FILTER & LIVE SEARCH BAR (UI/UX REDESIGN) ══ -->
-      <div class="v2-command-card greeting-hero-card" id="greeting-hero">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
-          <div style="flex:1; min-width:0;">
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <div style="font-size:11px; font-weight:800; color:var(--primary); letter-spacing:1px; text-transform:uppercase;" id="greeting-day-label">
-                Day 27 / 90 • Phase 1 (Foundation)
-              </div>
-              <span class="greeting-streak-badge" id="greeting-streak-badge">&#x1F525; 7 Day Streak</span>
-              <span class="greeting-xp-badge" id="greeting-xp-badge">⚡ 2450 XP · Lv.8</span>
-            </div>
-            <h2 class="greeting-hero-title" id="greeting-hero-title">
-              Good Morning, Tamizh! 🌅
-            </h2>
-            <p class="greeting-hero-quote" id="greeting-hero-quote">
-              "Consistency beats intensity da — every day you show up, you compound!"
-            </p>
-          </div>
-          <div style="text-align:right; flex-shrink:0;">
-            <div style="font-size:11px; color:var(--text-muted);">Today's Target</div>
-            <div style="font-size:2.2rem; font-weight:900; color:var(--primary); font-family:var(--font-display);">
-              6 HOURS
-            </div>
-            <div style="font-size:12px; color:var(--success);" id="home-completed-time-label">
-              Completed: 3h 42m • Remaining: 2h 18m
-            </div>
-          </div>
-        </div>
-
-        <!-- 90-Day Progress Bar -->
-        <div style="margin:20px 0 10px;">
-          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:6px;">
-            <span>90-Day Timeline Progress</span>
-            <span style="color:#fff; font-weight:700;">Day 27 / 90 (30%)</span>
-          </div>
-          <div style="width:100%; height:10px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden;">
-            <div style="width:30%; height:100%; background:linear-gradient(90deg, var(--primary), #6C63FF); border-radius:5px;"></div>
-          </div>
-        </div>
-
-        <!-- Four Preparation Tracks Summary Pills -->
-        <!-- Four Preparation Tracks Summary KPI Cards (MagicPatterns Style) -->
-        <!-- ── Interactive Career Target Track Switcher Pills ── -->
-        <div class="hero-track-switcher" style="display:flex; gap:8px; margin:16px 0 14px; overflow-x:auto; padding-bottom:4px;">
-          <button type="button" class="hero-track-pill active" id="track-pill-all" onclick="selectHeroTargetTrack('all')">🌟 All Goals (4)</button>
-          <button type="button" class="hero-track-pill" id="track-pill-gate" onclick="selectHeroTargetTrack('gate')">⚡ GATE CS 2027</button>
-          <button type="button" class="hero-track-pill" id="track-pill-placement" onclick="selectHeroTargetTrack('placement')">💼 Placements</button>
-          <button type="button" class="hero-track-pill" id="track-pill-swe" onclick="selectHeroTargetTrack('swe')">💻 Software Eng</button>
-          <button type="button" class="hero-track-pill" id="track-pill-internship" onclick="selectHeroTargetTrack('internship')">🚀 Internships</button>
-        </div>
-
-        <div class="magic-kpi-grid">
-          <!-- GATE 2027 -->
-          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'gate')">
-            <div class="magic-kpi-top">
-              <span class="magic-kpi-label">⚡ GATE 2027</span>
-              <span class="magic-trend-pill pos">↑ +4.2%</span>
-            </div>
-            <div class="magic-kpi-mid">
-              <div class="magic-kpi-val" id="kpi-gate-val">76%</div>
-              <div class="magic-kpi-sparkline">
-                <svg width="56" height="22" viewBox="0 0 56 22">
-                  <path d="M2 18 Q 14 15, 26 16 T 44 6 T 54 3" fill="none" stroke="#63D8FF" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-            <div class="magic-kpi-footer">
-              <span>12 Core Subjects Active</span>
-              <span style="color:var(--primary); font-weight:700;">71% PYQs</span>
-            </div>
-          </div>
-
-          <!-- Placements -->
-          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'placement')">
-            <div class="magic-kpi-top">
-              <span class="magic-kpi-label">💼 Placements</span>
-              <span class="magic-trend-pill pos">↑ +6.8%</span>
-            </div>
-            <div class="magic-kpi-mid">
-              <div class="magic-kpi-val" id="kpi-placement-val">78%</div>
-              <div class="magic-kpi-sparkline">
-                <svg width="56" height="22" viewBox="0 0 56 22">
-                  <path d="M2 19 Q 15 17, 28 12 T 46 8 T 54 3" fill="none" stroke="#4ADE80" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-            <div class="magic-kpi-footer">
-              <span>Aptitude &amp; Reasoning</span>
-              <span style="color:var(--success); font-weight:700;">108 Qs</span>
-            </div>
-          </div>
-
-          <!-- Software Eng -->
-          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'swe')">
-            <div class="magic-kpi-top">
-              <span class="magic-kpi-label">💻 Software Eng</span>
-              <span class="magic-trend-pill pos">↑ +5.1%</span>
-            </div>
-            <div class="magic-kpi-mid">
-              <div class="magic-kpi-val" id="kpi-swe-val">81%</div>
-              <div class="magic-kpi-sparkline">
-                <svg width="56" height="22" viewBox="0 0 56 22">
-                  <path d="M2 20 Q 18 17, 30 11 T 44 7 T 54 2" fill="none" stroke="#818CF8" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-            <div class="magic-kpi-footer">
-              <span>17 DSA Patterns + APIs</span>
-              <span style="color:#818CF8; font-weight:700;">142 Solved</span>
-            </div>
-          </div>
-
-          <!-- Internship -->
-          <div class="magic-kpi-card" onclick="navigateToView('prepare', 'internship')">
-            <div class="magic-kpi-top">
-              <span class="magic-kpi-label">🚀 Internship</span>
-              <span class="magic-trend-pill pos">↑ +8.0%</span>
-            </div>
-            <div class="magic-kpi-mid">
-              <div class="magic-kpi-val" id="kpi-intern-val">68%</div>
-              <div class="magic-kpi-sparkline">
-                <svg width="56" height="22" viewBox="0 0 56 22">
-                  <path d="M2 21 Q 14 17, 26 15 T 42 9 T 54 4" fill="none" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-            </div>
-            <div class="magic-kpi-footer">
-              <span>Resume: 84/100</span>
-              <span style="color:var(--warning); font-weight:700;">8 Applied</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="studio-hub-header" style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
-        <div class="studio-search-bar-wrap" style="position:relative; width:100%;">
-          <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:14px; color:var(--text-muted); pointer-events:none;">🔍</span>
-          <input type="text" id="studio-search-input" class="studio-search-input" 
-            placeholder="Search 28 power studios (e.g. mock interview, dsa, gate predictor, formula, ats resume, sql, battle)..." 
-            oninput="searchStudioHub(this.value)"
-            style="width:100%; padding:11px 40px 11px 40px; background:rgba(15, 23, 42, 0.7); border:1px solid rgba(108, 99, 255, 0.3); border-radius:12px; color:#fff; font-size:13px; outline:none; transition:var(--transition); box-sizing:border-box;">
-          <button id="studio-search-clear-btn" onclick="clearStudioSearch()" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); font-size:14px; cursor:pointer; display:none;">✕</button>
-        </div>
-
-        <div class="studio-filter-bar" id="studio-filter-bar" style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;">
-          <span style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; align-self:center; margin-right:4px;">Category:</span>
-          <button class="studio-tab-btn active" onclick="filterStudioHub('all')">🌟 All <span class="studio-badge-tag">28</span></button>
-          <button class="studio-tab-btn" onclick="filterStudioHub('ai')">⚡ AI &amp; Code <span class="studio-badge-tag">6</span></button>
-          <button class="studio-tab-btn" onclick="filterStudioHub('gate')">🎯 GATE 2027 <span class="studio-badge-tag">7</span></button>
-          <button class="studio-tab-btn" onclick="filterStudioHub('career')">💼 Placement &amp; DSA <span class="studio-badge-tag">5</span></button>
-          <button class="studio-tab-btn" onclick="filterStudioHub('focus')">⏱️ Focus &amp; Plan <span class="studio-badge-tag">9</span></button>
-          <button class="studio-tab-btn" onclick="filterStudioHub('battle')">⚔️ Battle Mode <span class="studio-badge-tag">1</span></button>
-        </div>
-      </div>
-
-      <div id="quick-studios-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:12px;">
-        <!-- AI & Code -->
-        <div class="magic-kpi-card" data-category="ai" style="padding:12px 14px;" onclick="openModal('mock-interview-modal'); initMockInterview();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🎙️</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">AI Mock Interview</div>
-              <div style="font-size:10px; color:var(--primary);">Voice &amp; Coding Pad</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="ai" style="padding:12px 14px;" onclick="openModal('code-reviewer-modal');">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">⚡</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">AI Code Reviewer</div>
-              <div style="font-size:10px; color:#10B981;">Complexity &amp; Bugs</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="ai" style="padding:12px 14px;" onclick="openModal('code-studio-modal'); loadCodeStudioTemplate('sliding-window');">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">💻</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">CSE Code Studio</div>
-              <div style="font-size:10px; color:#818CF8;">Multi-Language Sandbox</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="ai" style="padding:12px 14px;" onclick="openModal('cs-blitz-modal'); startCSBlitz();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🍧</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">CS Blitz Speed Arena</div>
-              <div style="font-size:10px; color:#EF4444;">60s Rapid MCQ Sprint</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="ai" style="padding:12px 14px;" onclick="openModal('system-architecture-modal'); initSystemDesign();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🧠</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">System Design Studio</div>
-              <div style="font-size:10px; color:var(--accent);">Interactive Blueprints</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="ai" style="padding:12px 14px;" onclick="openModal('ai-engine-modal'); initAIEngineModal();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">⚙️</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">AI Engine Config</div>
-              <div style="font-size:10px; color:#10B981;">GPT-5.4 / FreeLLMAPI</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GATE 2027 -->
-        <div class="magic-kpi-card" data-category="gate" style="padding:12px 14px;" onclick="openModal('formula-vault-modal'); initFormulaVault();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">⚛️</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Formula Vault</div>
-              <div style="font-size:10px; color:var(--accent);">40+ GATE Formulas</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="gate" style="padding:12px 14px;" onclick="openModal('weightage-heatmap-modal'); initWeightageHeatmap();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">📈</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">GATE Weightage Radar</div>
-              <div style="font-size:10px; color:#10B981;">10-Year Mark Maximizer</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="gate" style="padding:12px 14px;" onclick="openModal('gate-predictor-modal'); runGatePredictor();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🎯</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">GATE AIR Predictor</div>
-              <div style="font-size:10px; color:var(--success);">IIT &amp; PSU Chances</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="gate" style="padding:12px 14px;" onclick="openModal('notes-vault-modal'); initNotesVault();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">📖</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Notes Vault</div>
-              <div style="font-size:10px; color:var(--accent);">9 GATE Subjects</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="gate" style="padding:12px 14px;" onclick="openModal('audio-mentor-modal'); initAudioMentor();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🎧</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Tanglish Audio Pod</div>
-              <div style="font-size:10px; color:#A855F7;">2-Min GATE Briefings</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Career & DSA -->
-        <div class="magic-kpi-card" data-category="career" style="padding:12px 14px;" onclick="openModal('dsa-tracker-modal'); initDsaTracker();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🎯</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">DSA 17 Patterns</div>
-              <div style="font-size:10px; color:#F59E0B;">Striver A2Z Tracker</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="career" style="padding:12px 14px;" onclick="openModal('algo-visualizer-modal'); initAlgoVisualizer();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">💡</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Algorithm Visualizer</div>
-              <div style="font-size:10px; color:#00D4FF;">Interactive Two Pointers</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="career" style="padding:12px 14px;" onclick="openModal('resume-ats-modal');">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">📄</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">ATS Resume Studio</div>
-              <div style="font-size:10px; color:var(--primary);">JD Matcher &amp; Print</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="career" style="padding:12px 14px;" onclick="openModal('company-board-modal'); renderCompanyBoard();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🔱</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Company Board</div>
-              <div style="font-size:10px; color:var(--warning);">Kanban Pipeline</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Focus & Plans -->
-        <div class="magic-kpi-card" data-category="focus" style="padding:12px 14px;" onclick="openModal('smart-planner-modal'); initSmartPlanner();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">📅</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Smart Daily Plan</div>
-              <div style="font-size:10px; color:var(--primary);">6-Hour Timetable</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="focus" style="padding:12px 14px;" onclick="openModal('pomodoro-modal'); initPomoTimer();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">⏱️</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Pomodoro Timer</div>
-              <div style="font-size:10px; color:#EC4899;">Deep Focus Engine</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="focus" style="padding:12px 14px;" onclick="openModal('roadmap-gantt-modal'); renderGanttRoadmap();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🗺️</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">90-Day Trajectory</div>
-              <div style="font-size:10px; color:var(--warning);">iCal Calendar Sync</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="focus" style="padding:12px 14px;" onclick="openModal('motivation-modal'); renderMotivationEngine();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🔥</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Daily Motivation</div>
-              <div style="font-size:10px; color:var(--warning);">Streak &amp; Badges</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="focus" style="padding:12px 14px;" onclick="openModal('report-modal'); renderWeeklyReport();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">📊</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Weekly Report</div>
-              <div style="font-size:10px; color:var(--primary);">PDF Export</div>
-            </div>
-          </div>
-        </div>
-        <div class="magic-kpi-card" data-category="focus" style="padding:12px 14px;" onclick="openModal('backup-restore-modal'); initBackupModal();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">💾</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Vault Backup &amp; Print</div>
-              <div style="font-size:10px; color:#818CF8;">JSON Sync &amp; PDF Print</div>
-            </div>
-          </div>
-        </div>
-        <!-- GATE History Tracker -->
-        <div class="magic-kpi-card studio-card-new" data-category="gate" style="padding:12px 14px;" onclick="openModal('gate-history-modal'); initGateHistory();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">📋</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Mock History Tracker</div>
-              <div style="font-size:10px; color:#F59E0B;">Score Trends &amp; AIR</div>
-            </div>
-          </div>
-        </div>
-        <!-- CS Concept Mind Map -->
-        <div class="magic-kpi-card studio-card-new" data-category="gate" style="padding:12px 14px;" onclick="openModal('mindmap-modal'); initMindMap();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">🧩</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">CS Mind Map</div>
-              <div style="font-size:10px; color:#00D4FF;">9-Subject Mastery Web</div>
-            </div>
-          </div>
-        </div>
-        <!-- Smart Revision Scheduler -->
-        <div class="magic-kpi-card studio-card-new" data-category="focus" style="padding:12px 14px;" onclick="openModal('revision-scheduler-modal'); initRevisionScheduler();">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.4rem;">Ã°Å¸â€Â</span>
-            <div>
-              <div style="font-size:12px; font-weight:800; color:#fff;">Revision Scheduler</div>
-              <div style="font-size:10px; color:#10B981;">Leitner Spaced Repeat</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- Main Command Card — Animated Time-Aware Greeting -->
-
-      <!-- NEXT BEST ACTION BANNER -->
-      <div class="v2-next-action-strip">
-        <div>
-          <span style="font-size:10px; font-weight:800; color:var(--warning); letter-spacing:1px; text-transform:uppercase;">
-            💡 NEXT BEST ACTION (PREPARATION INTELLIGENCE)
-          </span>
-          <div class="action-title" id="home-next-action-title">
-            Revise Operating Systems: Deadlocks
-          </div>
-          <div class="action-why" id="home-next-action-why">
-            <strong>WHY?</strong> Your recent accuracy is 48% and the topic is prerequisite-critical. (Contributes to GATE 4 marks + Amazon/Microsoft OS rounds).
-          </div>
-        </div>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button class="action-btn" onclick="startTodayPlan()" style="background:var(--primary); color:#080B18; font-weight:800; padding:10px 24px; border:none; border-radius:8px; cursor:pointer;">
-            🚀 START TODAY'S PLAN
-          </button>
-          <button class="action-btn" onclick="openPomodoroModal()" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; padding:10px 16px; border-radius:8px; cursor:pointer;">
-            &#x23F1;&#xFE0F; 25/5 Pomodoro
-          </button>
-        </div>
-      </div>
-
-      
-      <!-- ── WEEKLY PREPARATION OVERVIEW (MAGICPATTERNS STYLE ANALYTICAL CHART) ── -->
-      <div class="v2-command-card" style="margin-top:4px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
-          <div>
-            <div style="font-size:11px; font-weight:800; color:var(--primary); letter-spacing:1px; text-transform:uppercase;">
-              📈 Preparation Overview
-            </div>
-            <h3 style="font-size:1.2rem; font-weight:800; margin:4px 0 0; color:#fff;">
-              Weekly Study Hours vs Target
-            </h3>
-            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
-              Daily progress across GATE, SWE, Placement &amp; Internship (6.0h Target/Day)
-            </div>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <div style="display:flex; background:rgba(255,255,255,0.05); border:1px solid var(--border-subtle); border-radius:6px; padding:2px;">
-              <button class="forge-track-tab active" style="font-size:11px; padding:4px 10px; border-radius:4px;" id="btn-chart-thisweek" onclick="toggleWeeklyView('this')">This Week</button>
-              <button class="forge-track-tab" style="font-size:11px; padding:4px 10px; border-radius:4px;" id="btn-chart-lastweek" onclick="toggleWeeklyView('last')">Last Week</button>
-            </div>
-            <div style="font-size:11px; font-weight:700; color:var(--success); background:rgba(74,222,128,0.12); padding:4px 8px; border-radius:6px; border:1px solid rgba(74,222,128,0.3);">
-              ↑ 94% Target Met
-            </div>
-          </div>
-        </div>
-
-        <!-- Visual Bar Chart Container -->
-        <div id="weekly-prep-chart-container" style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; height:170px; padding:16px 14px 8px; border-bottom:1px solid var(--border-subtle); background:rgba(0,0,0,0.2); border-radius:8px;">
-          <!-- Dynamically populated via renderWeeklyChart() -->
-        </div>
-
-        <!-- Bottom Chart Metrics Row -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-top:14px; padding-top:4px;">
-          <div>
-            <span style="font-size:11px; color:var(--text-muted);">Total Hours Logged</span>
-            <div style="font-size:1.15rem; font-weight:800; color:#fff;" id="chart-stat-total">39.2 hrs <span style="font-size:11px; color:var(--success); font-weight:600;">(+4.5h)</span></div>
-          </div>
-          <div>
-            <span style="font-size:11px; color:var(--text-muted);">Daily Target Average</span>
-            <div style="font-size:1.15rem; font-weight:800; color:#fff;" id="chart-stat-avg">5.6h / 6.0h</div>
-          </div>
-          <div>
-            <span style="font-size:11px; color:var(--text-muted);">FSRS Flashcards Reviewed</span>
-            <div style="font-size:1.15rem; font-weight:800; color:#fff;">48 Cards <span style="font-size:11px; color:var(--primary); font-weight:600;">(92% recall)</span></div>
-          </div>
-          <div>
-            <span style="font-size:11px; color:var(--text-muted);">Tasks Completed</span>
-            <div style="font-size:1.15rem; font-weight:800; color:#fff;">24 / 28 <span style="font-size:11px; color:var(--success); font-weight:600;">(86%)</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TODAY'S PLAN & WEAK AREAS DUAL COLUMN -->
-      <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:20px;">
-        
-        <!-- Today's Plan -->
-        <div class="track-card">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0; font-size:1.1rem; color:#fff; display:flex; align-items:center; gap:8px;">
-              <span>📋</span> TODAY'S PLAN
-            </h3>
-            <span style="font-size:12px; color:var(--text-muted);" id="home-tasks-time-indicator">
-              Planned: 2h 45m • 4 Tasks
-            </span>
-          </div>
-
-          <div id="home-today-tasks-container" style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
-            <!-- Populated dynamically via prepIntelligence.js -->
-          </div>
-
-          <!-- Add Task Form -->
-          <div style="display:flex; gap:8px; margin-top:14px;">
-            <input type="text" id="home-custom-task-input" class="form-input" placeholder="Add study task..." style="flex:1; font-size:12px;">
-            <select id="home-custom-task-track" class="form-input" style="width:105px; font-size:12px;">
-              <option value="GATE">GATE</option>
-              <option value="SOFTWARE">Software</option>
-              <option value="PLACEMENT">Placement</option>
-              <option value="INTERNSHIP">Internship</option>
-            </select>
-            <button class="action-btn" onclick="addHomePlanTask()" style="padding:6px 14px; font-size:12px;">+ Add</button>
-          </div>
-        </div>
-
-        <!-- Weak Areas & Mistake Book Quick Access -->
-        <div class="track-card">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0; font-size:1.1rem; color:#fff; display:flex; align-items:center; gap:8px;">
-              <span>&#x1F9E0;</span> WEAK AREAS
-            </h3>
-            <button class="action-btn" onclick="navigateToView('progress', 'mistakes')" style="font-size:11px; padding:3px 10px;">
-              Open Mistake Book
-            </button>
-          </div>
-
-          <div id="home-weak-areas-container" style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
-            <!-- Populated via prepIntelligence.js -->
-          </div>
-
-          <!-- FSRS Spaced Repetition Card Mini -->
-          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:10px; padding:14px; margin-top:12px;">
-            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--primary);">
-              <span>⚡ FSRS Spaced Repetition Due</span>
-              <span id="home-fsrs-status-pill">1 Card Due Today</span>
-            </div>
-            <div style="font-size:13px; font-weight:700; color:#fff; margin:6px 0;" id="home-fsrs-prompt">
-              Q: What are the 4 Coffman conditions for Deadlock in OS?
-            </div>
-            <div style="font-size:12px; color:var(--text-muted); display:none; line-height:1.4;" id="home-fsrs-solution">
-              A: Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait.
-            </div>
-            <button class="action-btn" id="home-fsrs-toggle-btn" onclick="toggleHomeFSRS()" style="width:100%; margin-top:8px; font-size:11px; padding:4px;">
-              Ã°Å¸â€˜Â&#xFE0F; Reveal Answer
-            </button>
-            <div class="fsrs-btn-row" id="home-fsrs-actions-row" style="display:none;">
-              <button class="fsrs-btn again" onclick="rateHomeFSRS('Again')">Again (1d)</button>
-              <button class="fsrs-btn hard" onclick="rateHomeFSRS('Hard')">Hard (2d)</button>
-              <button class="fsrs-btn good" onclick="rateHomeFSRS('Good')">Good (4d)</button>
-              <button class="fsrs-btn easy" onclick="rateHomeFSRS('Easy')">Easy (8d)</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- â”€â”€ FLOATING QUICK-ACTION BAR (Home View Only) â”€â”€ -->
-  <div class="floating-qab" id="floating-qab">
-    <button class="fqab-btn fqab-pomo" onclick="openModal('pomodoro-modal'); initPomoTimer();" title="Pomodoro Focus Engine">
-      <span class="fqab-icon">&#x23F1;&#xFE0F;</span>
-      <span class="fqab-label">Focus</span>
-    </button>
-    <button class="fqab-btn fqab-battle" onclick="openModal('dsa-battle-modal'); initDSABattle();" title="DSA Battle Arena">
-      <span class="fqab-icon">&#x2694;&#xFE0F;</span>
-      <span class="fqab-label">Battle</span>
-    </button>
-    <button class="fqab-btn fqab-quiz" onclick="openModal('formula-quiz-modal'); initFormulaQuiz();" title="Formula Quiz Blitz">
-      <span class="fqab-icon">&#x26A1;</span>
-      <span class="fqab-label">Blitz</span>
-    </button>
-    <button class="fqab-btn fqab-note" onclick="openModal('notes-vault-modal'); initNotesVault();" title="Notes Vault">
-      <span class="fqab-icon">&#x1F4DD;</span>
-      <span class="fqab-label">Notes</span>
-    </button>
-    <button class="fqab-btn fqab-standup" onclick="openModal('standup-journal-modal'); initStandupJournal();" title="Daily Standup Reflection">
-      <span class="fqab-icon">&#x1F4D4;</span>
-      <span class="fqab-label">Standup</span>
-    </button>
-    <button class="fqab-btn fqab-mentor" onclick="navigateToView('chat');" title="Ask AI Mentor">
-      <span class="fqab-icon">&#x1F916;</span>
-      <span class="fqab-label">Mentor</span>
-    </button>
-    <button class="fqab-dismiss" onclick="this.parentElement.classList.add('fqab-dismissed');" title="Dismiss Dock">&#x2715;</button>
+    <button class="sidebar-toggle-btn" id="sidebar-toggle-btn"
+      onclick="document.getElementById('sidebar').classList.toggle('collapsed');localStorage.setItem('gt_sidebar_collapsed',document.getElementById('sidebar').classList.contains('collapsed'))"
+      aria-label="Toggle sidebar">&#x276E;</button>
   </div>
+  <nav class="sidebar-nav" aria-label="Navigation">
+    <button class="sidebar-nav-item active" id="nav-home" onclick="navigateToView('home')" aria-current="page">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F3E0;</span>
+      <span class="sidebar-nav-label">Home</span>
+    </button>
 
-  <!-- ─── 2. PREPARE HUB (GATE 2027 | PLACEMENTS | SWE | INTERNSHIP) ─── -->
-  <main id="view-prepare" class="app-view-panel">
-    <div class="v2-home-grid">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">🎯 Comprehensive Preparation Hub</h2>
-          <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Unified syllabus, topic trackers, and roadmaps across the 4 career targets.</p>
-        </div>
-        <div class="forge-track-nav">
-          <button class="forge-track-tab active" id="btn-preptab-gate" onclick="switchPrepareTab('gate')">⚡ GATE 2027</button>
-          <button class="forge-track-tab" id="btn-preptab-placement" onclick="switchPrepareTab('placement')">💼 Placements</button>
-          <button class="forge-track-tab" id="btn-preptab-swe" onclick="switchPrepareTab('swe')">💻 Software Eng</button>
-          <button class="forge-track-tab" id="btn-preptab-internship" onclick="switchPrepareTab('internship')">🚀 Internship</button>
-        </div>
-      </div>
+    <div class="sidebar-section-label" aria-hidden="true">Prepare</div>
+    <button class="sidebar-nav-item" id="nav-prepare" onclick="navigateToView('prepare','gate')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x26A1;</span>
+      <span class="sidebar-nav-label">GATE 2027</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-placement" onclick="navigateToView('prepare','placement')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4BC;</span>
+      <span class="sidebar-nav-label">Placements</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-swe" onclick="navigateToView('prepare','swe')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4BB;</span>
+      <span class="sidebar-nav-label">Software Eng</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-intern" onclick="navigateToView('prepare','intern')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F680;</span>
+      <span class="sidebar-nav-label">Internships</span>
+    </button>
 
-      <!-- GATE 2027 Tab View -->
-      <div id="subview-prep-gate" style="display:block;">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;" id="prepare-gate-subjects-list">
-          <!-- Populated dynamically via JS -->
-        </div>
-      </div>
+    <div class="sidebar-section-label" aria-hidden="true">Practice</div>
+    <button class="sidebar-nav-item" id="nav-dsa" onclick="navigateToView('practice','dsa')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F9E9;</span>
+      <span class="sidebar-nav-label">DSA</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-pyq" onclick="navigateToView('practice','gate-pyq')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4CB;</span>
+      <span class="sidebar-nav-label">GATE PYQs</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-aptitude" onclick="navigateToView('practice','aptitude')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F9E0;</span>
+      <span class="sidebar-nav-label">Aptitude</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-cs-core" onclick="navigateToView('practice','cs-core')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4D6;</span>
+      <span class="sidebar-nav-label">CS Core</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-mock" onclick="navigateToView('practice','mock')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F3AF;</span>
+      <span class="sidebar-nav-label">Mock Tests</span>
+    </button>
 
-      <!-- Placements Tab View -->
-      <div id="subview-prep-placement" style="display:none;">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;" id="prepare-placement-sections-list">
-          <!-- Populated dynamically via JS -->
-        </div>
-      </div>
+    <div class="sidebar-section-label" aria-hidden="true">Career</div>
+    <button class="sidebar-nav-item" id="nav-opportunities" onclick="navigateToView('career','opportunities')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4A1;</span>
+      <span class="sidebar-nav-label">Opportunities</span>
+      <span class="sidebar-nav-badge" id="opp-badge" aria-label="New opportunities">3</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-resume" onclick="openModal('resume-ats-modal')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4C4;</span>
+      <span class="sidebar-nav-label">Resume</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-applications" onclick="navigateToView('career','applications')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4E8;</span>
+      <span class="sidebar-nav-label">Applications</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-interviews" onclick="navigateToView('career','interviews')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F399;&#xFE0F;</span>
+      <span class="sidebar-nav-label">Interviews</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-companies" onclick="navigateToView('career','companies')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F3E2;</span>
+      <span class="sidebar-nav-label">Companies</span>
+    </button>
 
-      <!-- SWE Tab View -->
-      <div id="subview-prep-swe" style="display:none;">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;" id="prepare-swe-sections-list">
-          <!-- Populated dynamically via JS -->
-        </div>
-      </div>
+    <div class="sidebar-section-label" aria-hidden="true">Progress</div>
+    <button class="sidebar-nav-item" id="nav-readiness" onclick="navigateToView('progress','readiness')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4CA;</span>
+      <span class="sidebar-nav-label">Readiness</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-mastery" onclick="navigateToView('progress','mastery')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x2B50;</span>
+      <span class="sidebar-nav-label">Mastery</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-mistakes" onclick="navigateToView('progress','mistakes')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4D4;</span>
+      <span class="sidebar-nav-label">Smart Revision</span>
+      <span class="sidebar-nav-badge" id="mistakes-badge" aria-label="Pending items">3</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-analytics" onclick="navigateToView('progress','analytics')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4C8;</span>
+      <span class="sidebar-nav-label">Analytics</span>
+    </button>
 
-      <!-- Internship Tab View -->
-      <div id="subview-prep-internship" style="display:none;">
-        <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px;" id="prepare-internship-sections-list">
-          <!-- Populated dynamically via JS -->
-        </div>
+    <div class="sidebar-section-label" aria-hidden="true">Labs &amp; Tools</div>
+    <button class="sidebar-nav-item" id="nav-labs" onclick="navigateToView('cselabs')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F52C;</span>
+      <span class="sidebar-nav-label">CSE Labs</span>
+    </button>
+    <button class="sidebar-nav-item" id="nav-resources" onclick="navigateToView('resources')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F4DA;</span>
+      <span class="sidebar-nav-label">Resources</span>
+    </button>
+
+    <div class="sidebar-section-label" aria-hidden="true">AI Mentor</div>
+    <button class="sidebar-nav-item" id="nav-mentor" onclick="navigateToView('mentor')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x1F916;</span>
+      <span class="sidebar-nav-label">GT AI Mentor</span>
+    </button>
+
+    <button class="sidebar-nav-item" id="nav-settings" onclick="navigateToView('settings')">
+      <span class="sidebar-nav-icon" aria-hidden="true">&#x2699;&#xFE0F;</span>
+      <span class="sidebar-nav-label">Settings</span>
+    </button>
+  </nav>
+  <div class="sidebar-user-area">
+    <div class="sidebar-user-card" onclick="openModal('profile-modal')" role="button" tabindex="0" aria-label="Open profile" onkeydown="if(event.key==='Enter')openModal('profile-modal')">
+      <div class="sidebar-avatar" aria-hidden="true">T</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">Tamizharasan E</div>
+        <div class="sidebar-user-status">&#x25CF; Day 27 &bull; Lv.8 Pro</div>
       </div>
     </div>
-  </main>
+  </div>
+</aside>
+<div id="main-content">
 
-  <!-- ─── 3. PROGRESS & MASTERY HUB (READINESS MATRIX, MISTAKE BOOK, FSRS) ─── -->
-  <main id="view-progress" class="app-view-panel">
-    <div class="v2-home-grid">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">📈 Progress, Mastery &amp; Mistake Book</h2>
-          <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Actual tracked competency matrix, error taxonomy, and FSRS spaced repetition.</p>
-        </div>
-        <div class="forge-track-nav">
-          <button class="forge-track-tab active" id="btn-progtab-mastery" onclick="switchProgressTab('mastery')">&#x1F3C6;  Mastery Matrix</button>
-          <button class="forge-track-tab" id="btn-progtab-mistakes" onclick="switchProgressTab('mistakes')">📕 Mistake Book</button>
-          <button class="forge-track-tab" id="btn-progtab-revision" onclick="switchProgressTab('revision')">Ã°Å¸â€â€ž FSRS Revision</button>
-          <button class="forge-track-tab" id="btn-progtab-weekly" onclick="switchProgressTab('weekly')">📋 Weekly Report</button>
-        </div>
-      </div>
-
-      <!-- Subview: Mastery Matrix -->
-      <div id="subview-prog-mastery" style="display:block;">
-        <div class="track-card">
-          <h3 style="margin:0 0 4px; color:#fff; font-size:1.15rem;">Cross-Goal Career Readiness Matrix</h3>
-          <p style="font-size:12px; color:var(--text-muted); margin:0 0 14px;">Real tracked scores across the 4 preparation goals. Highlights cross-goal high-leverage topics.</p>
-          <div style="overflow-x:auto;">
-            <table class="readiness-matrix-table" id="progress-readiness-table">
-              <!-- Populated via JS from prepIntelligence.js -->
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Subview: Mistake Book -->
-      <div id="subview-prog-mistakes" style="display:none;">
-        <div class="track-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <div>
-              <h3 style="margin:0; color:#fff; font-size:1.15rem;">📕 My Mistakes Book</h3>
-              <p style="font-size:12px; color:var(--text-muted); margin:2px 0 0;">Categorized error taxonomy to turn missed questions into permanent mastery.</p>
-            </div>
-            <button class="action-btn" onclick="reattemptMistakes()" style="background:var(--danger); color:#fff; font-weight:700; border:none; padding:8px 18px; border-radius:8px; cursor:pointer;">
-              🎯 [ REATTEMPT MY MISTAKES ]
-            </button>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:12px; margin-top:16px;" id="progress-mistakes-list">
-            <!-- Populated via mistakeBook.js -->
-          </div>
-        </div>
-      </div>
-
-      <!-- Subview: FSRS Revision -->
-      <div id="subview-prog-revision" style="display:none;">
-        <div class="track-card" id="progress-fsrs-deck-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-
-      <!-- Subview: Weekly Report -->
-      <div id="subview-prog-weekly" style="display:none;">
-        <div class="track-card" id="progress-weekly-report-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ─── 4. PRACTICE HUB (DSA 17 PATTERNS, GATE PYQ, APTITUDE, MOCKS) ─── -->
-  <main id="view-practice" class="app-view-panel">
-    <div class="v2-home-grid">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">💻 Practice Command Center</h2>
-          <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Striver 17 Patterns DSA, 2000—œPresent GATE PYQ engine, and aptitude speed drills.</p>
-        </div>
-        <div class="forge-track-nav">
-          <button class="forge-track-tab active" id="btn-practab-dsa" onclick="switchPracticeTab('dsa')">Ã°Å¸â€Â£ DSA (17 Patterns)</button>
-          <button class="forge-track-tab" id="btn-practab-pyq" onclick="switchPracticeTab('pyq')">📜 GATE PYQ</button>
-          <button class="forge-track-tab" id="btn-practab-aptitude" onclick="switchPracticeTab('aptitude')">📊 Aptitude</button>
-          <button class="forge-track-tab" id="btn-practab-mocks" onclick="switchPracticeTab('mocks')">&#x1F4DD; Mock Tests</button>
-        </div>
-      </div>
-
-      <!-- Practice Views -->
-      <div id="subview-prac-dsa" style="display:block;">
-        <div class="track-card" id="practice-dsa-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-      <div id="subview-prac-pyq" style="display:none;">
-        <div class="track-card" id="practice-pyq-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-      <div id="subview-prac-aptitude" style="display:none;">
-        <div class="track-card" id="practice-aptitude-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-      <div id="subview-prac-mocks" style="display:none;">
-        <div class="track-card" id="practice-mocks-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ─── 5. CAREER HUB (PROJECTS, RESUME, APPLICATIONS, INTERVIEWS, COMPANIES) ─── -->
-  <main id="view-career" class="app-view-panel">
-    <div class="v2-home-grid">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">💼 Career &amp; Opportunity Hub</h2>
-          <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">8-stage application tracking, transparent ATS resume scorer, and 1,024 companies directory.</p>
-        </div>
-        <div class="forge-track-nav">
-          <button class="forge-track-tab active" id="btn-careertab-apps" onclick="switchCareerTab('apps')">📬 Applications</button>
-          <button class="forge-track-tab" id="btn-careertab-resume" onclick="switchCareerTab('resume')">📄 Resume Readiness</button>
-          <button class="forge-track-tab" id="btn-careertab-projects" onclick="switchCareerTab('projects')">📦 Projects</button>
-          <button class="forge-track-tab" id="btn-careertab-companies" onclick="switchCareerTab('companies')">&#x1F3E2; Companies (1,024)</button>
-        </div>
-      </div>
-
-      <!-- Career Views -->
-      <div id="subview-car-apps" style="display:block;">
-        <div class="track-card" id="career-apps-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-      <div id="subview-car-resume" style="display:none;">
-        <div class="track-card" id="career-resume-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-      <div id="subview-car-projects" style="display:none;">
-        <div class="track-card" id="career-projects-container">
-          <!-- Populated via JS -->
-        </div>
-      </div>
-      <div id="subview-car-companies" style="display:none;">
-        <div class="track-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h3 style="margin:0; color:#fff;">&#x1F3E2; 1,024 Verified Placement Companies</h3>
-            <button class="action-btn" onclick="openModal('placement-directory-modal');renderMasterCompanies();">Open Full Directory &amp; Maps</button>
-          </div>
-          <div id="career-companies-preview">
-            <!-- Populated via JS -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ─── 6. CSE LABS CONSOLIDATED HUB (SECTION 45) ─── -->
-  <main id="view-cselabs" class="app-view-panel">
-    <div class="v2-home-grid">
+    <header class="main-header" role="banner">
+      <button class="sidebar-toggle-btn" style="display:none;" id="mobile-sidebar-open" aria-label="Open menu">&#x2630;</button>
       <div>
-        <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">🧪 CSE Interactive Labs Hub</h2>
-        <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Hands-on simulation studios for core Computer Science Engineering concepts.</p>
+        <div class="main-header-title" id="main-header-title">Home</div>
+        <div class="main-header-breadcrumb" id="main-header-breadcrumb">GT Study Mentor Pro &bull; 90-Day OS</div>
       </div>
-
-      <div class="cse-labs-grid">
-        <div class="cse-lab-card">
-          <div>
-            <div style="font-size:2rem; margin-bottom:6px;">&#x1F50D;</div>
-            <strong style="color:#fff; font-size:1.1rem;">Algorithm Lab</strong>
-            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">Interactive two-pointer step-through, sorting visualizer, and array algorithms.</p>
-          </div>
-          <button class="action-btn" onclick="openModal('algo-visualizer-modal')" style="width:100%;">Launch Algorithm Lab</button>
+      <div class="main-header-actions">
+        <div id="header-stopwatch-wrap" style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-subtle);padding:4px 12px;border-radius:var(--radius-full);">
+          <span class="stopwatch-dot" id="stopwatch-dot" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted);transition:all 0.3s;" aria-hidden="true"></span>
+          <span id="header-stopwatch-time" style="font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--text);" aria-live="off">00:00:00</span>
+          <button id="header-stopwatch-btn" onclick="toggleHeaderStopwatch()" style="font-size:11px;padding:3px 10px;font-weight:800;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;">&#x25B6; Focus</button>
         </div>
-
-        <div class="cse-lab-card">
-          <div>
-            <div style="font-size:2rem; margin-bottom:6px;">&#x1F5C4;&#xFE0F;</div>
-            <strong style="color:#fff; font-size:1.1rem;">SQL Query Playground</strong>
-            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">In-browser SQLite sandbox with live schema, sample tables, and query execution.</p>
-          </div>
-          <button class="action-btn" onclick="openModal('sql-playground-modal')" style="width:100%;">Launch SQL Lab</button>
-        </div>
-
-        <div class="cse-lab-card">
-          <div>
-            <div style="font-size:2rem; margin-bottom:6px;">Ã°Å¸â€Â¤</div>
-            <strong style="color:#fff; font-size:1.1rem;">TOC Automata Validator</strong>
-            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">Test regular expressions, DFA state machines, and context-free grammar strings.</p>
-          </div>
-          <button class="action-btn" onclick="openModal('toc-validator-modal')" style="width:100%;">Launch TOC Lab</button>
-        </div>
-
-        <div class="cse-lab-card">
-          <div>
-            <div style="font-size:2rem; margin-bottom:6px;">&#x1F310;</div>
-            <strong style="color:#fff; font-size:1.1rem;">Network &amp; CIDR Lab</strong>
-            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">IPv4/CIDR subnet calculations, usable hosts, broadcast address, and packet simulation.</p>
-          </div>
-          <button class="action-btn" onclick="openModal('subnet-calc-modal')" style="width:100%;">Launch Network Lab</button>
-        </div>
-
-        <div class="cse-lab-card">
-          <div>
-            <div style="font-size:2rem; margin-bottom:6px;">&#x1F3C6;</div>
-            <strong style="color:#fff; font-size:1.1rem;">System Design Studio</strong>
-            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">Design distributed architectures, Redis caching, message queues, and load balancers.</p>
-          </div>
-          <button class="action-btn" onclick="openModal('sysdesign-modal')" style="width:100%;">Launch System Design</button>
-        </div>
-
-        <div class="cse-lab-card">
-          <div>
-            <div style="font-size:2rem; margin-bottom:6px;">Ã°Å¸â€œÂ</div>
-            <strong style="color:#fff; font-size:1.1rem;">GATE Calculator &amp; IEEE 754</strong>
-            <p style="font-size:12px; color:var(--text-muted); margin:6px 0;">Authentic GATE virtual calculator and 32-bit floating-point bitwise converter.</p>
-          </div>
-          <button class="action-btn" onclick="openModal('calculator-modal')" style="width:100%;">Launch Calculator</button>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ─── 7. RESOURCES & 8. SETTINGS PANELS ─── -->
-  <main id="view-resources" class="app-view-panel">
-    <div class="v2-home-grid">
-      <div>
-        <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">&#x1F4DA; Curated Resource Library</h2>
-        <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Essential formula sheets, handbooks, and topic cheat sheets for CSE students.</p>
-      </div>
-      <div id="resources-library-list" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
-        <!-- Populated via JS -->
-      </div>
-    </div>
-  </main>
-
-  <main id="view-settings" class="app-view-panel">
-    <div class="v2-home-grid">
-      <div>
-        <h2 style="font-size:1.6rem; font-weight:800; color:#fff; margin:0;">&#x2699;&#xFE0F; Application Settings &amp; Data</h2>
-        <p style="color:var(--text-muted); font-size:13px; margin:4px 0 0;">Zero monetization. Free student platform. Customize themes, export data, or manage offline storage.</p>
-      </div>
-
-      <div class="track-card" style="max-width:680px;">
-        <h3 style="margin:0 0 12px; color:#fff;">🎨 Visual Appearance</h3>
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <button class="action-btn" onclick="setV2Theme('dark')" style="padding:8px 16px;">🌙 Cyber Dark (#080B18)</button>
-          <button class="action-btn" onclick="setV2Theme('light')" style="padding:8px 16px;">Ã¢Ëœâ‚¬&#xFE0F; Clean Light</button>
-          <button class="action-btn" onclick="setV2Theme('contrast')" style="padding:8px 16px;">⚡ High Contrast (WCAG 2.2)</button>
-        </div>
-
-        <h3 style="margin:24px 0 12px; color:#fff;">💾 Data Backup &amp; Privacy</h3>
-        <p style="font-size:12px; color:var(--text-muted); margin:0 0 12px;">All your study plans, tasks, mistakes, and application logs are stored locally in your browser.</p>
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <button class="action-btn" onclick="exportCareerData('json')">📤 Export All Data (JSON)</button>
-          <button class="action-btn" onclick="exportCareerData('csv')">📊 Export Tasks (CSV)</button>
-          <button class="action-btn" onclick="if(confirm('Reset all demo data to default state?')) { localStorage.clear(); location.reload(); }" style="color:var(--danger); border-color:var(--danger);">Ã°Å¸â€”â€˜&#xFE0F; Reset Data</button>
-        </div>
-      </div>
-    </div>
-  </main>
-
-
-
-  <!-- ─── SIDEBAR ─── -->
-  
-
-  <!-- ─── CHAT PANEL ─── -->
-  <main id="chat-panel">
-
-    <!-- Chat Header -->
-    <header class="chat-header">
-      <div class="chat-header-left">
-        <button class="hamburger-btn" id="hamburger-btn" title="Toggle Dashboard">
-          <span></span><span></span><span></span>
-        </button>
-        <div class="mentor-avatar">Ã°Å¸Å½â€œ</div>
-        <div class="mentor-info">
-          <h2>GT Study Mentor Pro</h2>
-          <p class="mentor-status">Ã¢â€”Â Online — Senior SWE &amp; GATE Topper</p>
-        </div>
-      </div>
-      <div class="chat-header-right">
-        <!-- Live Audio Waveform -->
-        <div class="waveform-visualizer" id="header-waveform">
-          <div class="waveform-bar"></div>
-          <div class="waveform-bar"></div>
-          <div class="waveform-bar"></div>
-          <div class="waveform-bar"></div>
-          <div class="waveform-bar"></div>
-        </div>
-
-        <!-- Skilldunia AI Quick Action Pills -->
-        <span class="network-status-badge online" id="header-network-badge">Ã¢â€”Â Online</span>
-        <span class="role-badge student" id="user-role-badge" title="Click to cycle role (Student / Mentor / Admin)" onclick="cycleUserRole()" style="cursor:pointer;">STUDENT</span>
-        <button class="header-badge-pill" id="hdr-qbank-btn" onclick="navigateToView('practice', 'pyq');initQBank();" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.35);color:var(--accent);cursor:pointer;font-weight:700;">
-          <svg class="tech-svg-icon neon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
-          <span>Question Bank (2000—œNow)</span>
-        </button>
-        <button class="header-badge-pill" id="hdr-tracks-btn" onclick="navigateToView('prepare');initUnifiedTracks();" style="background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(0,212,255,0.2));border:1px solid var(--accent);color:var(--accent);cursor:pointer;font-weight:700;">
-          <svg class="tech-svg-icon neon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)"/></svg>
-          <span>Unified Tracks</span>
-        </button>
-        <button class="header-badge-pill" id="hdr-prep-btn" onclick="openModal('free-prep-hub-modal');initPrepHub();" style="background:rgba(255,179,0,0.15);border:1px solid rgba(255,179,0,0.3);color:var(--warning);cursor:pointer;">
-          <svg class="tech-svg-icon neon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          <span>Free Prep</span>
-        </button>
-        <button class="icon-btn" id="theme-toggle-btn" title="Toggle Light/Dark Mode" onclick="toggleThemeMode()">🌙</button>
-        <select id="ui-lang-select" class="form-input" onchange="changeLanguage(this.value)" style="width:75px;height:28px;padding:2px 4px;font-size:11px;border-radius:12px;background:rgba(255,255,255,0.06);color:var(--text);cursor:pointer;">
-          <option value="en">&#x1F310; EN</option>
-          <option value="hi">&#x1F310; Ã Â¤Â¹Ã Â¤Â¿Ã Â¤â€šÃ Â¤Â¦Ã Â¥â‚¬</option>
-          <option value="ta">&#x1F310; Ã Â®Â¤Ã Â®Â®Ã Â®Â¿Ã Â®Â´Ã Â¯Â</option>
-        </select>
-        <button class="header-badge-pill" id="hdr-jobs-btn" onclick="openModal('placement-directory-modal');renderMasterCompanies();" style="background:rgba(0,230,118,0.15);border:1px solid rgba(0,230,118,0.3);color:var(--success);cursor:pointer;">
-          <svg class="tech-svg-icon neon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="6" x2="9.01" y2="6"/><line x1="15" y1="6" x2="15.01" y2="6"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="15" y1="10" x2="15.01" y2="10"/><line x1="9" y1="14" x2="9.01" y2="14"/><line x1="15" y1="14" x2="15.01" y2="14"/><line x1="9" y1="18" x2="9.01" y2="18"/><line x1="15" y1="18" x2="15.01" y2="18"/></svg>
-          <span>1000+ Jobs</span>
-        </button>
-        <button class="header-badge-pill" id="hdr-mock-btn" onclick="openModal('ai-mock-interview-modal');generateMockQuestion();" style="background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.3);color:var(--accent);cursor:pointer;">
-          <span>&#x1F399;&#xFE0F;</span>
-          <span>AI Mock</span>
-        </button>
-        <button class="header-badge-pill" id="hdr-career-btn" onclick="navigateToView('career')" style="background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);color:var(--primary-light);cursor:pointer;">
-          <svg class="tech-svg-icon neon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-          <span>Career Map</span>
-        </button>
-
-        <!-- Lo-Fi Sounds Pill -->
-        <button class="header-badge-pill" id="open-lofi-btn" title="Ambient Lo-Fi & Focus Sounds">
-          <span>🎧</span>
-          <span id="lofi-status-label">Lo-Fi</span>
-        </button>
-
-        <!-- Session Timer Pill -->
-        <div class="session-timer-pill" id="header-session-pill">
-          <span class="stimer-dot"></span>
-          <span class="stimer-label" id="header-slot-label">Loading...</span>
-        </div>
-        <button class="header-badge-pill" id="open-palette-btn" title="Command Palette (Ctrl+K)" style="background:rgba(108,99,255,0.18);border:1px solid var(--primary);cursor:pointer;">
-          <span>⚡</span>
-          <span>Ctrl+K</span>
-        </button>
-
-        <div class="header-clock" id="header-clock">--:--</div>
-        <button class="icon-btn" id="chat-search-toggle-btn" title="Search Chat">&#x1F50D;</button>
-        <button class="icon-btn" id="open-code-editor-btn" title="Live Code Editor (Alt+C)">💻</button>
-        <button class="icon-btn" id="open-ai-insights-btn" title="AI Daily Insights (Alt+I)">🤖</button>
-        <button class="icon-btn" id="export-chat-btn" title="Export Chat (Alt+E)">📤</button>
-        <button class="icon-btn" id="open-materials-header-btn" title="Study Materials">&#x1F4DA;</button>
-        <button class="icon-btn" id="open-profile-btn" title="Profile">
-          <span id="header-profile-emoji">&#x1F9D1;&#x200D;&#x1F4BB;</span>
-        </button>
-        <button class="icon-btn" id="open-settings-btn" title="Settings">&#x2699;&#xFE0F;</button>
-        <button class="icon-btn" id="clear-chat-btn" title="Clear Chat">Ã°Å¸â€”â€˜&#xFE0F;</button>
-        <button class="icon-btn" id="open-calculator-btn" title="GATE Virtual Calculator (Alt+Q)">Ã°Å¸Â§Â®</button>
-        <button class="icon-btn" id="open-keyboard-shortcuts-btn" title="Keyboard Shortcuts (?)">Ã¢Å’Â¨&#xFE0F;</button>
+        <button onclick="window.CommandPalette&&CommandPalette.open()" style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-full);padding:5px 14px;color:var(--text-muted);font-size:12px;cursor:pointer;" aria-label="Open command palette (Ctrl+K)">&#x2318; Ctrl+K</button>
+        <button onclick="navigateToView('mentor')" style="display:flex;align-items:center;gap:6px;background:rgba(91,91,214,0.14);border:1px solid rgba(91,91,214,0.3);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light);font-size:12px;cursor:pointer;font-weight:600;">&#x1F916; Ask GT AI</button>
       </div>
     </header>
 
-    <!-- Chat Search Bar -->
-    <div class="chat-search-bar" id="chat-search-bar">
-      <span>&#x1F50D;</span>
-      <input type="text" class="chat-search-input" id="chat-search-input" placeholder="Search chat messages...">
-      <span class="chat-search-results" id="chat-search-results">0 results</span>
-      <button class="chat-search-close" id="chat-search-close">&#x2715;</button>
-    </div>
-
-    <!-- Messages -->
-    <div id="chat-messages">
-      <div class="welcome-banner" id="welcome-banner">
-        <div class="wave-emoji">Ã°Å¸â€˜â€¹</div>
-        <h2>Hi da! 🚀 I'm your Study Mentor Pro - Senior Software Engineer and GATE Topper.</h2>
-   <p>Unga 3-month journey-la unga kooda iruken. Ready to crack GATE and become a Software Engineer? Let's start! Ã°Å¸â€™Âª</p>
-        <div class="quick-prompts">
-          <button class="quick-prompt-btn" data-prompt="What should I study now? Give me a specific plan for the next hour based on my current schedule!">
-            <span class="qp-icon">⚡</span>What should I study now?
-          </button>
-          <button class="quick-prompt-btn" data-prompt="Give me a DSA problem from Striver A2Z with approach hints da — don't give full solution!">
-            <span class="qp-icon">💻</span>Give me a DSA problem
-          </button>
-          <button class="quick-prompt-btn" data-prompt="Explain Operating System Process Scheduling in simple Tanglish with real-world examples and GATE PYQ context.">
-            <span class="qp-icon">📖</span>Explain an OS concept
-          </button>
-          <button class="quick-prompt-btn" data-prompt="Give me placement interview tips for Zoho and TCS NQT — coding rounds, aptitude, HR tips, what to prepare!">
-            <span class="qp-icon">&#x1F3E2;</span>Placement prep tips
-          </button>
-          <button class="quick-prompt-btn" data-prompt="Today is a leave day! Give me an intensive full-day study plan with time slots to maximize productivity!">
-            <span class="qp-icon">Ã°Å¸Å’Â´</span>Leave day plan!
-          </button>
-          <button class="quick-prompt-btn" data-prompt="Give me 5 GATE previous year questions on Data Structures with detailed solutions and key concepts to remember.">
-            <span class="qp-icon">&#x1F4DD;</span>GATE PYQ practice
-          </button>
-          <button class="quick-prompt-btn" data-prompt="Analyze my performance: I've been studying for some days. What are my weak areas based on typical CSE student patterns and how can I improve?">
-            <span class="qp-icon">&#x1F50D;</span>Analyze my performance
-          </button>
-          <button class="quick-prompt-btn" data-prompt="Give me a surprise coding challenge — a medium LeetCode-style problem with clear constraints and examples, but DON'T give the solution yet!">
-            <span class="qp-icon">Ã°Å¸Å½Â²</span>Surprise coding challenge
-          </button>
+    <!-- HOME VIEW -->
+    <section class="view-panel active" id="view-home" aria-label="Home Dashboard">
+      <div class="home-greeting">
+        <div class="home-greeting-day" id="home-day-label">Day 27 / 90 &bull; Phase 1: Foundation</div>
+        <div class="home-greeting-text" id="home-greeting-full">Good <span id="home-time-greeting">Evening</span>, <span id="home-name">Tamizharasan</span>! &#x1F44B;</div>
+        <div class="home-phase-badge">
+          <span>&#x1F3C6;</span>
+          <span id="home-phase-text">Phase 1 &bull; Foundation Sprint &bull; 30% Complete</span>
         </div>
       </div>
-    </div>
 
-    <!-- Input Area -->
-    <div class="chat-input-area">
-      <div class="chat-input-container">
-        <textarea id="chat-input" placeholder="Ask your mentor anything da... (OS, DSA, GATE PYQs, Placement, Leave day plan...)" rows="1"></textarea>
-        <div class="chat-input-actions">
-          <button id="mic-btn" class="chat-action-btn" title="Voice Chat (Tap to speak)">Ã°Å¸Å½Â¤</button>
-          <button id="clear-input-btn" class="chat-action-btn" title="Clear Input" style="display:none;font-size:12px;">✕</button>
-          <button class="chat-send-btn" id="send-btn" title="Send (Enter)">Ã¢Å¾Â¤</button>
+      <div class="home-layout">
+        <!-- Left column -->
+        <div class="home-nba-col">
+          <div class="section-header mb-12">
+            <div>
+              <div class="section-title">&#x2B50; Next Best Action</div>
+              <div class="section-title-sub">What you should do right now, and why</div>
+            </div>
+            <button onclick="refreshNBA&&refreshNBA()" style="background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:5px 10px;color:var(--text-muted);font-size:11px;cursor:pointer;" aria-label="Refresh Next Best Action">&#x1F504;</button>
+          </div>
+
+          <div class="nba-card nd-card-lift" id="nba-main-card">
+            <div class="nba-track-badge" id="nba-track-badge"><span>&#x26A1;</span><span id="nba-track-text">GATE 2027</span></div>
+            <div class="nba-title" id="nba-title">Loading recommendation...</div>
+            <div class="nba-why" id="nba-why">Analyzing your preparation data...</div>
+            <div class="nba-meta-grid">
+              <div class="nba-meta-item"><div class="nba-meta-label">Duration</div><div class="nba-meta-value" id="nba-duration">45 min</div></div>
+              <div class="nba-meta-item"><div class="nba-meta-label">Accuracy</div><div class="nba-meta-value" id="nba-accuracy" style="color:var(--danger);">48%</div></div>
+              <div class="nba-meta-item"><div class="nba-meta-label">Mistakes</div><div class="nba-meta-value" id="nba-mistakes">2 pending</div></div>
+              <div class="nba-meta-item"><div class="nba-meta-label">Supports</div><div class="nba-meta-value" id="nba-goals" style="font-size:11px;">GATE + SWE</div></div>
+            </div>
+            <button class="nba-start-btn" onclick="window.FocusSession&&FocusSession.startNBA()" id="nba-start-btn">
+              <span>&#x25B6;&#xFE0F;</span> <span>Start Focus Session</span>
+            </button>
+          </div>
+
+          <div id="reschedule-alert" style="display:none;margin-top:12px;padding:14px 16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:var(--radius);font-size:13px;color:var(--text);">
+            <div style="font-weight:700;color:var(--warning);margin-bottom:6px;">&#x23F0; Missed Tasks &mdash; Smart Reschedule Proposed</div>
+            <div id="reschedule-content">Loading rescheduling suggestions...</div>
+            <div style="margin-top:10px;display:flex;gap:8px;">
+              <button onclick="acceptReschedule&&acceptReschedule()" style="padding:6px 16px;background:var(--warning);color:#000;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;">Accept Plan</button>
+              <button onclick="document.getElementById('reschedule-alert').style.display='none'" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted);cursor:pointer;">Dismiss</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="home-right-col">
+          <div class="nd-card" style="padding:16px;margin-bottom:16px;text-align:center;">
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:12px;">&#x1F4C5; 90-Day Journey</div>
+            <svg width="140" height="140" viewBox="0 0 140 140" class="progress-ring-svg" aria-label="90-day progress: 30% complete" role="img" style="transform:rotate(-90deg);">
+              <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+              <circle id="ring-main" cx="70" cy="70" r="54" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"
+                stroke-dasharray="339.29" stroke-dashoffset="237.5"
+                style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);"/>
+              <text x="70" y="66" text-anchor="middle" font-size="26" font-weight="900" fill="var(--text)" font-family="Outfit,sans-serif" transform="rotate(90,70,70)" id="ring-day-text">27</text>
+              <text x="70" y="82" text-anchor="middle" font-size="12" fill="var(--text-muted)" font-family="Inter,sans-serif" transform="rotate(90,70,70)">/ 90 days</text>
+              <text x="70" y="95" text-anchor="middle" font-size="10" fill="var(--success)" font-family="Inter,sans-serif" font-weight="700" transform="rotate(90,70,70)">30% done</text>
+            </svg>
+            <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;">
+              <span style="font-size:10px;padding:3px 9px;border-radius:var(--radius-full);background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:var(--accent);font-weight:700;">P1 &#x2713;</span>
+              <span style="font-size:10px;padding:3px 9px;border-radius:var(--radius-full);background:var(--surface);border:1px solid var(--border-subtle);color:var(--text-muted);">P2</span>
+              <span style="font-size:10px;padding:3px 9px;border-radius:var(--radius-full);background:var(--surface);border:1px solid var(--border-subtle);color:var(--text-muted);">P3</span>
+            </div>
+          </div>
+
+          <div class="nd-card" style="padding:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);">&#x1F4CB; Today's Plan</div>
+              <button onclick="openModal('smart-planner-modal')" style="background:none;border:none;color:var(--primary-light);font-size:11px;cursor:pointer;font-weight:600;">Edit &#x270E;</button>
+            </div>
+            <div class="today-timeline" id="today-timeline-list">
+              <div style="color:var(--text-muted);font-size:13px;padding:8px 0;">Loading today's tasks...</div>
+            </div>
+            <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-size:12px;color:var(--text-muted);">Completion</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text);" id="today-progress-text">1/4 tasks</div>
+            </div>
+            <div style="background:var(--depth-4);border-radius:var(--radius-full);height:5px;margin-top:8px;overflow:hidden;">
+              <div id="today-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--success),var(--accent));border-radius:var(--radius-full);width:25%;transition:width 0.8s ease;"></div>
+            </div>
+            <button onclick="openModal('shutdown-review-modal');window.generateShutdownReview&&generateShutdownReview()" style="width:100%;margin-top:12px;padding:8px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.22);border-radius:var(--radius-sm);color:var(--success);font-size:12px;font-weight:700;cursor:pointer;">
+              &#x1F4CC; Daily Shutdown Review
+            </button>
+          </div>
+        </div>
+
+        <!-- Readiness row -->
+        <div class="home-readiness-row">
+          <div class="section-header mb-12">
+            <div>
+              <div class="section-title">&#x1F4CA; Readiness Scores</div>
+              <div class="section-title-sub">Based on your actual preparation activity &mdash; not probability</div>
+            </div>
+            <button onclick="navigateToView('progress','readiness')" style="background:none;border:none;color:var(--primary-light);font-size:11px;cursor:pointer;">See factors &rarr;</button>
+          </div>
+          <div class="readiness-orb-grid" id="readiness-orbs-container">
+            <!-- Rendered by renderReadinessOrbs() in app.js -->
+          </div>
+        </div>
+
+        <!-- Weak area alert -->
+        <div class="home-weak-row">
+          <div class="section-header mb-12">
+            <div>
+              <div class="section-title">&#x26A0;&#xFE0F; Weak Areas Requiring Attention</div>
+              <div class="section-title-sub">Smart Revision &mdash; powered by spaced repetition</div>
+            </div>
+            <button onclick="navigateToView('progress','mistakes')" style="background:none;border:none;color:var(--primary-light);font-size:11px;cursor:pointer;">Open Smart Revision &rarr;</button>
+          </div>
+          <div class="weak-alert-card" id="weak-alert-container">
+            <div class="weak-alert-header"><span>&#x1F4D5;</span> Topics below 65% accuracy</div>
+            <div id="weak-topics-list">
+              <!-- Rendered by renderWeakTopics() in app.js -->
+            </div>
+          </div>
         </div>
       </div>
-      <div class="input-hint" style="margin-top:8px;">
-        <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line ·
-        <span class="offline-badge" id="offline-badge" style="display:none">Ã°Å¸â€œÂ´ Offline (Local AI Active)</span>
+    </section>
+
+    <!-- PREPARE VIEW -->
+    <section class="view-panel" id="view-prepare" aria-label="Preparation Hub">
+      <div style="margin-bottom:20px;">
+        <div class="section-title" style="font-size:1.3rem;">&#x1F4D8; Preparation Hub</div>
+        <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Deep dive into each of your four career goals. Every topic aligned to your 90-day plan.</p>
       </div>
-    </div>
-  </main>
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" role="tablist" id="prepare-tab-bar">
+        <button role="tab" class="tab-pill active" id="ptab-gate" onclick="switchPrepTab('gate')" aria-selected="true">&#x26A1; GATE 2027</button>
+        <button role="tab" class="tab-pill" id="ptab-placement" onclick="switchPrepTab('placement')" aria-selected="false">&#x1F4BC; Placements</button>
+        <button role="tab" class="tab-pill" id="ptab-swe" onclick="switchPrepTab('swe')" aria-selected="false">&#x1F4BB; Software Eng</button>
+        <button role="tab" class="tab-pill" id="ptab-intern" onclick="switchPrepTab('intern')" aria-selected="false">&#x1F680; Internships</button>
+      </div>
+      <div id="prepare-content-area">
+        <div style="color:var(--text-muted);font-size:13px;">Loading preparation data...</div>
+      </div>
+    </section>
 
-  <!-- ─── DASHBOARD PANEL (Evaluations) ─── -->
-  
+    <!-- PRACTICE VIEW -->
+    <section class="view-panel" id="view-practice" aria-label="Practice Arena">
+      <div style="margin-bottom:20px;">
+        <div class="section-title" style="font-size:1.3rem;">&#x2694;&#xFE0F; Practice Arena</div>
+        <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Sharpen your skills with targeted, tracked practice sessions.</p>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" role="tablist">
+        <button role="tab" class="tab-pill active" id="pxtab-dsa" onclick="switchPracticeTab('dsa')" aria-selected="true">&#x1F9E9; DSA</button>
+        <button role="tab" class="tab-pill" id="pxtab-pyq" onclick="switchPracticeTab('gate-pyq')" aria-selected="false">&#x1F4CB; GATE PYQs</button>
+        <button role="tab" class="tab-pill" id="pxtab-aptitude" onclick="switchPracticeTab('aptitude')" aria-selected="false">&#x1F9E0; Aptitude</button>
+        <button role="tab" class="tab-pill" id="pxtab-cs" onclick="switchPracticeTab('cs-core')" aria-selected="false">&#x1F4D6; CS Core</button>
+        <button role="tab" class="tab-pill" id="pxtab-mock" onclick="switchPracticeTab('mock')" aria-selected="false">&#x1F3AF; Mock Tests</button>
+      </div>
+      <div id="practice-content-area">
+        <div style="color:var(--text-muted);font-size:13px;">Loading practice modules...</div>
+      </div>
+    </section>
 
-  <!-- ─── MAP PANEL (Placements & Internships) ─── -->
-  
+    <!-- CAREER VIEW (Opportunity Board) -->
+    <section class="view-panel" id="view-career" aria-label="Career Pipeline">
+      <div style="margin-bottom:20px;">
+        <div class="section-title" style="font-size:1.3rem;">&#x1F3AF; Career Pipeline</div>
+        <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Track every opportunity from discovery to offer. No selection probability claims.</p>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" role="tablist">
+        <button role="tab" class="tab-pill active" id="ctab-projects" onclick="switchCareerTab('projects')" aria-selected="true">?? Projects</button>
+        <button role="tab" class="tab-pill" id="ctab-resume" onclick="switchCareerTab('resume')" aria-selected="false">?? Resume</button>
+        <button role="tab" class="tab-pill" id="ctab-opportunities" onclick="switchCareerTab('opportunities')" aria-selected="false">?? Opportunities</button>
+        <button role="tab" class="tab-pill" id="ctab-applications" onclick="switchCareerTab('applications')" aria-selected="false">?? Applications</button>
+        <button role="tab" class="tab-pill" id="ctab-interviews" onclick="switchCareerTab('interviews')" aria-selected="false">??? Interviews</button>
+        <button role="tab" class="tab-pill" id="ctab-companies" onclick="switchCareerTab('companies')" aria-selected="false">?? Companies</button>
+      </div>
+      <div id="career-content-area">
+        <div style="color:var(--text-muted);font-size:13px;">Loading career pipeline...</div>
+      </div>
+    </section>
+
+    <!-- PROGRESS VIEW -->
+    <section class="view-panel" id="view-progress" aria-label="Progress and Analytics">
+      <div style="margin-bottom:20px;">
+        <div class="section-title" style="font-size:1.3rem;">&#x1F4C8; Progress &amp; Analytics</div>
+        <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Every metric derives from your actual logged study activity. No hard-coded values.</p>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" role="tablist">
+        <button role="tab" class="tab-pill active" id="progtab-readiness" onclick="switchProgressTab('readiness')" aria-selected="true">?? Readiness</button>
+        <button role="tab" class="tab-pill" id="progtab-mastery" onclick="switchProgressTab('mastery')" aria-selected="false">? Mastery</button>
+        <button role="tab" class="tab-pill" id="progtab-analytics" onclick="switchProgressTab('analytics')" aria-selected="false">?? Analytics</button>
+        <button role="tab" class="tab-pill" id="progtab-mistakes" onclick="switchProgressTab('mistakes')" aria-selected="false">?? Mistake Book</button>
+        <button role="tab" class="tab-pill" id="progtab-smart-revision" onclick="switchProgressTab('smart-revision')" aria-selected="false">?? Smart Revision</button>
+      </div>
+      <div id="progress-content-area">
+        <div style="color:var(--text-muted);font-size:13px;">Loading progress data...</div>
+      </div>
+    </section>
+
+    <!-- CSE LABS VIEW -->
+    <section class="view-panel" id="view-cselabs" aria-label="CSE Labs">
+      <div style="margin-bottom:20px;">
+        <div class="section-title" style="font-size:1.3rem;">&#x1F52C; CSE Labs &amp; Tools</div>
+        <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Interactive learning utilities. Algorithm visualization, SQL, networking, system design and GATE tools.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;" id="cselabs-grid">
+        <!-- Rendered by renderCSELabs() -->
+      </div>
+    </section>
+
+    <!-- RESOURCES VIEW -->
+    <section class="view-panel" id="view-resources" aria-label="Resources">
+      <div style="margin-bottom:20px;">
+        <div class="section-title" style="font-size:1.3rem;">&#x1F4DA; Resources</div>
+        <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Curated study materials, formula sheets, and references.</p>
+      </div>
+      <div id="resources-content">
+        <div style="color:var(--text-muted);font-size:13px;">Loading resources...</div>
+      </div>
+    </section>
+
+    <!-- AI MENTOR VIEW -->
+    <section class="view-panel" id="view-chat" aria-label="GT AI Mentor">
+      <div id="chat-view-container" style="display:flex;flex-direction:column;height:100%;">
+        <div class="chat-header" id="chat-header" role="banner">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:18px;" aria-hidden="true">&#x1F916;</div>
+            <div>
+              <div style="font-weight:800;font-size:15px;color:var(--text);">GT AI Mentor</div>
+              <div style="font-size:11px;color:var(--success);">&#x25CF; Active &bull; Your Personal Preparation Coach</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-left:auto;" role="group" aria-label="Mentor modes">
+            <button class="tab-pill active" id="mentor-mode-planning" onclick="setMentorMode('planning')">??? Planning</button>
+            <button class="tab-pill" id="mentor-mode-gate" onclick="setMentorMode('gate')">? GATE</button>
+            <button class="tab-pill" id="mentor-mode-dsa" onclick="setMentorMode('dsa')">?? DSA</button>
+            <button class="tab-pill" id="mentor-mode-placement" onclick="setMentorMode('placement')">?? Placement</button>
+            <button class="tab-pill" id="mentor-mode-swe" onclick="setMentorMode('swe')">?? SWE</button>
+            <button class="tab-pill" id="mentor-mode-intern" onclick="setMentorMode('intern')">?? Internship</button>
+            <button class="tab-pill" id="mentor-mode-interview" onclick="setMentorMode('interview')">??? Interview</button>
+            <button class="tab-pill" id="mentor-mode-resume" onclick="setMentorMode('resume')">?? Resume</button>
+          </div>
+        </div>
+        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Chat messages">
+          <div class="welcome-banner">
+            <h1 style="font-size:1.5rem;font-weight:900;font-family:var(--font-display);color:var(--text);margin-bottom:8px;">GT AI Mentor &#x1F916;</h1>
+            <p style="color:var(--text-sub);font-size:14px;line-height:1.6;max-width:480px;margin:0 auto 16px;">Your personal preparation coach da! I know your weak areas, your goals, and your 90-day plan. Ask me anything.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:560px;margin:0 auto;" role="list">
+              <button class="action-chip" onclick="openChatWithContext('Plan my day for today based on my 90-day preparation goals')" role="listitem">?? Plan My Day</button>
+              <button class="action-chip" onclick="openChatWithContext('Explain this CSE concept clearly from first principles: ')" role="listitem">?? Explain a Concept</button>
+              <button class="action-chip" onclick="startScaffoldedDoubtSolver()" role="listitem">? Solve a Doubt (Socratic)</button>
+              <button class="action-chip" onclick="openChatWithContext('Help me review and fix this mistake: ')" role="listitem">?? Review Mistake</button>
+              <button class="action-chip" onclick="setMentorMode('interview');openChatWithContext('Start a technical mock interview with me for a CSE graduate role');" role="listitem">??? Interview Practice</button>
+              <button class="action-chip" onclick="setMentorMode('resume');openChatWithContext('Review my resume bullet points and suggest quantifiable impact metrics');" role="listitem">?? Resume Review</button>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area" id="chat-input-area">
+          <div class="input-row">
+            <textarea id="chat-input" class="chat-input"
+              placeholder="Ask GT AI Mentor anything da... (Shift+Enter for new line)"
+              rows="1" aria-label="Message input"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"
+              oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';"></textarea>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()" aria-label="Send message">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+          <div class="input-meta" id="input-meta">
+            <span id="chat-model-indicator">&#x26A1; GPT-5.4 Active</span>
+            <button id="export-chat-btn" onclick="exportChatHistory&&exportChatHistory()" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;">&#x1F4E4; Export</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS VIEW -->
+    <section class="view-panel" id="view-settings" aria-label="Settings">
+      <div style="margin-bottom:20px;">
+        <div class="section-title" style="font-size:1.3rem;">&#x2699;&#xFE0F; Settings</div>
+        <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Personalize your preparation OS.</p>
+      </div>
+      <div id="settings-content-area">
+        <div style="color:var(--text-muted);font-size:13px;">Loading settings...</div>
+      </div>
+    </section>
+</div>
 </div>
 
-<!-- Sidebar Overlay (mobile) -->
-<div class="sidebar-overlay hidden" id="sidebar-overlay"></div>
+<!-- Mobile Bottom Nav (5 tabs) -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Mobile navigation">
+  <button class="mob-nav-btn active" id="mob-nav-home" onclick="navigateToView('home')" aria-label="Home">
+    <span class="mob-nav-icon" aria-hidden="true">??</span>
+    <span class="mob-nav-label">Home</span>
+  </button>
+  <button class="mob-nav-btn" id="mob-nav-prepare" onclick="navigateToView('prepare')" aria-label="Prepare">
+    <span class="mob-nav-icon" aria-hidden="true">??</span>
+    <span class="mob-nav-label">Prepare</span>
+  </button>
+  <button class="mob-nav-btn" id="mob-nav-practice" onclick="navigateToView('practice')" aria-label="Practice">
+    <span class="mob-nav-icon" aria-hidden="true">??</span>
+    <span class="mob-nav-label">Practice</span>
+  </button>
+  <button class="mob-nav-btn" id="mob-nav-progress" onclick="navigateToView('progress')" aria-label="Progress">
+    <span class="mob-nav-icon" aria-hidden="true">??</span>
+    <span class="mob-nav-label">Progress</span>
+  </button>
+  <button class="mob-nav-btn" id="mob-nav-more" onclick="openModal('mobile-more-modal')" aria-label="More options">
+    <span class="mob-nav-icon" aria-hidden="true">?</span>
+    <span class="mob-nav-label">More</span>
+  </button>
+</nav>
 
-<!-- ─── MODAL: Profile ─── -->
+<!-- Mobile More Modal -->
+<div class="modal-overlay" id="mobile-more-modal" role="dialog" aria-modal="true" aria-label="More Navigation">
+  <div class="modal" style="max-width:380px;">
+    <button class="modal-close" data-close="mobile-more-modal" aria-label="Close">?</button>
+    <div class="modal-title">?? More Options</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
+      <button onclick="closeModal('mobile-more-modal');navigateToView('career');" class="action-btn" style="padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <span style="font-size:20px;">??</span>
+        <span style="font-size:12px;font-weight:700;">Career</span>
+      </button>
+      <button onclick="closeModal('mobile-more-modal');navigateToView('cselabs');" class="action-btn" style="padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <span style="font-size:20px;">??</span>
+        <span style="font-size:12px;font-weight:700;">CSE Labs</span>
+      </button>
+      <button onclick="closeModal('mobile-more-modal');navigateToView('resources');" class="action-btn" style="padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <span style="font-size:20px;">??</span>
+        <span style="font-size:12px;font-weight:700;">Resources</span>
+      </button>
+      <button onclick="closeModal('mobile-more-modal');navigateToView('mentor');" class="action-btn" style="padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;">
+        <span style="font-size:20px;">??</span>
+        <span style="font-size:12px;font-weight:700;">GT AI Mentor</span>
+      </button>
+      <button onclick="closeModal('mobile-more-modal');navigateToView('settings');" class="action-btn" style="padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;grid-column:1/-1;">
+        <span style="font-size:20px;">??</span>
+        <span style="font-size:12px;font-weight:700;">Settings</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Daily Shutdown Review Modal -->
+<div class="modal-overlay" id="shutdown-review-modal" role="dialog" aria-modal="true" aria-label="Daily Shutdown Review">
+  <div class="modal" style="max-width:640px;">
+    <button class="modal-close" data-close="shutdown-review-modal" aria-label="Close">&#x2715;</button>
+    <div class="modal-title">&#x1F4CC; Daily Shutdown Review</div>
+    <div class="modal-subtitle">End-of-day reflection &mdash; <span id="shutdown-date"></span></div>
+    <div class="shutdown-grid" id="shutdown-stats-grid"></div>
+    <div id="shutdown-highlights"></div>
+    <div style="margin-top:16px;padding:14px;background:rgba(91,91,214,0.08);border:1px solid rgba(91,91,214,0.22);border-radius:var(--radius-sm);">
+      <div style="font-size:11px;font-weight:800;color:var(--primary-light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">&#x1F3AF; Tomorrow's Priority</div>
+      <div id="shutdown-tomorrow" style="font-size:13px;color:var(--text);line-height:1.5;">Loading...</div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="openModal('weekly-report-modal');window.generateWeeklyReport&&generateWeeklyReport();" style="flex:1;padding:10px;background:var(--surface-mid);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">&#x1F4CA; Weekly Report</button>
+      <button onclick="closeModal('shutdown-review-modal')" class="submit-btn" style="flex:2;padding:10px;">&#x1F31F; Great work da! Done for today.</button>
+    </div>
+  </div>
+</div>
+
+<!-- Weekly Mentor Report Modal -->
+<div class="modal-overlay" id="weekly-report-modal" role="dialog" aria-modal="true" aria-label="Weekly Mentor Report">
+  <div class="modal modal-tall" style="max-width:700px;">
+    <button class="modal-close" data-close="weekly-report-modal" aria-label="Close">&#x2715;</button>
+    <div class="modal-title">&#x1F4CA; Weekly Mentor Report</div>
+    <div class="modal-subtitle">Generated from your actual study activity</div>
+    <div id="weekly-report-content" style="margin-top:16px;"><div style="color:var(--text-muted);font-size:13px;">Loading report...</div></div>
+  </div>
+</div>
+
+<!-- Hidden legacy button anchors (preserve JS references) -->
+<div style="display:none;" aria-hidden="true">
+  <button id="cal-prev"></button>
+  <button id="cal-next"></button>
+  <button id="mark-leave-btn"></button>
+  <button id="mark-exam-btn"></button>
+  <button id="mark-clear-btn"></button>
+  <button id="nav-chat-btn" onclick="navigateToView('mentor')"></button>
+  <button id="nav-eval-btn" onclick="navigateToView('progress')"></button>
+  <button id="nav-map-btn" onclick="navigateToView('career','opportunities')"></button>
+</div>
+
 <div class="modal-overlay" id="profile-modal">
   <div class="modal">
     <button class="modal-close" data-close="profile-modal">✕</button>
@@ -1585,6 +939,7 @@
 <!-- ─── MODAL: Quick Notes ─── -->
 
 <!-- ─── MODAL: Daily Quiz Challenge ─── -->
+
 <div class="modal-overlay" id="quiz-modal">
   <div class="modal">
     <button class="modal-close" data-close="quiz-modal">✕</button>
@@ -1846,6 +1201,7 @@
 
 
 <!-- ─── MODAL: Global Command Palette (Ctrl+K) ─── -->
+
 <div class="modal-overlay" id="command-palette-modal">
   <div class="modal command-palette-dialog" style="max-width: 620px; padding: 0; overflow: hidden; border-radius: var(--radius);">
     <div class="palette-search-wrap">
@@ -1865,6 +1221,7 @@
 </div>
 
 <!-- ─── MODAL: Official GATE 2027 Virtual Calculator ─── -->
+
 <div class="modal-overlay" id="calculator-modal">
   <div class="modal modal-tall gate-calc-modal" style="max-width: 580px;">
     <button class="modal-close" data-close="calculator-modal">&#x2715;</button>
@@ -2019,6 +1376,7 @@
 
 <!-- ─── MODAL: Tamil Nadu & India Placement Directory ─── -->
 <!-- ─── MODAL: Master 100+ Companies Placement & Map Ecosystem ─── -->
+
 <div class="modal-overlay" id="placement-directory-modal">
   <div class="modal modal-tall master-placement-dialog" style="max-width: 960px;">
     <button class="modal-close" data-close="placement-directory-modal">&#x2715;</button>
@@ -2202,6 +1560,7 @@
 
 
 <!-- ─── MODAL: In-Browser SQL Query Playground ─── -->
+
 <div class="modal-overlay" id="sql-playground-modal">
   <div class="modal modal-tall sql-dialog" style="max-width: 860px;">
     <button class="modal-close" data-close="sql-playground-modal">&#x2715;</button>
@@ -2482,39 +1841,6 @@ WHERE p.package_lpa >= 10.0;</textarea>
   <button id="nav-map-btn"></button>
 </div>
 
-<script src="app.js"></script>
-<script src="app_v2.js?v=2.0"></script>
-
-<!-- ─── MOBILE BOTTOM NAVIGATION BAR ─── -->
-<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <button class="mob-nav-btn active" id="mob-nav-chat" title="AI Mentor Chat">
-    <span class="mob-icon">💬</span>
-    <span class="mob-label">Chat</span>
-  </button>
-  <button class="mob-nav-btn" id="mob-nav-mock" title="AI Mock Interview">
-    <span class="mob-icon">&#x1F399;&#xFE0F;</span>
-    <span class="mob-label">Mock AI</span>
-  </button>
-  <button class="mob-nav-btn" id="mob-nav-dir" title="100+ Companies">
-    <span class="mob-icon">&#x1F3E2;</span>
-    <span class="mob-label">Jobs</span>
-  </button>
-  <button class="mob-nav-btn" id="mob-nav-exam" title="GATE Exam Simulator">
-    <span class="mob-icon">&#x1F4DD;</span>
-    <span class="mob-label">Exam</span>
-  </button>
-  <button class="mob-nav-btn" id="mob-nav-calc" title="GATE Calculator">
-    <span class="mob-icon">Ã°Å¸Â§Â®</span>
-    <span class="mob-label">Calc</span>
-  </button>
-  <button class="mob-nav-btn" id="mob-nav-menu" title="Full Menu">
-    <span class="mob-icon">⚡</span>
-    <span class="mob-label">Menu</span>
-  </button>
-</nav>
-
-
-<!-- ─── 1. AI MOCK INTERVIEW STUDIO (VOICE & REAL-TIME EVALUATOR) ─── -->
 <div class="modal-overlay" id="mock-interview-modal">
   <div class="modal modal-tall" style="max-width: 960px;">
     <button class="modal-close" data-close="mock-interview-modal">&#x2715;</button>
@@ -2592,6 +1918,7 @@ WHERE p.package_lpa >= 10.0;</textarea>
 </div>
 
 <!-- ─── 2. GATE 2027 AIR PREDICTOR & IIT/PSU ADMISSION ENGINE ─── -->
+
 <div class="modal-overlay" id="gate-predictor-modal">
   <div class="modal modal-tall" style="max-width: 920px;">
     <button class="modal-close" data-close="gate-predictor-modal">&#x2715;</button>
@@ -2646,6 +1973,7 @@ WHERE p.package_lpa >= 10.0;</textarea>
 </div>
 
 <!-- ─── 3. CSE CODE STUDIO & ALGORITHMIC SANDBOX ─── -->
+
 <div class="modal-overlay" id="code-studio-modal">
   <div class="modal modal-tall" style="max-width: 980px;">
     <button class="modal-close" data-close="code-studio-modal">&#x2715;</button>
@@ -2697,6 +2025,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── 4. 90-DAY VISUAL GANTT TRAJECTORY & CALENDAR SYNC (.ICS) ─── -->
+
 <div class="modal-overlay" id="roadmap-gantt-modal">
   <div class="modal modal-tall" style="max-width: 940px;">
     <button class="modal-close" data-close="roadmap-gantt-modal">&#x2715;</button>
@@ -2725,6 +2054,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── 5. ATS RESUME STUDIO & JOB KEYWORD SCANNER ─── -->
+
 <div class="modal-overlay" id="resume-ats-modal">
   <div class="modal modal-tall" style="max-width: 1040px;">
     <button class="modal-close" data-close="resume-ats-modal">&#x2715;</button>
@@ -2811,6 +2141,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 2 — FEATURE 1: POMODORO FOCUS TIMER STUDIO ─── -->
+
 <div class="modal-overlay" id="pomodoro-modal">
   <div class="modal" style="max-width:540px;">
     <button class="modal-close" data-close="pomodoro-modal">&#x2715;</button>
@@ -2883,6 +2214,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 2 — FEATURE 2: SUBJECT NOTES VAULT ─── -->
+
 <div class="modal-overlay" id="notes-vault-modal">
   <div class="modal modal-tall" style="max-width:860px;">
     <button class="modal-close" data-close="notes-vault-modal">&#x2715;</button>
@@ -3050,6 +2382,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 2 — FEATURE 5: DAILY MOTIVATION & TANGLISH MENTOR ENGINE ─── -->
+
 <div class="modal-overlay" id="motivation-modal">
   <div class="modal" style="max-width:620px;">
     <button class="modal-close" data-close="motivation-modal">&#x2715;</button>
@@ -3127,6 +2460,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 3 — FEATURE 1: GATE FORMULA VAULT MODAL ─── -->
+
 <div class="modal-overlay" id="formula-vault-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:880px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3161,6 +2495,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 3 — FEATURE 2: AI CODE REVIEWER MODAL ─── -->
+
 <div class="modal-overlay" id="code-reviewer-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:860px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3201,6 +2536,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 3 — FEATURE 3: SMART DAILY PLANNER MODAL ─── -->
+
 <div class="modal-overlay" id="smart-planner-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:760px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3224,6 +2560,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 3 — FEATURE 4: STRIVER A2Z 17 PATTERNS MODAL ─── -->
+
 <div class="modal-overlay" id="dsa-tracker-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:820px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3252,6 +2589,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 3 — FEATURE 5: AI ENGINE & GATEWAY CONFIG MODAL ─── -->
+
 <div class="modal-overlay" id="ai-engine-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:680px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3326,6 +2664,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 4 — FEATURE 1: CS BLITZ ARENA MODAL ─── -->
+
 <div class="modal-overlay" id="cs-blitz-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:760px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3392,6 +2731,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 4 — FEATURE 2: SYSTEM DESIGN STUDIO MODAL ─── -->
+
 <div class="modal-overlay" id="system-architecture-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:880px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3434,6 +2774,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 4 — FEATURE 3: GATE WEIGHTAGE HEATMAP MODAL ─── -->
+
 <div class="modal-overlay" id="weightage-heatmap-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:820px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3471,6 +2812,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 4 — FEATURE 4: BACKUP & PRINT CHEAT SHEET MODAL ─── -->
+
 <div class="modal-overlay" id="backup-restore-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:720px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3537,6 +2879,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 5 — FEATURE 1: ALGORITHM VISUALIZER MODAL ─── -->
+
 <div class="modal-overlay" id="algo-visualizer-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:860px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3594,6 +2937,7 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 5 — FEATURE 2: TANGLISH AUDIO MENTOR PODCAST MODAL ─── -->
+
 <div class="modal-overlay" id="audio-mentor-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:760px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3669,6 +3013,7 @@ Execution Time: 2.4ms</pre>
 <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      WAVE 6 â€” FEATURE A: GATE MOCK EXAM HISTORY TRACKER
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+
 <div class="modal-overlay" id="gate-history-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:900px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3732,6 +3077,7 @@ Execution Time: 2.4ms</pre>
 <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      WAVE 6 â€” FEATURE B: CS CONCEPT MIND MAP
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+
 <div class="modal-overlay" id="mindmap-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:900px; width:95%; max-height:92vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3776,6 +3122,7 @@ Execution Time: 2.4ms</pre>
 <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      WAVE 6 â€” FEATURE C: SMART REVISION SCHEDULER
      â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+
 <div class="modal-overlay" id="revision-scheduler-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:820px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3830,6 +3177,7 @@ Execution Time: 2.4ms</pre>
 <!-- ══════════════════════════════════════════════════════════════
      WAVE 7 — FEATURE 1: DSA BATTLE MODE (1v1 Timed Challenge)
      ══════════════════════════════════════════════════════════════ -->
+
 <div class="modal-overlay" id="dsa-battle-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:860px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3913,6 +3261,7 @@ function solve(arr) {
 <!-- ══════════════════════════════════════════════════════════════
      WAVE 7 — FEATURE 2: STUDY STREAK CALENDAR (GitHub-Style)
      ══════════════════════════════════════════════════════════════ -->
+
 <div class="modal-overlay" id="streak-calendar-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:820px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -3971,6 +3320,7 @@ function solve(arr) {
 <!-- ══════════════════════════════════════════════════════════════
      WAVE 7 — FEATURE 3: FORMULA QUIZ BLITZ
      ══════════════════════════════════════════════════════════════ -->
+
 <div class="modal-overlay" id="formula-quiz-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:720px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -4047,6 +3397,7 @@ function solve(arr) {
 <!-- ══════════════════════════════════════════════════════════════
      WAVE 7 — FEATURE 4: DAILY STANDUP JOURNAL
      ══════════════════════════════════════════════════════════════ -->
+
 <div class="modal-overlay" id="standup-journal-modal" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:720px; width:95%; max-height:90vh; display:flex; flex-direction:column;">
     <div class="modal-header">
@@ -4104,6 +3455,124 @@ function solve(arr) {
   </div>
 </div>
 
+
+
+<!-- ?? 3D Portfolio Project Modal: Vortex-3D Distributed Cluster Simulator ?? -->
+<div class="modal-overlay" id="project-3d-modal" role="dialog" aria-modal="true" aria-label="Vortex-3D Distributed Cluster Simulator">
+  <div class="modal modal-tall" style="max-width:880px; width:95vw;">
+    <button class="modal-close" data-close="project-3d-modal" onclick="closeVortex3DModal()">?</button>
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+      <span style="font-size:24px;">??</span>
+      <div>
+        <div class="modal-title" style="margin:0;">Vortex-3D: Distributed Consensus Cluster Simulator</div>
+        <div class="modal-subtitle">Interactive 3D Raft Protocol Simulation &amp; Portfolio Showcase</div>
+      </div>
+    </div>
+
+    <!-- Modal Subtabs -->
+    <div style="display:flex; gap:8px; margin:14px 0; border-bottom:1px solid var(--border-subtle); padding-bottom:10px;">
+      <button class="tab-pill active" id="vortex-tab-sim" onclick="switchVortexTab('sim')">?? Interactive 3D Simulator</button>
+      <button class="tab-pill" id="vortex-tab-resume" onclick="switchVortexTab('resume')">?? ATS Resume Bullets</button>
+      <button class="tab-pill" id="vortex-tab-arch" onclick="switchVortexTab('arch')">?? System Architecture Specs</button>
+    </div>
+
+    <!-- TAB 1: Live 3D Simulation Viewport -->
+    <div id="vortex-view-sim">
+      <!-- 3D Canvas Viewport -->
+      <div style="position:relative; width:100%; border-radius:var(--radius-sm); overflow:hidden; border:1px solid var(--border-subtle); background:#050510;">
+        <canvas id="vortex-3d-canvas" style="width:100%; height:380px; display:block; cursor:grab;"></canvas>
+        <div style="position:absolute; bottom:8px; left:12px; font-size:10px; color:rgba(255,255,255,0.45); pointer-events:none;">
+          ??? Drag to Orbit in 3D &bull; Scroll to Zoom &bull; Real-time 60 FPS Canvas Projection
+        </div>
+        <!-- Live HUD Overlay -->
+        <div style="position:absolute; top:10px; right:12px; display:flex; gap:8px; pointer-events:none;">
+          <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:var(--text);" id="vortex-hud-term">Term 1</span>
+          <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:#F59E0B;" id="vortex-hud-leader">Leader: Node-1</span>
+          <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:var(--success);" id="vortex-hud-quorum">Full Quorum (5/5)</span>
+        </div>
+      </div>
+
+      <!-- Simulation Controls Bar -->
+      <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+        <button onclick="Vortex3D.proposeClientWrite()" class="submit-btn" style="padding:8px 16px; font-size:12px;">
+          ?? Propose Client Write
+        </button>
+        <button onclick="Vortex3D.killLeader()" class="action-btn" style="padding:8px 14px; font-size:12px; color:var(--danger); border-color:rgba(239,68,68,0.3);">
+          ?? Crash Leader (Election Test)
+        </button>
+        <button onclick="Vortex3D.togglePartition()" id="vortex-partition-btn" class="action-btn" style="padding:8px 14px; font-size:12px; color:var(--warning); border-color:rgba(245,158,11,0.3);">
+          ? Split Partition
+        </button>
+        <button onclick="Vortex3D.resetCluster()" class="action-btn" style="padding:8px 14px; font-size:12px; margin-left:auto;">
+          ?? Reset Cluster
+        </button>
+      </div>
+
+      <!-- Real-Time Raft Event Log -->
+      <div style="margin-top:14px; padding:12px; background:var(--depth-4); border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+        <div style="font-size:11px; font-weight:800; color:var(--primary-light); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">
+          ?? Consensus Audit Stream
+        </div>
+        <div id="vortex-log-list" style="max-height:85px; overflow-y:auto;">
+          <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-sub);">[00:00:01] Cluster initialized with 5 nodes. Node-1 elected LEADER for Term 1.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ATS Resume Bullets -->
+    <div id="vortex-view-resume" style="display:none;">
+      <div style="padding:16px; background:var(--depth-4); border-radius:var(--radius-sm); border:1px solid var(--border-subtle); margin-bottom:14px;">
+        <div style="font-size:13px; font-weight:800; color:var(--text); margin-bottom:8px;">?? Pre-Calibrated ATS Resume Bullets (SDE / Systems Roles)</div>
+        <div style="font-size:12px; color:var(--text-sub); line-height:1.6; margin-bottom:14px;">
+          Copy and paste these quantifiable impact statements directly into your resume under the Projects section:
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="padding:10px 14px; background:var(--surface); border-radius:6px; font-size:12px; line-height:1.5; border:1px solid var(--border-subtle);">
+            ? <strong>Engineered interactive 3D spatial consensus simulator</strong> modeling the Raft protocol with real-time leader election, log replication, and split-brain partition recovery across clustered nodes.
+          </div>
+          <div style="padding:10px 14px; background:var(--surface); border-radius:6px; font-size:12px; line-height:1.5; border:1px solid var(--border-subtle);">
+            ? <strong>Designed custom Canvas 3D perspective projection pipeline</strong> delivering smooth 60 FPS orbital camera rendering and particle packet animation with zero heavy external library dependencies (&lt;100KB footprint).
+          </div>
+          <div style="padding:10px 14px; background:var(--surface); border-radius:6px; font-size:12px; line-height:1.5; border:1px solid var(--border-subtle);">
+            ? <strong>Implemented dynamic fault injection suite</strong> enabling live simulation of network partitions, leader heartbeat timeouts, and majority quorum validation adhering to the CAP theorem.
+          </div>
+        </div>
+        <button onclick="copyVortexResumeBullets()" class="submit-btn" style="margin-top:14px; padding:8px 20px; font-size:12px;">
+          ?? Copy Bullets to Clipboard
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 3: System Architecture Specs -->
+    <div id="vortex-view-arch" style="display:none;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px;">
+        <div style="padding:14px; background:var(--depth-4); border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <div style="font-size:11px; font-weight:800; color:var(--primary-light); margin-bottom:6px;">Raft State Machine</div>
+          <div style="font-size:12px; color:var(--text-sub); line-height:1.5;">
+            Nodes transition between Follower, Candidate, and Leader based on randomized election timeouts (150-300ms equivalent) and heartbeat pulses.
+          </div>
+        </div>
+        <div style="padding:14px; background:var(--depth-4); border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <div style="font-size:11px; font-weight:800; color:var(--success); margin-bottom:6px;">Log Replication &amp; Commit</div>
+          <div style="font-size:12px; color:var(--text-sub); line-height:1.5;">
+            Client writes are accepted strictly by the Leader and broadcast to followers. Entries are committed only when acknowledged by a majority quorum (&lfloor;N/2&rfloor; + 1).
+          </div>
+        </div>
+        <div style="padding:14px; background:var(--depth-4); border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <div style="font-size:11px; font-weight:800; color:var(--warning); margin-bottom:6px;">Partition Tolerance</div>
+          <div style="font-size:12px; color:var(--text-sub); line-height:1.5;">
+            Simulates network partitions where minority partitions reject writes, preventing split-brain corruption until reconnection and log reconciliations occur.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="project3D.js"></script>
+<script src="app.js"></script>
+<script src="app_v2.js"></script>
+<script src="career.js" onerror="console.warn('career.js not yet present')"></script>
+<script src="focusSession.js" onerror="console.warn('focusSession.js not yet present')"></script>
 </body>
 </html>
-
