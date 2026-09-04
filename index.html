@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>GT Study Mentor Pro — 90-Day Preparation OS</title>
-  <meta name="description" content="Your personal 90-day preparation OS for GATE CS 2027, Placements, Software Engineering and Internships." />
+  <title>GT Study Mentor Pro — 90-Day Career Preparation</title>
+  <meta name="description" content="A focused 90-day preparation system for GATE 2027, placements, software engineering and internships." />
   <meta name="theme-color" content="#5B5BD6" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="application-name" content="GT Mentor Pro" />
@@ -18,7 +18,7 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   <link rel="stylesheet" href="style.css" />
   <script src="prepIntelligence.js"></script>
@@ -300,9 +300,9 @@
               <circle id="ring-main" cx="70" cy="70" r="54" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"
                 stroke-dasharray="339.29" stroke-dashoffset="237.5"
                 style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);"/>
-              <text x="70" y="66" text-anchor="middle" font-size="26" font-weight="900" fill="var(--text)" font-family="Outfit,sans-serif" transform="rotate(90,70,70)" id="ring-day-text">27</text>
-              <text x="70" y="82" text-anchor="middle" font-size="12" fill="var(--text-muted)" font-family="Inter,sans-serif" transform="rotate(90,70,70)">/ 90 days</text>
-              <text x="70" y="95" text-anchor="middle" font-size="10" fill="var(--success)" font-family="Inter,sans-serif" font-weight="700" transform="rotate(90,70,70)">30% done</text>
+              <text x="70" y="66" text-anchor="middle" font-size="26" font-weight="900" fill="var(--text)" font-family="Poppins,sans-serif" transform="rotate(90,70,70)" id="ring-day-text">27</text>
+              <text x="70" y="82" text-anchor="middle" font-size="12" fill="var(--text-muted)" font-family="Poppins,sans-serif" transform="rotate(90,70,70)">/ 90 days</text>
+              <text x="70" y="95" text-anchor="middle" font-size="10" fill="var(--success)" font-family="Poppins,sans-serif" font-weight="700" transform="rotate(90,70,70)">30% done</text>
             </svg>
             <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;">
               <span style="font-size:10px;padding:3px 9px;border-radius:var(--radius-full);background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:var(--accent);font-weight:700;">P1 &#x2713;</span>
@@ -343,6 +343,32 @@
           </div>
           <div class="readiness-orb-grid" id="readiness-orbs-container">
             <!-- Rendered by renderReadinessOrbs() in app.js -->
+          </div>
+        </div>
+
+        <!-- 3D Skill Graph Section -->
+        <div class="home-skillgraph-row" style="grid-column: 1 / -1; margin-top: 8px;">
+          <div class="section-header mb-12">
+            <div>
+              <div class="section-title">&#x2728; 3D Skill Stack &amp; Knowledge Graph</div>
+              <div class="section-title-sub">Interactive spatial map &mdash; click any node to inspect mastery, mistakes, and next action</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="skill-legend-pill status-mastered">&#x25CF; Mastered</span>
+              <span class="skill-legend-pill status-strong">&#x25CF; Strong</span>
+              <span class="skill-legend-pill status-developing">&#x25CF; Developing</span>
+              <span class="skill-legend-pill status-weak">&#x25CF; Weak</span>
+            </div>
+          </div>
+          <div class="skill-graph-card neo-card" id="skill-graph-container">
+            <div class="skill-graph-canvas-wrap">
+              <div class="skill-graph-nodes" id="skill-graph-nodes">
+                <!-- Dynamically populated by render3DSkillGraph() -->
+              </div>
+            </div>
+            <div class="skill-inspector-card" id="skill-inspector-card" style="display:none;">
+              <!-- Populated when user clicks any skill node -->
+            </div>
           </div>
         </div>
 

@@ -8649,5 +8649,211 @@ window.getStudentState = function () {
   };
 };
 
-// Expose alias on window
 window.studentState = window.getStudentState();
+
+// ══════════════════════════════════════════════════════════════
+//  GT NEODEPTH 3D HOME COMMAND CENTER & SKILL GRAPH (Section 20-25)
+// ══════════════════════════════════════════════════════════════
+
+const SKILL_NODES_DATA = {
+  'dsa': { name: 'DSA & Algorithms', icon: '🧩', state: 'Mastered', accuracy: 92, mistakes: 0, revision: 'Up to Date', goals: 'GATE + Placement + SWE', next: 'Segment Trees & Fenwick Tree' },
+  'dbms': { name: 'DBMS & Transactions', icon: '🗄️', state: 'Strong', accuracy: 76, mistakes: 1, revision: '1 Due Today', goals: 'GATE + SWE Backend', next: 'Conflict Serializability Drills' },
+  'os': { name: 'Operating Systems', icon: '⚙️', state: 'Developing', accuracy: 64, mistakes: 2, revision: 'Due Now', goals: 'GATE + Core Interview', next: 'Deadlocks Banker\'s Algorithm' },
+  'sql': { name: 'SQL & Query Optimization', icon: '📊', state: 'Mastered', accuracy: 88, mistakes: 0, revision: 'Mastered', goals: 'Placement + SWE + Intern', next: 'Window Functions & Indexing' },
+  'cn': { name: 'Computer Networks', icon: '🌐', state: 'Strong', accuracy: 70, mistakes: 1, revision: 'Upcoming', goals: 'GATE + Interview', next: 'CIDR Subnetting Lab' },
+  'sysdesign': { name: 'System Design (HLD/LLD)', icon: '🏛️', state: 'Developing', accuracy: 68, mistakes: 1, revision: 'Due in 2 days', goals: 'SWE + Tier-1 Placement', next: 'Raft Consensus Simulation' },
+  'aptitude': { name: 'General Aptitude & Logic', icon: '🧠', state: 'Strong', accuracy: 84, mistakes: 0, revision: 'Up to Date', goals: 'Placement Screening', next: 'Permutations & Probability' },
+  'swe': { name: 'Full-Stack SWE & Git', icon: '💻', state: 'Strong', accuracy: 80, mistakes: 0, revision: 'Up to Date', goals: 'Internship + SWE', next: 'Docker Containerization & CI/CD' }
+};
+
+window.render3DSkillGraph = function () {
+  const container = document.getElementById('skill-graph-nodes');
+  if (!container) return;
+
+  const entries = Object.entries(SKILL_NODES_DATA);
+  container.innerHTML = entries.map(([key, data]) => {
+    const stateClass = data.state.toLowerCase();
+    return `
+      <div class="skill-3d-node neo-card" id="skill-node-${key}" onclick="inspectSkillNode('${key}')" role="button" tabindex="0" aria-label="Inspect ${data.name}">
+        <div class="skill-node-icon">${data.icon}</div>
+        <div class="skill-node-name">${data.name}</div>
+        <span class="skill-node-state ${stateClass}">${data.state}</span>
+        <div class="skill-node-meter">
+          <div class="skill-node-fill" style="width:${data.accuracy}%;background:${data.accuracy>=85?'var(--success)':data.accuracy>=70?'var(--accent)':data.accuracy>=60?'var(--warning)':'var(--danger)'};"></div>
+        </div>
+      </div>`;
+  }).join('');
+};
+
+window.inspectSkillNode = function (key) {
+  const node = SKILL_NODES_DATA[key];
+  if (!node) return;
+
+  document.querySelectorAll('.skill-3d-node').forEach(el => el.classList.remove('active-inspect'));
+  const activeEl = document.getElementById('skill-node-' + key);
+  if (activeEl) activeEl.classList.add('active-inspect');
+
+  const card = document.getElementById('skill-inspector-card');
+  if (!card) return;
+
+  card.style.display = 'flex';
+  card.innerHTML = `
+    <div style="flex:1;min-width:260px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="font-size:24px;">${node.icon}</span>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--text);">${node.name}</div>
+          <div style="font-size:11px;color:var(--text-muted);">Supports: <strong style="color:var(--primary-light);">${node.goals}</strong></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;">
+        <div style="font-size:12px;"><span style="color:var(--text-muted);">Accuracy:</span> <strong style="color:${node.accuracy>=75?'var(--success)':'var(--warning)'};">${node.accuracy}%</strong></div>
+        <div style="font-size:12px;"><span style="color:var(--text-muted);">Mistakes:</span> <strong>${node.mistakes} recorded</strong></div>
+        <div style="font-size:12px;"><span style="color:var(--text-muted);">Revision:</span> <strong style="color:var(--accent);">${node.revision}</strong></div>
+      </div>
+      <div style="font-size:12px;margin-top:8px;color:var(--text-sub);">
+        <strong>Recommended Next Action:</strong> ${node.next}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button onclick="startSkillFocusSession('${key}')" style="padding:10px 18px;border-radius:10px;background:var(--primary);color:#fff;border:none;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 4px 14px var(--primary-glow);">
+        ▶ Practice Topic
+      </button>
+      <button onclick="document.getElementById('skill-inspector-card').style.display='none'" style="background:var(--surface);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;">
+        ✕ Close
+      </button>
+    </div>`;
+};
+
+window.startSkillFocusSession = function (key) {
+  const node = SKILL_NODES_DATA[key];
+  if (!node) return;
+  if (window.FocusSession) {
+    FocusSession.start(node.name + ' — ' + node.next, 'Master conceptual fundamentals and solve practice items for ' + node.name, 45);
+  } else if (typeof showToast === 'function') {
+    showToast('Starting focus for ' + node.name + '!', 'info');
+  }
+};
+
+window.renderHomeView = function () {
+  const prep = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getState() : null;
+  const nba = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getNextBestAction() : null;
+
+  // 1. Next Best Action (Hero Card)
+  if (nba) {
+    const trackEl = document.getElementById('nba-track-text');
+    const titleEl = document.getElementById('nba-title');
+    const whyEl = document.getElementById('nba-why');
+    const durEl = document.getElementById('nba-duration');
+    const accEl = document.getElementById('nba-accuracy');
+    const misEl = document.getElementById('nba-mistakes');
+    const goalsEl = document.getElementById('nba-goals');
+
+    if (trackEl) trackEl.textContent = nba.track || 'GATE 2027';
+    if (titleEl) titleEl.textContent = (nba.subject ? nba.subject + ' → ' : '') + (nba.action || 'OS Deadlocks');
+    if (whyEl) whyEl.textContent = nba.why || 'Accuracy 48% • Recent mistakes • Smart Revision due • High GATE + interview relevance';
+    if (durEl) durEl.textContent = (nba.estMinutes || 45) + ' min';
+    if (accEl) accEl.textContent = (nba.accuracy || 48) + '%';
+    if (misEl) misEl.textContent = (nba.pendingMistakes || 2) + ' pending';
+    if (goalsEl) goalsEl.textContent = nba.supports || 'GATE + SWE';
+  }
+
+  // 2. Today\'s Plan Spatial Timeline
+  const timelineContainer = document.getElementById('today-timeline-list');
+  const progText = document.getElementById('today-progress-text');
+  const progBar = document.getElementById('today-progress-bar');
+  const tasks = (prep && prep.todayTasks && prep.todayTasks.length) ? prep.todayTasks : [
+    { id: 't1', time: '07:00', topic: 'OS Deadlocks: Banker’s Algorithm', duration: '45m', completed: true, track: 'GATE' },
+    { id: 't2', time: '09:00', topic: 'DSA: Binary Tree Maximum Path Sum', duration: '60m', completed: false, active: true, track: 'SWE' },
+    { id: 't3', time: '18:30', topic: 'DBMS: B+ Tree Insertion & Splitting', duration: '45m', completed: false, track: 'GATE' },
+    { id: 't4', time: '21:00', topic: 'Smart Revision: Spaced Review Queue', duration: '30m', completed: false, track: 'Cross-Goal' }
+  ];
+
+  const doneCount = tasks.filter(t => t.completed).length;
+  if (progText) progText.textContent = doneCount + '/' + tasks.length + ' tasks';
+  if (progBar) progBar.style.width = Math.round((doneCount / Math.max(1, tasks.length)) * 100) + '%';
+
+  if (timelineContainer) {
+    timelineContainer.innerHTML = tasks.map((t, idx) => {
+      const isDone = t.completed;
+      const isActive = !isDone && (t.active || idx === doneCount);
+      return `
+        <div class="timeline-item ${isDone ? 'done' : ''} ${isActive ? 'active' : ''}" style="${isActive ? 'background:rgba(91,91,214,0.06);padding:8px 10px;border-radius:var(--radius-sm);margin:4px 0;' : ''}">
+          <div class="timeline-dot" style="${isDone ? 'background:var(--success);border-color:var(--success);' : isActive ? 'background:var(--primary);border-color:var(--primary);' : 'background:transparent;border-color:var(--text-muted);'}"></div>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:11px;font-weight:700;color:${isActive ? 'var(--primary-light)' : 'var(--text-muted)'};font-family:var(--font-mono);">${t.time || ('0' + (7 + idx * 3) + ':00')}</span>
+              <span style="font-size:10px;padding:1px 6px;border-radius:var(--radius-full);background:rgba(255,255,255,0.05);color:var(--text-muted);">${t.duration || '45m'}</span>
+            </div>
+            <div style="font-size:13px;font-weight:${isActive ? '700' : '500'};color:${isDone ? 'var(--text-muted)' : 'var(--text)'};text-decoration:${isDone ? 'line-through' : 'none'};margin-top:2px;">
+              ${t.topic || (t.subject + ': ' + t.topic)}
+            </div>
+            ${isActive ? `
+              <div style="display:flex;gap:6px;margin-top:8px;">
+                <button onclick="window.FocusSession&&FocusSession.startNBA()" style="font-size:10px;padding:3px 10px;border-radius:4px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:700;">▶ Focus</button>
+                <button onclick="toggleHomeTimelineTask('${t.id}')" style="font-size:10px;padding:3px 8px;border-radius:4px;background:var(--surface-mid);color:var(--text-sub);border:1px solid var(--border-subtle);cursor:pointer;">✓ Done</button>
+              </div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // 3. 3D Readiness Cards (4 Goals: GATE 2027, Placements, SWE, Internships)
+  const readinessContainer = document.getElementById('readiness-orbs-container');
+  if (readinessContainer) {
+    const rData = [
+      { key: 'gate', name: 'GATE 2027', score: 76, color: 'var(--gate-color)', trend: '+4% pace', focus: 'OS: Deadlocks & Paging', action: 'PYQ Practice', view: 'prepare', tab: 'gate' },
+      { key: 'placement', name: 'Placements', score: 78, color: 'var(--placement-color)', trend: '+5% this wk', focus: 'DSA: Trees & Dynamic Prog', action: 'Striver Tracker', view: 'prepare', tab: 'placement' },
+      { key: 'swe', name: 'Software Eng', score: 81, color: 'var(--swe-color)', trend: '+3% quality', focus: 'REST APIs & Distributed Raft', action: 'Launch Lab', view: 'cselabs', tab: null },
+      { key: 'internship', name: 'Internship', score: 68, color: 'var(--intern-color)', trend: '+6% velocity', focus: 'ATS Score & Tech Portfolio', action: 'View Pipeline', view: 'career', tab: 'opportunities' }
+    ];
+
+    readinessContainer.innerHTML = rData.map(r => `
+      <div class="readiness-orb neo-card" onclick="navigateToView('${r.view}','${r.tab}')" style="border-top:3px solid ${r.color};cursor:pointer;">
+        <div class="readiness-orb-ring">
+          <svg viewBox="0 0 36 36">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3.5" />
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="${r.color}" stroke-width="3.5" stroke-dasharray="${r.score}, 100" stroke-linecap="round" />
+          </svg>
+          <div class="readiness-orb-pct" style="color:var(--text);font-family:var(--font-family);">${r.score}%</div>
+        </div>
+        <div class="readiness-orb-label" style="color:${r.color};">${r.name}</div>
+        <div class="readiness-orb-sub">${r.trend}</div>
+        <div style="font-size:10px;color:var(--text-sub);margin-top:8px;line-height:1.3;">
+          <div style="color:var(--text-muted);font-size:9px;text-transform:uppercase;">Focus:</div>
+          <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.focus}</div>
+        </div>
+        <div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border-subtle);font-size:10px;font-weight:700;color:${r.color};">
+          ${r.action} →
+        </div>
+      </div>`).join('');
+  }
+
+  // 4. 3D Skill Graph & Stack (Section 24)
+  if (typeof render3DSkillGraph === 'function') render3DSkillGraph();
+
+  // 5. Weak Areas List
+  const weakList = document.getElementById('weak-topics-list');
+  if (weakList) {
+    const weaks = [
+      { subject: 'OS', topic: 'Deadlocks (Banker’s Algorithm)', accuracy: 48, goal: 'GATE + Placement' },
+      { subject: 'DSA', topic: 'Dynamic Programming on Trees', accuracy: 54, goal: 'SWE' },
+      { subject: 'DBMS', topic: 'Conflict Serializability & 2PL', accuracy: 58, goal: 'GATE' },
+      { subject: 'CN', topic: 'CIDR Subnetting & Supernetting', accuracy: 62, goal: 'Placement' }
+    ];
+    weakList.innerHTML = weaks.map(w => `
+      <div class="weak-topic-pill" onclick="navigateToView('progress','mistakes')" title="Click to open Smart Revision">
+        <span style="font-weight:700;color:var(--text);">${w.subject}: ${w.topic}</span>
+        <span class="weak-accuracy-badge">${w.accuracy}% Acc</span>
+        <span style="font-size:10px;color:var(--text-muted);">(${w.goal})</span>
+      </div>`).join('');
+  }
+};
+
+window.renderHomeDashboard = window.renderHomeView;
+
+window.toggleHomeTimelineTask = function (id) {
+  if (typeof showToast === 'function') showToast('Task marked as completed! 🎉', 'success');
+  if (typeof renderHomeView === 'function') renderHomeView();
+};
+
