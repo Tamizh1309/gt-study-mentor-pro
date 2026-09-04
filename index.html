@@ -610,39 +610,7 @@
   </div>
 </div>
 
-<!-- Hidden legacy button anchors (preserve JS references) -->
-<div style="display:none;" aria-hidden="true">
-  <button id="cal-prev"></button>
-  <button id="cal-next"></button>
-  <button id="mark-leave-btn"></button>
-  <button id="mark-exam-btn"></button>
-  <button id="mark-clear-btn"></button>
-  <button id="nav-chat-btn" onclick="navigateToView('mentor')"></button>
-  <button id="nav-eval-btn" onclick="navigateToView('progress')"></button>
-  <button id="nav-map-btn" onclick="navigateToView('career','opportunities')"></button>
-</div>
 
-<div class="modal-overlay" id="profile-modal">
-  <div class="modal">
-    <button class="modal-close" data-close="profile-modal">✕</button>
-    <div class="modal-title">👤 Student Profile</div>
-    <div class="modal-subtitle">Unga info save pannunga — mentor personalize aagum da!</div>
-
-    <div class="profile-avatar-selector">
-      <div class="avatar-label">Choose Your Avatar</div>
-      <div class="avatar-grid" id="avatar-grid">
-        <button class="avatar-opt selected" data-emoji="&#x1F9D1;&#x200D;&#x1F4BB;">&#x1F9D1;&#x200D;&#x1F4BB;</button>
-        <button class="avatar-opt" data-emoji="Ã°Å¸â€˜Â¨">Ã°Å¸â€˜Â¨</button>
-        <button class="avatar-opt" data-emoji="Ã°Å¸â€˜Â©">Ã°Å¸â€˜Â©</button>
-        <button class="avatar-opt" data-emoji="&#x1F9D1;&#x200D;&#x1F4BB;">&#x1F9D1;&#x200D;&#x1F4BB;</button>
-        <button class="avatar-opt" data-emoji="Ã°Å¸â€˜Â¨Ã¢â‚¬ÂÃ°Å¸Å½â€œ">Ã°Å¸â€˜Â¨Ã¢â‚¬ÂÃ°Å¸Å½â€œ</button>
-        <button class="avatar-opt" data-emoji="Ã°Å¸â€˜Â©Ã¢â‚¬ÂÃ°Å¸Å½â€œ">Ã°Å¸â€˜Â©Ã¢â‚¬ÂÃ°Å¸Å½â€œ</button>
-        <button class="avatar-opt" data-emoji="🚀">🚀</button>
-        <button class="avatar-opt" data-emoji="Ã°Å¸Â¦Â¾">Ã°Å¸Â¦Â¾</button>
-        <button class="avatar-opt" data-emoji="&#x1F9E0;">&#x1F9E0;</button>
-        <button class="avatar-opt" data-emoji="⚡">⚡</button>
-      </div>
-    </div>
 
     <div class="progress-form">
       <div class="form-group">
@@ -1826,20 +1794,9 @@ WHERE p.package_lpa >= 10.0;</textarea>
   <div id="gate-countdown-sub"></div>
   <div id="countdown-progress-bar"></div>
   <div id="pomodoro-display"></div>
-  <button id="pomo-start-btn"></button>
-  <button id="pomo-reset-btn"></button>
-  <button id="pomo-skip-btn"></button>
-  <button id="clear-chat-btn"></button>
-  <button id="quick-ask-btn"></button>
-  <button id="cal-prev"></button>
-  <button id="cal-next"></button>
-  <button id="mark-leave-btn"></button>
-  <button id="mark-exam-btn"></button>
-  <button id="mark-clear-btn"></button>
-  <button id="nav-chat-btn"></button>
-  <button id="nav-eval-btn"></button>
-  <button id="nav-map-btn"></button>
-</div>
+  <button id="pomo-reset-btn" style="display:none;"></button>
+  <button id="pomo-skip-btn" style="display:none;"></button>
+  <button id="quick-ask-btn" style="display:none;"></button>
 
 <div class="modal-overlay" id="mock-interview-modal">
   <div class="modal modal-tall" style="max-width: 960px;">
@@ -2328,9 +2285,9 @@ Execution Time: 2.4ms</pre>
 </div>
 
 <!-- ─── WAVE 2 — FEATURE 4: WEEKLY PDF REPORT GENERATOR ─── -->
-<div class="modal-overlay" id="weekly-report-modal">
+<div class="modal-overlay" id="weekly-pdf-export-modal">
   <div class="modal modal-tall" style="max-width:780px;">
-    <button class="modal-close" data-close="weekly-report-modal">&#x2715;</button>
+    <button class="modal-close" data-close="weekly-pdf-export-modal">&#x2715;</button>
     <div class="modal-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
       <div style="display:flex; align-items:center; gap:10px;">
         <span>📊</span> Weekly PDF Report Generator
@@ -3571,8 +3528,9 @@ function solve(arr) {
 
 <script src="project3D.js"></script>
 <script src="app.js"></script>
-<script src="app_v2.js"></script>
-<script src="career.js" onerror="console.warn('career.js not yet present')"></script>
+
+<script src="career.js"></script>
+<script src="labs.js" onerror="console.warn('career.js not yet present')"></script>
 <script src="focusSession.js" onerror="console.warn('focusSession.js not yet present')"></script>
 </body>
 </html>
