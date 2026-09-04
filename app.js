@@ -8365,8 +8365,7 @@ window.CommandPalette = (function () {
     { id: 'find-company', label: 'Find Company', sub: 'Browse the opportunity board', icon: '\uD83C\uDFE2', kbd: 'Alt+C', action: () => { navigateToView('career','companies'); } },
     { id: 'add-application', label: 'Add Application', sub: 'Track a new job application', icon: '\uD83D\uDCE8', kbd: 'Alt+P', action: () => { navigateToView('career','applications'); } },
     { id: 'open-resume', label: 'Open Resume Optimizer', sub: 'ATS checker and optimization', icon: '\uD83D\uDCC4', kbd: 'Alt+V', action: () => { openModal('resume-ats-modal'); } },
-    { id: 'pomodoro', label: 'Start Pomodoro', sub: '25-minute focus timer', icon: '\u23F1\uFE0F', kbd: 'Alt+O', action: () => { openModal('pomodoro-modal'); } },
-    { id: 'gate-predictor', label: 'GATE Rank Predictor', sub: 'Estimate your rank (not guaranteed)', icon: '\uD83C\uDFC6', kbd: '', action: () => { openModal('gate-predictor-modal'); } }
+    { id: 'gate-readiness', label: 'GATE Preparation Readiness', sub: 'Inspect syllabus coverage & PYQ factor analysis', icon: '⚡', kbd: 'Alt+G', action: () => { navigateToView('progress','readiness'); } }
   ];
 
   let filtered = [...COMMANDS];

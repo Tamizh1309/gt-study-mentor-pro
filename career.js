@@ -618,6 +618,120 @@ const CareerModule = (function () {
     renderApplications('career-content-area');
   }
 
+  function startCompanySprint(name) {
+    if (window.FocusSession) {
+      FocusSession.start(name + ' — Day 1 Sprint', 'Begin the 7-day intensive company preparation sprint.', 45);
+    } else if (typeof showToast === 'function') {
+      showToast('Started 7-Day Sprint for ' + name + '!', 'success');
+    }
+  }
+
+  // ── 6. Company Preparation Mode (Section 32 & 34) ──
+  function renderCompanies(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const companies = [
+      {
+        name: 'Zoho Corporation',
+        role: 'Software Developer',
+        readiness: 74,
+        strong: ['C/C++ Programming', 'DBMS & SQL', 'Recursion & Trees'],
+        needsWork: ['Complex Matrix Manipulation', 'System Design Basics'],
+        sprint: [
+          'Day 1 → C Pointers & Dynamic Memory Allocation',
+          'Day 2 → Matrix Manipulation & 2D Arrays',
+          'Day 3 → String Algorithms (Substrings & Palindromes)',
+          'Day 4 → Binary Search Trees & Graph Traversals',
+          'Day 5 → DBMS SQL Queries, Joins & Normalization',
+          'Day 6 → Zoho Pattern Mock Technical Interview',
+          'Day 7 → Full Zoho Coding Round Simulation & Review'
+        ]
+      },
+      {
+        name: 'TCS Digital',
+        role: 'Digital Systems Engineer',
+        readiness: 82,
+        strong: ['Quantitative Aptitude', 'Computer Networks', 'Array Algorithms'],
+        needsWork: ['Advanced Dynamic Programming', 'Graph Shortest Paths'],
+        sprint: [
+          'Day 1 → Number Systems & Time-Speed-Distance Drills',
+          'Day 2 → Advanced Array Manipulations & Hashing',
+          'Day 3 → Computer Networks Subnetting & Routing',
+          'Day 4 → Stack, Queue & Linked List Interview PYQs',
+          'Day 5 → Dynamic Programming 0/1 Knapsack & Memoization',
+          'Day 6 → TCS Digital Mock Coding Assessment',
+          'Day 7 → Bar-Raiser Technical & Behavioral Prep'
+        ]
+      },
+      {
+        name: 'Amazon / Product Unicorns',
+        role: 'SDE-1 / Summer Intern',
+        readiness: 68,
+        strong: ['Data Structures & Algorithms', 'Object-Oriented Design', 'Git'],
+        needsWork: ['High-Level System Design (HLD)', 'Concurrency & Distributed Consensus'],
+        sprint: [
+          'Day 1 → Two Pointers & Sliding Window LeetCode Patterns',
+          'Day 2 → Trees, Tries & Heap Optimization',
+          'Day 3 → Graphs (BFS, DFS, Dijkstra, Topo Sort)',
+          'Day 4 → Dynamic Programming on Grids & Strings',
+          'Day 5 → Distributed Systems (Raft Consensus & Caching)',
+          'Day 6 → SDE-1 Bar Raiser Mock Technical Interview',
+          'Day 7 → Leadership Principles & Behavioral STAR Studio'
+        ]
+      }
+    ];
+
+    container.innerHTML = `
+      <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text);">Company Preparation Mode</div>
+          <div style="font-size:12px;color:var(--text-sub);">Tailored 7-Day Sprints &amp; Evidence-Based Readiness (No fake probabilities)</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;">
+        ${companies.map(c => `
+          <div class="nd-card neo-card" style="padding:22px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+              <div>
+                <div style="font-size:16px;font-weight:800;color:var(--text);">${c.name}</div>
+                <div style="font-size:12px;color:var(--text-muted);">${c.role}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:22px;font-weight:900;color:${c.readiness>=75?'var(--success)':'var(--warning)'};font-family:var(--font-display);">${c.readiness}%</div>
+                <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Readiness</div>
+              </div>
+            </div>
+
+            <div style="margin-bottom:12px;">
+              <div style="font-size:11px;font-weight:700;color:var(--success);margin-bottom:4px;">✓ Strong Areas:</div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                ${c.strong.map(s => `<span class="skill-have-tag">${s}</span>`).join('')}
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:4px;">△ Needs Work:</div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                ${c.needsWork.map(s => `<span class="skill-gap-tag">${s}</span>`).join('')}
+              </div>
+            </div>
+
+            <div style="padding:12px;background:var(--depth-4);border-radius:10px;border:1px solid var(--border-subtle);margin-bottom:14px;">
+              <div style="font-size:11px;font-weight:800;color:var(--primary-light);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">⚡ 7-Day Sprint Blueprint:</div>
+              <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--text-sub);">
+                ${c.sprint.map(s => `<div>• ${s}</div>`).join('')}
+              </div>
+            </div>
+
+            <button onclick="CareerModule.startCompanySprint('${c.name}')" class="submit-btn" style="width:100%;padding:10px;font-size:12px;">
+              ▶ Start 7-Day Sprint
+            </button>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
   return {
     getOpportunities: () => state.opportunities,
     getApplications: () => state.applications,
@@ -626,6 +740,8 @@ const CareerModule = (function () {
     renderProjects,
     renderApplications,
     renderInterviews,
+    renderCompanies,
+    startCompanySprint,
     moveOpportunity,
     promptAddOpportunity,
     removeApplication,
@@ -637,4 +753,43 @@ const CareerModule = (function () {
 
 if (typeof window !== 'undefined') {
   window.CareerModule = CareerModule;
+
+  window.switchCareerTab = function (tab) {
+    document.querySelectorAll('#view-career .tab-pill').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    const btn = document.getElementById('ctab-' + tab);
+    if (btn) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+    }
+
+    if (tab === 'opportunities') CareerModule.renderOpportunityBoard('career-content-area');
+    else if (tab === 'projects') CareerModule.renderProjects('career-content-area');
+    else if (tab === 'applications') CareerModule.renderApplications('career-content-area');
+    else if (tab === 'interviews') CareerModule.renderInterviews('career-content-area');
+    else if (tab === 'companies') CareerModule.renderCompanies('career-content-area');
+    else if (tab === 'resume') {
+      const el = document.getElementById('career-content-area');
+      if (el) {
+        el.innerHTML = `
+          <div class="nd-card neo-card" style="padding:24px;max-width:720px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div>
+                <div style="font-size:16px;font-weight:800;color:var(--text);">ATS Resume Readiness Checklist</div>
+                <div style="font-size:12px;color:var(--text-sub);">Heuristic review for SDE and Systems roles</div>
+              </div>
+              <button onclick="openModal('resume-ats-modal')" class="submit-btn" style="padding:8px 18px;font-size:12px;">Launch ATS Scanner</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--text);">
+              <div style="padding:10px;background:var(--surface);border-radius:8px;border-left:3px solid var(--success);">✓ 3 High-Impact Action Verbs identified (Engineered, Benchmarked, Designed)</div>
+              <div style="padding:10px;background:var(--surface);border-radius:8px;border-left:3px solid var(--success);">✓ GitHub Repository and Live Demo URLs verified</div>
+              <div style="padding:10px;background:var(--surface);border-radius:8px;border-left:3px solid var(--success);">✓ Core CS Coursework (OS, DBMS, CN, DSA) highlighted</div>
+              <div style="padding:10px;background:var(--surface);border-radius:8px;border-left:3px solid var(--warning);">△ Missing cloud deployment link (AWS/Vercel/Render) for Web Project</div>
+            </div>
+          </div>`;
+      }
+    }
+  };
 }
