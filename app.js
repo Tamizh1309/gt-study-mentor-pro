@@ -3457,38 +3457,6 @@ function renderAnalyticsModal() {
 }
 document.getElementById('open-analytics-btn')?.addEventListener('click', () => { openModal('analytics-modal'); renderAnalyticsModal(); });
 
-// ── GATE SCORE PREDICTOR ───────────────────────────────────────
-const GATE_CUTOFF = [
-  {college:'IIT Bombay CSE',cutoff:820},{college:'IIT Delhi CSE',cutoff:815},{college:'IIT Madras CSE',cutoff:810},
-  {college:'IIT Kharagpur CSE',cutoff:790},{college:'IIT Kanpur CSE',cutoff:780},{college:'IIT Roorkee CSE',cutoff:760},
-  {college:'IIT Hyderabad CSE',cutoff:730},{college:'NIT Trichy CSE',cutoff:720},{college:'NIT Warangal CSE',cutoff:710},
-  {college:'NIT Surathkal CSE',cutoff:695},{college:'IIIT Hyderabad CSE',cutoff:680},{college:'IIIT Allahabad IT',cutoff:650},
-  {college:'NIT Calicut CSE',cutoff:640},{college:'NIT Durgapur CSE',cutoff:610},{college:'PSG Tech Coimbatore',cutoff:580},
-];
-document.getElementById('open-predictor-btn')?.addEventListener('click', () => openModal('predictor-modal'));
-document.getElementById('run-predictor-btn')?.addEventListener('click', () => {
-  const mockScore = parseFloat(document.getElementById('predictor-mock-score')?.value || 0);
-  const mockCount = parseInt(document.getElementById('predictor-mock-count')?.value || 1);
-  const accuracy = parseFloat(document.getElementById('predictor-accuracy')?.value || 50);
-  const monthsLeft = parseInt(document.getElementById('predictor-months-left')?.value || 3);
-  if (!mockScore || mockScore < 1) { showToast('Enter your mock score da!', 'error', '❌'); return; }
-  const pred = Math.min(100, Math.max(10, mockScore + (accuracy - 50) * 0.3 + monthsLeft * 2.5 + Math.min(8, mockCount * 1.5)));
-  const gateScore = Math.round(pred * 10);
-  const percentile = Math.min(99.9, (pred / 100) * 92 + 6);
-  const airLow = Math.max(1, Math.round((1 - (percentile + 1.5) / 100) * 120000));
-  const airHigh = Math.max(airLow + 100, Math.round((1 - (percentile - 1) / 100) * 120000));
-  const resultEl = document.getElementById('predictor-result');
-  if (!resultEl) return;
-  const colleges = GATE_CUTOFF.map(c => {
-    const sc = gateScore >= c.cutoff + 20 ? 'college-safe' : gateScore >= c.cutoff ? 'college-border' : 'college-reach';
-    const sl = gateScore >= c.cutoff + 20 ? '✅ Safe' : gateScore >= c.cutoff ? '⚠️ Border' : '❌ Reach';
-    return '<div class="college-item"><span class="college-name">' + c.college + '</span><span class="college-cutoff ' + sc + '">' + sl + ' (' + c.cutoff + ')</span></div>';
-  }).join('');
-  resultEl.style.display = 'block';
-  resultEl.innerHTML = '<div class="predictor-score-big">' + pred.toFixed(1) + '</div><div class="predictor-rank-range">GATE Score: ' + gateScore + '/1000 | AIR: ' + airLow.toLocaleString() + ' – ' + airHigh.toLocaleString() + '</div><div style="font-size:12px;color:var(--text-sub);margin-bottom:12px;">Based on ' + mockCount + ' mock(s), ' + accuracy + '% accuracy, ' + monthsLeft + ' months left.</div><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;">College Eligibility</div><div class="college-list">' + colleges + '</div>';
-  addXP(10, 'Used GATE Score Predictor');
-  trackTodayXP(10);
-});
 
 // ── AI DOUBT SOLVER ────────────────────────────────────────────
 document.getElementById('open-doubt-solver-btn')?.addEventListener('click', () => openModal('doubt-solver-modal'));
@@ -6727,14 +6695,6 @@ function switchUnifiedTrack(trackId) {
 
 window.switchUnifiedTrack = switchUnifiedTrack;
 
-function switchGateTrackSub(sub) {
-  document.getElementById('gate-sub-formulas').style.display = sub === 'formulas' ? 'block' : 'none';
-  document.getElementById('gate-sub-predictor').style.display = sub === 'predictor' ? 'block' : 'none';
-  document.getElementById('gate-tab-formulas')?.classList.toggle('active', sub === 'formulas');
-  document.getElementById('gate-tab-predictor')?.classList.toggle('active', sub === 'predictor');
-}
-
-window.switchGateTrackSub = switchGateTrackSub;
 
 function renderPuzzlesList() {
   const container = document.getElementById('track-puzzles-list');
