@@ -345,7 +345,7 @@
       console.warn('[GT JARVIS] Offline or server error, using resilient client fallback:', err);
       // Resilient client fallback
       const fallbackReply = generateClientFallback(cleanText, state.mode);
-      appendChatMessage('assistant', fallbackReply.text, fallbackReply.action);
+      appendChatMessage('assistant', fallbackReply.text, fallbackReply.action, null, true);
       if (state.voiceEnabled) speak(fallbackReply.spoken);
       if (fallbackReply.action) executeSafeAction(fallbackReply.action);
       setStatus('IDLE');
@@ -529,33 +529,65 @@
   }
 
   // ──────────────────────────────────────────────────────────────────────────
-  // 8. Resilient Client Fallback (Zero Downtime)
+  // 8. Resilient Client Fallback (Zero Downtime & Bilingual Tanglish)
   // ──────────────────────────────────────────────────────────────────────────
   function generateClientFallback(prompt, mode) {
     const lower = prompt.toLowerCase();
     const ctx = collectLocalStudentContext();
 
-    if (/focus|study|timer/i.test(lower)) {
+    // Tanglish / English Study Planning & Next Action
+    if (/(enna\s*padikanum|what\s*(should\s*i|to)\s*study|plan\s*my\s*day|next\s*action)/i.test(lower)) {
       return {
-        text: "Starting a 45-minute focus session for you now. Maintain your flow and avoid interruptions!",
-        spoken: "Starting a 45-minute focus session now.",
-        action: { type: 'start_focus', params: { duration: 45, topic: 'Deep Focus Block' } }
+        text: "Kandippa! Based on your current Day " + ctx.day + " zero-state roadmap, start with your Next Best Action on Home or launch a 45-minute focus session on core DSA/GATE concepts.",
+        spoken: "Based on your 90-day trajectory, let's start with your high-leverage Next Best Action now.",
+        action: { type: 'show_progress' }
       };
     }
 
-    if (/dsa|code|algorithm/i.test(lower)) {
+    // Tanglish / English Focus session
+    if (/(focus|study|timer|focus\s*start\s*pannu|\d+\s*mins?\s*focus)/i.test(lower)) {
+      const match = lower.match(/(\d+)\s*mins?/);
+      const mins = match ? parseInt(match[1], 10) : 45;
       return {
-        text: "Opening your DSA practice workspace. Remember to verify time complexity and test edge cases before submitting.",
+        text: `Starting a ${mins}-minute focused deep work session da! Keep distractions away and focus completely.`,
+        spoken: `Starting a ${mins} minute focus session now.`,
+        action: { type: 'start_focus', params: { duration: mins, topic: 'Deep Focus Block' } }
+      };
+    }
+
+    // Tanglish / English Mistakes
+    if (/(mistakes?\s*kaatu|show\s*(my\s*)?mistakes?|unresolved|review\s*mistakes?)/i.test(lower)) {
+      return {
+        text: "Opening your Mistake Book & Smart Revision queue. Reviewing confident errors is the fastest way to master concepts!",
+        spoken: "Opening your Mistake Book and Smart Revision queue.",
+        action: { type: 'open_revision' }
+      };
+    }
+
+    // Tanglish / English Interview practice
+    if (/(interview\s*practice|interview\s*practice\s*pannalama|mock\s*interview)/i.test(lower)) {
+      return {
+        text: "Sure da! Launching the AI Mock Interview Studio with SDE-1, GATE Oral, and HR STAR tracks.",
+        spoken: "Launching the AI Mock Interview Studio now.",
+        action: { type: 'start_interview' }
+      };
+    }
+
+    // Tanglish / English DSA practice
+    if (/(dsa|code|algorithm|dsa\s*practice)/i.test(lower)) {
+      return {
+        text: "Opening your DSA practice arena. Focus on two-pointers, sliding window, and graph traversals with Socratic guidance.",
         spoken: "Opening your DSA practice workspace.",
         action: { type: 'open_dsa' }
       };
     }
 
-    if (/revision|mistake/i.test(lower)) {
+    // "I'm stuck" / "stuck" workflow
+    if (/(stuck|i'm\s*stuck|help\s*me\s*debug|stuck\s*aagiten)/i.test(lower)) {
       return {
-        text: "Navigating to your Smart Revision queue. Regular active recall prevents memory decay.",
-        spoken: "Opening your Smart Revision queue.",
-        action: { type: 'open_revision' }
+        text: "No worries da! Take a breath. Step 1: Write down small input test cases on paper. Step 2: Check boundary conditions (empty array, single element, negative numbers). Let's solve it step by step!",
+        spoken: "Don't worry. Check your edge cases and boundary conditions first. Let's break down the problem.",
+        action: null
       };
     }
 
@@ -574,7 +606,7 @@
       };
     }
 
-    if (/weak|weakness|struggle/i.test(lower)) {
+    if (/weak|weakness|struggle|weak\s*ah\s*iruken/i.test(lower)) {
       return {
         text: "I don't have enough tracked practice or quiz data yet to identify a weak topic. Complete practice questions or a diagnostic quiz to build evidence.",
         spoken: "I don't have enough tracked data yet to identify a weak area. Start your first practice session to begin tracking.",
@@ -594,7 +626,7 @@
   // ──────────────────────────────────────────────────────────────────────────
   // 9. UI Chat Message Renderer
   // ──────────────────────────────────────────────────────────────────────────
-  function appendChatMessage(role, text, action = null, intent = null) {
+  function appendChatMessage(role, text, action = null, intent = null, isOfflineFallback = false) {
     const container = document.getElementById('chat-messages');
     if (!container) return;
 
@@ -615,6 +647,10 @@
         actionBadge = `<div class="jarvis-action-tag">⚡ Action Executed: <strong>${action.type.replace('_', ' ').toUpperCase()}</strong></div>`;
       }
 
+      const offlineTag = isOfflineFallback 
+        ? `<span style="font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(56,189,248,0.15);color:var(--accent);border:1px solid rgba(56,189,248,0.3);font-weight:700;">LOCAL INTELLIGENCE ACTIVE</span>`
+        : '';
+
       // Format markdown-like bold and line breaks
       const formatted = escapeHtml(text)
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -623,9 +659,10 @@
 
       bubble.innerHTML = `
         <div class="chat-text">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
             <span style="font-weight:800;font-size:12px;color:var(--primary-light);letter-spacing:0.5px;">GT JARVIS</span>
             <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(91,91,214,0.2);color:var(--primary-light);">${state.mode.toUpperCase()}</span>
+            ${offlineTag}
           </div>
           <p style="margin:0;">${formatted}</p>
           ${actionBadge}

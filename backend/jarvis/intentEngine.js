@@ -25,7 +25,9 @@ const INTENT_RULES = [
       /focus\s+session/i,
       /let('s|s)?\s+study/i,
       /study\s+for\s+\d+\s*(mins?|minutes?|hours?)/i,
-      /start\s+\d+\s*(mins?|minutes?)/i
+      /start\s+\d+\s*(mins?|minutes?)/i,
+      /focus\s*(start\s*)?pannu/i,
+      /\d+\s*mins?\s*focus/i
     ],
     extractParams: (text) => {
       const durationMatch = text.match(/(\d+)\s*(mins?|minutes?)/i);
@@ -88,7 +90,8 @@ const INTENT_RULES = [
     category: 'career_request',
     patterns: [
       /(start|take|launch|conduct|practice)\s+(a\s+)?(mock\s+interview|interview)/i,
-      /interview\s+me/i
+      /interview\s+me/i,
+      /interview\s*practice\s*pannalama/i
     ],
     extractParams: () => ({ action: 'mock_interview' })
   },
@@ -123,7 +126,9 @@ const INTENT_RULES = [
     patterns: [
       /(what\s+should\s+i\s+study|plan\s+my\s+day|create\s+a\s+study\s+plan|what\s+should\s+i\s+do\s+next)/i,
       /plan\s+today/i,
-      /next\s+best\s+action/i
+      /next\s+best\s+action/i,
+      /(da\s+)?enna\s+padikanum/i,
+      /today\s*plan\s*pannu/i
     ],
     extractParams: () => ({ action: 'generate_plan' })
   },
@@ -139,7 +144,9 @@ const INTENT_RULES = [
     intent: 'REVIEW_MISTAKES',
     category: 'application_command',
     patterns: [
-      /(mistake\s+book|review\s+mistakes?|my\s+errors?|unresolved\s+mistakes?)/i
+      /(mistake\s+book|review\s+mistakes?|my\s+errors?|unresolved\s+mistakes?)/i,
+      /(enoda\s+)?mistakes?\s*kaatu/i,
+      /mistakes?\s*review\s*pannu/i
     ],
     extractParams: () => ({ view: 'progress', tab: 'mistakes' })
   },
