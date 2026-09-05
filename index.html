@@ -246,29 +246,56 @@
 
     <!-- HOME VIEW -->
     <section class="view-panel active" id="view-home" aria-label="Home Dashboard">
-      <!-- Editorial Hero Section -->
-      <div class="editorial-hero-wrap">
-        <div class="editorial-hero-tag">
-          <span class="pulse-dot"></span>
-          <span id="home-day-label">Day 0 / 90 &bull; Preparation Zero-State &amp; Setup</span>
+      <!-- Editorial Hero Section (Ideogram-Inspired V5 Composition) -->
+      <div class="editorial-hero-wrap" id="editorial-hero">
+        <!-- Top Editorial Brand Bar -->
+        <div class="editorial-brand-bar">
+          <div class="editorial-brand-left">
+            <span class="editorial-brand-title">GT STUDY MENTOR PRO</span>
+            <span class="editorial-brand-separator">&bull;</span>
+            <span class="editorial-brand-day" id="home-day-label">Day 0 / 90 &bull; Orientation Zero-State</span>
+          </div>
+          <div class="editorial-brand-right" id="hero-jarvis-indicator" onclick="window.openJarvisModal?openJarvisModal():(window.toggleJarvisVoice&&toggleJarvisVoice())" role="button" tabindex="0" title="Click to interact with JARVIS">
+            <span class="pulse-dot-jarvis" id="hero-jarvis-dot"></span>
+            <span class="editorial-brand-jarvis" id="hero-jarvis-status">JARVIS &bull; IDLE</span>
+          </div>
         </div>
-        <h1 class="editorial-hero-title">
-          You don't need another schedule.<br>
-          <span class="editorial-highlight">You need to know what matters next.</span>
-        </h1>
-        <p class="editorial-hero-sub" id="home-greeting-full">
-          Good <span id="home-time-greeting">Day</span>, <span id="home-name">Student</span>. GT Study Mentor Pro is your 90-day career preparation operating system for GATE 2027, Placements, SWE &amp; Internships.
-        </p>
-        <div class="editorial-hero-ctas">
-          <button class="cta-pill-primary" onclick="window.openDay0Onboarding&&openDay0Onboarding()" id="hero-start-btn">
-            <span>🚀</span> <span>Start Day 0</span>
-          </button>
-          <button class="cta-pill-secondary" onclick="window.openJarvisModal&&openJarvisModal()" id="hero-jarvis-btn">
-            <span>🎙️</span> <span>Talk to JARVIS</span>
-          </button>
-          <div class="home-phase-badge" style="margin-left:auto;">
-            <span>🏆</span>
-            <span id="home-phase-text">Orientation &bull; Day 0 Zero-State &bull; 0% Complete</span>
+
+        <!-- Main Editorial Grid: Content on Left, 3D Core HUD on Right -->
+        <div class="editorial-hero-grid">
+          <!-- Left Column: Typography & CTAs -->
+          <div class="editorial-hero-content">
+            <h1 class="editorial-hero-title">
+              PREPARE SMARTER.<br>
+              <span class="editorial-highlight">KNOW WHAT MATTERS NEXT.</span>
+            </h1>
+            <p class="editorial-hero-sub" id="home-greeting-full">
+              JARVIS understands your goals, decides what matters, and helps you act.
+            </p>
+            <div class="editorial-hero-ctas">
+              <button class="cta-pill-primary" onclick="window.executeNbaAction?executeNbaAction():window.openDay0Onboarding&&openDay0Onboarding()" id="hero-start-btn">
+                <span>🚀</span> <span>START DAY 0</span>
+              </button>
+              <button class="cta-pill-secondary" onclick="window.openJarvisModal?openJarvisModal():(window.toggleJarvisVoice&&toggleJarvisVoice())" id="hero-jarvis-btn">
+                <span>🎙️</span> <span>TALK TO JARVIS</span>
+              </button>
+              <div class="home-phase-badge" style="margin-left:auto;">
+                <span>🏆</span>
+                <span id="home-phase-text">Orientation &bull; Day 0 Zero-State &bull; 0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Integrated 3D JARVIS HUD Core -->
+          <div class="hero-jarvis-hud-col" id="hero-jarvis-hud" onclick="window.openJarvisModal?openJarvisModal():(window.toggleJarvisVoice&&toggleJarvisVoice())" role="button" tabindex="0" title="Click to talk with GT JARVIS">
+            <div class="hero-jarvis-canvas-wrap">
+              <canvas id="jarvis-3d-canvas" width="220" height="220" class="hero-jarvis-canvas" aria-label="JARVIS 3D Core HUD"></canvas>
+            </div>
+            <div class="hero-jarvis-hud-label">
+              <span class="hero-hud-icon">◉</span>
+              <span class="hero-hud-title">JARVIS CORE</span>
+              <span class="hero-hud-state" id="hero-jarvis-state-label">IDLE</span>
+            </div>
           </div>
         </div>
       </div>

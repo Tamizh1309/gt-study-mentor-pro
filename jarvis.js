@@ -267,6 +267,21 @@
     if (orb) {
       orb.setAttribute('data-status', newStatus.toLowerCase());
     }
+
+    // Synchronize V5 Editorial Hero HUD indicators
+    const heroStatus = document.getElementById('hero-jarvis-status');
+    const heroStateLabel = document.getElementById('hero-jarvis-state-label');
+    const heroDot = document.getElementById('hero-jarvis-dot');
+
+    if (heroStatus) {
+      heroStatus.textContent = `JARVIS • ${newStatus}`;
+    }
+    if (heroStateLabel) {
+      heroStateLabel.textContent = newStatus;
+    }
+    if (heroDot) {
+      heroDot.className = `pulse-dot-jarvis status-${newStatus.toLowerCase()}`;
+    }
   }
 
   function updateVoiceStatusBanner(msg) {
@@ -637,11 +652,17 @@
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    let width = canvas.width = 240;
-    let height = canvas.height = 240;
+    let width = canvas.width = 220;
+    let height = canvas.height = 220;
 
     let angle = 0;
     let pulse = 0;
+
+    canvas.style.cursor = 'pointer';
+    canvas.onclick = (e) => {
+      e.stopPropagation();
+      toggleListening();
+    };
 
     function render() {
       ctx.clearRect(0, 0, width, height);
@@ -649,9 +670,27 @@
       const cx = width / 2;
       const cy = height / 2;
 
-      angle += 0.02;
-      pulse += 0.04;
-      const pulseFactor = Math.sin(pulse) * 4;
+      const isReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!isReducedMotion) {
+        if (state.status === 'PROCESSING') {
+          angle += 0.045;
+          pulse += 0.05;
+        } else if (state.status === 'SPEAKING') {
+          angle += 0.025;
+          pulse += 0.08;
+        } else if (state.status === 'LISTENING') {
+          angle += 0.015;
+          pulse += 0.05;
+        } else {
+          angle += 0.015;
+          pulse += 0.035;
+        }
+      } else {
+        angle = 0;
+        pulse = 0;
+      }
+
+      const pulseFactor = isReducedMotion ? 0 : Math.sin(pulse) * 4;
 
       // Color scheme based on state (Cinematic Editorial Palette)
       let mainColor = '#38BDF8'; // Soft Cyan (IDLE)
@@ -671,12 +710,12 @@
       }
 
       // 1. Outer Ambient Glow
-      const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 80 + pulseFactor);
+      const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 75 + pulseFactor);
       grad.addColorStop(0, glowColor);
       grad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(cx, cy, 85 + pulseFactor, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 80 + pulseFactor, 0, Math.PI * 2);
       ctx.fill();
 
       // 2. Outer Orbital Ring (Clockwise)
@@ -687,7 +726,7 @@
       ctx.lineWidth = 2;
       ctx.setLineDash([14, 8, 4, 8]);
       ctx.beginPath();
-      ctx.arc(0, 0, 68, 0, Math.PI * 2);
+      ctx.arc(0, 0, 64, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
 
@@ -699,7 +738,7 @@
       ctx.lineWidth = 1.5;
       ctx.setLineDash([8, 12]);
       ctx.beginPath();
-      ctx.arc(0, 0, 52, 0, Math.PI * 2);
+      ctx.arc(0, 0, 48, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
 
@@ -709,10 +748,10 @@
         for (let i = 0; i < barCount; i++) {
           const barAngle = (i / barCount) * Math.PI * 2 + angle;
           const waveHeight = (Math.sin(pulse * 2 + i) * 0.5 + 0.5) * 16 + 4;
-          const x1 = cx + Math.cos(barAngle) * 38;
-          const y1 = cy + Math.sin(barAngle) * 38;
-          const x2 = cx + Math.cos(barAngle) * (38 + waveHeight);
-          const y2 = cy + Math.sin(barAngle) * (38 + waveHeight);
+          const x1 = cx + Math.cos(barAngle) * 36;
+          const y1 = cy + Math.sin(barAngle) * 36;
+          const x2 = cx + Math.cos(barAngle) * (36 + waveHeight);
+          const y2 = cy + Math.sin(barAngle) * (36 + waveHeight);
 
           ctx.strokeStyle = mainColor;
           ctx.lineWidth = 2;
@@ -725,7 +764,7 @@
 
       // 5. Central Solid Glowing Core
       ctx.beginPath();
-      ctx.arc(cx, cy, 26 + pulseFactor * 0.5, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 24 + pulseFactor * 0.5, 0, Math.PI * 2);
       ctx.fillStyle = mainColor;
       ctx.shadowColor = mainColor;
       ctx.shadowBlur = 18;
@@ -734,7 +773,7 @@
 
       // 6. Core Inner Highlight
       ctx.beginPath();
-      ctx.arc(cx - 6, cy - 6, 8, 0, Math.PI * 2);
+      ctx.arc(cx - 5, cy - 5, 7, 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
       ctx.fill();
 
@@ -814,6 +853,8 @@
     setMode,
     getState: () => ({ ...state })
   };
+
+  window.toggleJarvisVoice = toggleListening;
 
   // Connect global sendMessage
   window.sendMessage = function() {

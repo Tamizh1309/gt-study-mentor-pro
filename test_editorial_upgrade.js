@@ -31,20 +31,22 @@ let executablePath = edgePaths.find(p => fs.existsSync(p));
       if (msg.type() === 'error') console.log('[Browser Error]', msg.text());
     });
 
-    console.log('Loading app on http://localhost:3000/?reset=true...');
-    await page.goto('http://localhost:3000/?reset=true', { waitUntil: 'networkidle2' });
-    await new Promise(r => setTimeout(r, 1200));
+    console.log('Loading app on http://localhost:3000...');
+    await page.goto('http://localhost:3000', { waitUntil: 'load', timeout: 30000 });
+    await new Promise(r => setTimeout(r, 1500));
 
-    // 1. Check Editorial Hero Title
+    // 1. Check Editorial Hero Title (V5 Ideogram Specification)
     const heroTitle = await page.$eval('.editorial-hero-title', el => el.textContent.trim());
     console.log('✅ Editorial Hero Title:', heroTitle.replace(/\s+/g, ' '));
-    if (!heroTitle.includes("You don't need another schedule")) {
-      throw new Error('Hero title mismatch');
+    if (!heroTitle.includes("PREPARE SMARTER") && !heroTitle.includes("KNOW WHAT MATTERS NEXT")) {
+      throw new Error('Hero title mismatch: expected PREPARE SMARTER / KNOW WHAT MATTERS NEXT');
     }
 
-    // 2. Check Learning Universe Canvas
+    // 2. Check Learning Universe Canvas & Integrated 3D JARVIS HUD Core
     const canvasExists = await page.$eval('#learning-universe-canvas', el => Boolean(el));
+    const jarvisCanvasExists = await page.$eval('#jarvis-3d-canvas', el => Boolean(el));
     console.log('✅ Learning Universe Canvas active:', canvasExists);
+    console.log('✅ Integrated 3D JARVIS Core Canvas active:', jarvisCanvasExists);
 
     // 3. Check NBA Card elements
     const nbaTitle = await page.$eval('#nba-title', el => el.textContent.trim());
