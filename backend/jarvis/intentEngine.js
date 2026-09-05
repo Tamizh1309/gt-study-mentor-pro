@@ -126,6 +126,30 @@ const INTENT_RULES = [
       /next\s+best\s+action/i
     ],
     extractParams: () => ({ action: 'generate_plan' })
+  },
+  {
+    intent: 'START_QUIZ',
+    category: 'application_command',
+    patterns: [
+      /(quiz\s+me|start\s+(a\s+)?quiz|test\s+me|practice\s+quiz|diagnostic\s+test)/i
+    ],
+    extractParams: () => ({ view: 'practice', tab: 'quiz' })
+  },
+  {
+    intent: 'REVIEW_MISTAKES',
+    category: 'application_command',
+    patterns: [
+      /(mistake\s+book|review\s+mistakes?|my\s+errors?|unresolved\s+mistakes?)/i
+    ],
+    extractParams: () => ({ view: 'progress', tab: 'mistakes' })
+  },
+  {
+    intent: 'RESET_JOURNEY',
+    category: 'application_command',
+    patterns: [
+      /(reset\s+(my\s+)?(preparation|journey|progress|state|data)|start\s+over|fresh\s+start)/i
+    ],
+    extractParams: () => ({ action: 'confirm_reset' })
   }
 ];
 

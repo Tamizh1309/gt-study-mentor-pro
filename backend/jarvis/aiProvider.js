@@ -52,6 +52,26 @@ const LOCAL_KNOWLEDGE_BASE = [
     keywords: ['time complexity', 'big o', 'space complexity'],
     title: 'DSA — Asymptotic Notation & Big-O',
     answer: "Big-O notation describes the upper bound of an algorithm's execution time or memory consumption as the input size N grows toward infinity:\n• O(1): Constant time (hash map lookup, array index access)\n• O(log N): Logarithmic (binary search, balanced BST operations)\n• O(N): Linear (single loop, array traversal)\n• O(N log N): Linearithmic (Merge Sort, Heap Sort, efficient Quick Sort)\n• O(N²): Quadratic (nested loops, Bubble/Insertion sort)\n• O(2ⁿ): Exponential (naive recursive Fibonacci, subsets generation)"
+  },
+  {
+    keywords: ['recursion', 'recursive', 'base case'],
+    title: 'DSA — Recursion & Stack Frames',
+    answer: "Recursion occurs when a function calls itself to solve a smaller instance of the same problem. Every recursive solution requires:\n1. Base Case: The condition that terminates recursion to prevent stack overflow.\n2. Recursive Step: Dividing the problem and calling itself with a smaller input toward the base case.\n\nUnder the hood, each recursive call pushes a new stack frame onto the Call Stack storing local variables and return addresses. Space complexity is proportional to the maximum recursion tree depth: O(Depth)."
+  },
+  {
+    keywords: ['normalization', 'normal form', 'bcnf', '3nf', '2nf', '1nf'],
+    title: 'DBMS — Normalization & Functional Dependencies',
+    answer: "Normalization organizes database tables to minimize redundancy and prevent insertion, update, and deletion anomalies:\n• 1NF: Atomic column values (no multi-valued attributes or repeating groups).\n• 2NF: In 1NF + No partial dependency (every non-key attribute fully functionally dependent on primary key).\n• 3NF: In 2NF + No transitive dependency (non-prime attributes depend only on candidate keys).\n• BCNF: Stricter 3NF where for every functional dependency X → Y, X must be a super key."
+  },
+  {
+    keywords: ['pointer', 'pointers', 'memory address', 'dereference'],
+    title: 'Programming — Pointers & Memory Management',
+    answer: "A pointer is a variable that stores the memory address of another variable rather than storing a direct value:\n• Address-of operator (&x): Retrieves the physical memory address of variable x.\n• Dereference operator (*p): Accesses or modifies the value stored at the memory address pointed to by p.\n• Pointers enable dynamic memory allocation (heap via malloc/new), efficient pass-by-reference without cloning large structs, and linked data structure implementations (linked lists, trees, graphs)."
+  },
+  {
+    keywords: ['rest', 'rest api', 'http methods', 'restful'],
+    title: 'Software Engineering — RESTful Architecture',
+    answer: "REST (Representational State Transfer) is an architectural style for networked distributed systems adhering to 6 core constraints:\n1. Stateless: Every request contains all information needed to process it; server stores no client session context.\n2. Client-Server Separation: UI concerns separated from data storage.\n3. Uniform Interface: Standardized HTTP verbs (GET: read, POST: create, PUT/PATCH: update, DELETE: remove) and URI resources.\n4. Cacheable: Responses explicitly define whether they can be cached.\n5. Layered System: Client cannot tell whether it is connected directly to end server or proxy/load balancer."
   }
 ];
 
@@ -66,7 +86,19 @@ async function generateResponse(prompt, context = {}, mode = 'study') {
   const apiKey = process.env.JARVIS_API_KEY || process.env.GEMINI_API_KEY;
   const provider = (process.env.JARVIS_PROVIDER || (apiKey ? 'gemini' : 'local')).toLowerCase();
 
-  // If an API key is configured, attempt the cloud AI provider
+  // 1. If FreeLLMAPI / OpenAI-compatible router is configured
+  if (provider === 'freellmapi' || process.env.JARVIS_API_URL) {
+    try {
+      const response = await callFreeLLMAPI(prompt, context, mode);
+      if (response && response.trim().length > 0) {
+        return { text: response.trim(), source: 'freellmapi-router' };
+      }
+    } catch (err) {
+      console.warn('[JARVIS AI Provider] FreeLLMAPI router failed. Falling back gracefully.', err.message);
+    }
+  }
+
+  // 2. If Gemini provider is configured
   if (apiKey && provider === 'gemini') {
     try {
       const response = await callGeminiAPI(prompt, context, mode, apiKey);
@@ -74,15 +106,83 @@ async function generateResponse(prompt, context = {}, mode = 'study') {
         return { text: response.trim(), source: 'gemini-cloud' };
       }
     } catch (err) {
-      console.warn('[JARVIS AI Provider] Cloud provider failed or rate-limited. Falling back gracefully to Local CSE Intelligence.', err.message);
+      console.warn('[JARVIS AI Provider] Gemini provider failed or rate-limited. Falling back gracefully.', err.message);
     }
   }
 
-  // Fallback / Default: Fast, reliable, offline-ready Local CSE Intelligence
+  // 3. Fallback / Default: Fast, reliable, offline-ready Local CSE Intelligence
   return {
     text: generateLocalCSEAnswer(prompt, context, mode),
     source: 'local-intelligence'
   };
+}
+
+/**
+ * Calls FreeLLMAPI / OpenAI-compatible gateway with intelligent task-based model routing
+ */
+async function callFreeLLMAPI(prompt, context, mode) {
+  const baseURL = process.env.JARVIS_API_URL || 'http://127.0.0.1:3001/v1/chat/completions';
+  const apiKey = process.env.JARVIS_API_KEY || 'freellmapi-local';
+
+  // Task-specific routing profile selection
+  let selectedModel = process.env.JARVIS_MODEL || 'auto:balanced';
+  if (mode === 'dsa' || /code|algorithm|python|java|c\+\+|implement/i.test(prompt)) {
+    selectedModel = process.env.JARVIS_CODING_MODEL || 'auto:coding';
+  } else if (/explain|deep|system design|architect|why/i.test(prompt)) {
+    selectedModel = process.env.JARVIS_SMART_MODEL || 'auto:smart';
+  } else if (/quick|time|define|what is/i.test(prompt)) {
+    selectedModel = process.env.JARVIS_FAST_MODEL || 'auto:fast';
+  }
+
+  const currentDay = context.day ?? 0;
+  const systemPrompt = `You are GT JARVIS, a highly capable, calm, concise AI career preparation mentor for a CS student preparing for GATE 2027, Placements, SWE, and Internships.
+Current Mode: ${mode.toUpperCase()}
+Student Context:
+- Day: Day ${currentDay} / 90
+- Readiness: GATE ${context.readinessScores?.gate ?? 0}%, Placement ${context.readinessScores?.placement ?? 0}%, SWE ${context.readinessScores?.swe ?? 0}%, Internship ${context.readinessScores?.internship ?? 0}%
+- Pending Mistakes: ${context.pendingMistakes ?? 0}
+- Target: ${context.targetRole || 'GATE + SWE'}
+
+Guidelines:
+1. Be structured, encouraging, and technically precise.
+2. If Day 0, do not fabricate prior performance; guide orientation.
+3. In DSA mode, offer Socratic hints before full code.
+4. Keep answers beginner-friendly and actionable.`;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const res = await fetch(baseURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: selectedModel,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.5,
+        max_tokens: 650
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      throw new Error(`FreeLLMAPI returned status ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || null;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
 }
 
 /**

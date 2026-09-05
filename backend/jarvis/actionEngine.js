@@ -29,7 +29,10 @@ const ALLOWED_ACTIONS = {
   START_INTERVIEW: 'start_mock_interview',
   OPEN_DASHBOARD: 'open_dashboard',
   OPEN_CSE_LAB: 'open_cse_lab',
-  OPEN_RESOURCES: 'open_resources'
+  OPEN_RESOURCES: 'open_resources',
+  START_QUIZ: 'start_quiz',
+  REVIEW_MISTAKES: 'review_mistakes',
+  RESET_JOURNEY: 'reset_journey'
 };
 
 /**
@@ -118,6 +121,30 @@ function resolveAction(intent, params = {}) {
         type: ALLOWED_ACTIONS.OPEN_DASHBOARD,
         params: { view: 'home' },
         spokenConfirmation: "Returning to your 90-day Home Command Center."
+      };
+    }
+
+    case 'START_QUIZ': {
+      return {
+        type: ALLOWED_ACTIONS.START_QUIZ,
+        params: { view: 'practice', tab: 'quiz' },
+        spokenConfirmation: "Launching your adaptive technical diagnostic quiz."
+      };
+    }
+
+    case 'REVIEW_MISTAKES': {
+      return {
+        type: ALLOWED_ACTIONS.REVIEW_MISTAKES,
+        params: { view: 'progress', tab: 'mistakes' },
+        spokenConfirmation: "Opening your Mistake Book to review and resolve concept errors."
+      };
+    }
+
+    case 'RESET_JOURNEY': {
+      return {
+        type: ALLOWED_ACTIONS.RESET_JOURNEY,
+        params: { confirmationRequired: true },
+        spokenConfirmation: "Resetting your preparation journey returns all progress to Day 0. Opening confirmation."
       };
     }
 

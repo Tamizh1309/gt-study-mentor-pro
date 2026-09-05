@@ -432,6 +432,33 @@
           break;
         }
 
+        case 'start_quiz': {
+          if (typeof window.navigateToView === 'function') {
+            window.navigateToView('practice');
+            if (typeof window.switchPracticeTab === 'function') {
+              window.switchPracticeTab('quiz');
+            }
+          }
+          break;
+        }
+
+        case 'review_mistakes': {
+          if (typeof window.navigateToView === 'function') {
+            window.navigateToView('progress');
+            if (typeof window.switchProgressTab === 'function') {
+              window.switchProgressTab('mistakes');
+            }
+          }
+          break;
+        }
+
+        case 'reset_journey': {
+          if (typeof window.resetPreparationJourney === 'function') {
+            window.resetPreparationJourney();
+          }
+          break;
+        }
+
         default:
           console.log('[GT JARVIS] Unhandled action type:', action.type);
       }
