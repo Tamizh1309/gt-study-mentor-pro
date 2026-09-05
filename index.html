@@ -485,46 +485,82 @@
       </div>
     </section>
 
-    <!-- AI MENTOR VIEW -->
-    <section class="view-panel" id="view-chat" aria-label="GT AI Mentor">
+    <!-- GT JARVIS VOICE & PREPARATION COMMAND CENTER -->
+    <section class="view-panel" id="view-chat" aria-label="GT JARVIS Voice Assistant">
       <div id="chat-view-container" style="display:flex;flex-direction:column;height:100%;">
-        <div class="chat-header" id="chat-header" role="banner">
+        <!-- JARVIS Top Control Header -->
+        <div class="chat-header" id="chat-header" role="banner" style="flex-wrap:wrap;gap:12px;">
           <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:18px;" aria-hidden="true">&#x1F916;</div>
+            <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#5B5BD6,#06B6D4);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 15px rgba(91,91,214,0.4);" aria-hidden="true">&#x1F916;</div>
             <div>
-              <div style="font-weight:800;font-size:15px;color:var(--text);">GT AI Mentor</div>
-              <div style="font-size:11px;color:var(--success);">&#x25CF; Active &bull; Your Personal Preparation Coach</div>
+              <div style="font-weight:800;font-size:16px;color:var(--text);letter-spacing:0.3px;">GT JARVIS</div>
+              <div style="font-size:11px;color:var(--primary-light);font-weight:600;" id="jarvis-active-mode-label">&#x1F4CB; Study Planning Active</div>
             </div>
           </div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-left:auto;" role="group" aria-label="Mentor modes">
-            <button class="tab-pill active" id="mentor-mode-planning" onclick="setMentorMode('planning')">&#x1F4CB; Planning</button>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;align-items:center;" role="group" aria-label="JARVIS modes">
+            <button class="tab-pill active" id="mentor-mode-study" onclick="setMentorMode('study')">&#x1F4CB; Study</button>
             <button class="tab-pill" id="mentor-mode-gate" onclick="setMentorMode('gate')">&#x1F393; GATE</button>
-            <button class="tab-pill" id="mentor-mode-dsa" onclick="setMentorMode('dsa')">&#x1F4BB; DSA</button>
+            <button class="tab-pill" id="mentor-mode-dsa" onclick="setMentorMode('dsa')">&#x1F4BB; DSA Socratic</button>
             <button class="tab-pill" id="mentor-mode-placement" onclick="setMentorMode('placement')">&#x1F3E2; Placement</button>
             <button class="tab-pill" id="mentor-mode-swe" onclick="setMentorMode('swe')">&#x2699;&#xFE0F; SWE</button>
             <button class="tab-pill" id="mentor-mode-intern" onclick="setMentorMode('intern')">&#x1F31F; Internship</button>
             <button class="tab-pill" id="mentor-mode-interview" onclick="setMentorMode('interview')">&#x1F3A4; Interview</button>
             <button class="tab-pill" id="mentor-mode-resume" onclick="setMentorMode('resume')">&#x1F4C4; Resume</button>
+            <button class="tab-pill" id="mentor-mode-focus" onclick="setMentorMode('focus')">&#x26A1; Focus</button>
+            <button class="tab-pill" id="jarvis-voice-toggle" style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);color:var(--success);font-weight:700;">&#x1F50A; Voice On</button>
           </div>
         </div>
-        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Chat messages">
+
+        <!-- 3D JARVIS Central Core Hero HUD -->
+        <div class="jarvis-hud-card nd-card" style="margin:14px 0 16px;padding:18px;text-align:center;position:relative;overflow:hidden;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <!-- 3D Animated Orbital Core Canvas -->
+            <div style="position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center;">
+              <canvas id="jarvis-3d-canvas" width="240" height="240" style="width:150px;height:150px;display:block;"></canvas>
+            </div>
+            <div style="margin-top:8px;">
+              <span id="jarvis-status-badge" class="jarvis-badge status-idle">IDLE</span>
+            </div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);margin-top:6px;letter-spacing:0.3px;">
+              &ldquo;Don&rsquo;t ask what to study. Ask JARVIS.&rdquo;
+            </div>
+            <div id="jarvis-status-desc" style="font-size:12px;color:var(--text-sub);margin-top:2px;">
+              Online &amp; Active &bull; Speak naturally or click the microphone
+            </div>
+            <div id="jarvis-voice-banner" style="display:none;font-size:11px;color:var(--warning);background:rgba(245,158,11,0.12);padding:4px 12px;border-radius:4px;margin-top:6px;border:1px solid rgba(245,158,11,0.25);"></div>
+          </div>
+        </div>
+
+        <!-- Conversation Stream -->
+        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="JARVIS Conversation Stream">
           <div class="welcome-banner">
-            <h1 style="font-size:1.5rem;font-weight:900;font-family:var(--font-display);color:var(--text);margin-bottom:8px;">GT AI Mentor &#x1F916;</h1>
-            <p style="color:var(--text-sub);font-size:14px;line-height:1.6;max-width:480px;margin:0 auto 16px;">Your personal preparation coach da! I know your weak areas, your goals, and your 90-day plan. Ask me anything.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:560px;margin:0 auto;" role="list">
-              <button class="action-chip" onclick="openChatWithContext('Plan my day for today based on my 90-day preparation goals')" role="listitem">&#x1F4C5; Plan My Day</button>
-              <button class="action-chip" onclick="openChatWithContext('Explain this CSE concept clearly from first principles: ')" role="listitem">&#x1F4A1; Explain a Concept</button>
-              <button class="action-chip" onclick="startScaffoldedDoubtSolver()" role="listitem">&#x1F50D; Solve a Doubt (Socratic)</button>
-              <button class="action-chip" onclick="openChatWithContext('Help me review and fix this mistake: ')" role="listitem">&#x1F4DD; Review Mistake</button>
-              <button class="action-chip" onclick="setMentorMode('interview');openChatWithContext('Start a technical mock interview with me for a CSE graduate role');" role="listitem">&#x1F3A4; Interview Practice</button>
-              <button class="action-chip" onclick="setMentorMode('resume');openChatWithContext('Review my resume bullet points and suggest quantifiable impact metrics');" role="listitem">&#x1F4C4; Resume Review</button>
+            <h1 style="font-size:1.4rem;font-weight:900;font-family:var(--font-display);color:var(--text);margin-bottom:6px;">Personal Study &amp; Career Intelligence</h1>
+            <p style="color:var(--text-sub);font-size:13px;line-height:1.6;max-width:520px;margin:0 auto 14px;">I know your 90-day progress, your weak areas, and your career milestones. Ask me any technical question, plan your study blocks, or execute focus sessions.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:620px;margin:0 auto;" role="list">
+              <button class="action-chip" onclick="openChatWithContext('What should I study today based on my 90-day preparation goals?')" role="listitem">&#x1F4C5; What should I study today?</button>
+              <button class="action-chip" onclick="openChatWithContext('Explain deadlock in operating systems and how Banker\'s algorithm avoids it.')" role="listitem">&#x1F4A1; Explain Deadlocks</button>
+              <button class="action-chip" onclick="openChatWithContext('Start a 45-minute focus session on DSA Tree Traversal')" role="listitem">&#x26A1; Start 45m Focus Session</button>
+              <button class="action-chip" onclick="openChatWithContext('Give me a Socratic hint for finding cycle in a directed graph')" role="listitem">&#x1F4BB; Socratic DSA Hint</button>
+              <button class="action-chip" onclick="openChatWithContext('Check my resume ATS score and suggest quantifiable impact metrics')" role="listitem">&#x1F4C4; ATS Resume Check</button>
+              <button class="action-chip" onclick="openChatWithContext('How should I prepare for a technical interview at Zoho?')" role="listitem">&#x1F3E2; Zoho Prep Sprint</button>
             </div>
           </div>
         </div>
+
+        <!-- JARVIS Input Area with Live Voice Button -->
         <div class="chat-input-area" id="chat-input-area">
-          <div class="input-row">
+          <div class="input-row" style="display:flex;align-items:center;gap:8px;">
+            <!-- Real-time Voice Input Mic Button -->
+            <button class="jarvis-mic-btn" id="jarvis-mic-btn" aria-label="Toggle Voice Input" title="Click to speak (Microphone)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </button>
             <textarea id="chat-input" class="chat-input"
-              placeholder="Ask GT AI Mentor anything da... (Shift+Enter for new line)"
+              placeholder="Ask JARVIS anything or click the microphone to speak... (Shift+Enter for newline)"
               rows="1" aria-label="Message input"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"
               oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';"></textarea>
@@ -533,7 +569,7 @@
             </button>
           </div>
           <div class="input-meta" id="input-meta">
-            <span id="chat-model-indicator">&#x26A1; GPT-5.4 Active</span>
+            <span id="chat-model-indicator">&#x26A1; JARVIS Engine &bull; Web Speech &bull; Offline CSE Intelligence Active</span>
             <button id="export-chat-btn" onclick="exportChatHistory&&exportChatHistory()" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;">&#x1F4E4; Export</button>
           </div>
         </div>
@@ -3552,11 +3588,20 @@ function solve(arr) {
   </div>
 </div>
 
+<!-- Floating 3D Quick-Access JARVIS Orb -->
+<button id="jarvis-floating-orb" class="jarvis-floating-orb" aria-label="Summon GT JARVIS Voice Assistant" title="Ask JARVIS (Voice / Chat)">
+  <div class="orb-pulse-ring"></div>
+  <div class="orb-core">
+    <span style="font-size:18px;">🎙️</span>
+  </div>
+  <span class="orb-tooltip">Ask JARVIS</span>
+</button>
+
 <script src="project3D.js"></script>
 <script src="app.js"></script>
-
 <script src="career.js"></script>
 <script src="labs.js" onerror="console.warn('career.js not yet present')"></script>
 <script src="focusSession.js" onerror="console.warn('focusSession.js not yet present')"></script>
+<script src="jarvis.js"></script>
 </body>
 </html>

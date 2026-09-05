@@ -50,6 +50,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
 
+// ── GT JARVIS Voice & AI Preparation Assistant ──
+const jarvisRouter = require('./backend/jarvis/jarvisController');
+app.use('/api/jarvis', jarvisRouter);
 
 // ── Placements & Internships Endpoint ──
 app.get('/api/placements', (req, res) => {
