@@ -18,7 +18,7 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   <link rel="stylesheet" href="style.css" />
   <script src="prepIntelligence.js"></script>
@@ -246,12 +246,30 @@
 
     <!-- HOME VIEW -->
     <section class="view-panel active" id="view-home" aria-label="Home Dashboard">
-      <div class="home-greeting">
-        <div class="home-greeting-day" id="home-day-label">Day 0 / 90 &bull; Preparation Zero-State &amp; Setup</div>
-        <div class="home-greeting-text" id="home-greeting-full">Good <span id="home-time-greeting">Day</span>, <span id="home-name">Student</span>! &#x1F44B;</div>
-        <div class="home-phase-badge">
-          <span>&#x1F3C6;</span>
-          <span id="home-phase-text">Orientation &bull; Day 0 Zero-State &bull; 0% Complete</span>
+      <!-- Editorial Hero Section -->
+      <div class="editorial-hero-wrap">
+        <div class="editorial-hero-tag">
+          <span class="pulse-dot"></span>
+          <span id="home-day-label">Day 0 / 90 &bull; Preparation Zero-State &amp; Setup</span>
+        </div>
+        <h1 class="editorial-hero-title">
+          You don't need another schedule.<br>
+          <span class="editorial-highlight">You need to know what matters next.</span>
+        </h1>
+        <p class="editorial-hero-sub" id="home-greeting-full">
+          Good <span id="home-time-greeting">Day</span>, <span id="home-name">Student</span>. GT Study Mentor Pro is your 90-day career preparation operating system for GATE 2027, Placements, SWE &amp; Internships.
+        </p>
+        <div class="editorial-hero-ctas">
+          <button class="cta-pill-primary" onclick="window.openDay0Onboarding&&openDay0Onboarding()" id="hero-start-btn">
+            <span>🚀</span> <span>Start Day 0</span>
+          </button>
+          <button class="cta-pill-secondary" onclick="window.openJarvisModal&&openJarvisModal()" id="hero-jarvis-btn">
+            <span>🎙️</span> <span>Talk to JARVIS</span>
+          </button>
+          <div class="home-phase-badge" style="margin-left:auto;">
+            <span>🏆</span>
+            <span id="home-phase-text">Orientation &bull; Day 0 Zero-State &bull; 0% Complete</span>
+          </div>
         </div>
       </div>
 
@@ -267,18 +285,41 @@
           </div>
 
           <div class="nba-card nd-card-lift" id="nba-main-card">
-            <div class="nba-track-badge" id="nba-track-badge"><span>&#x26A1;</span><span id="nba-track-text">DAY 0 SETUP</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div class="nba-track-badge" id="nba-track-badge"><span>&#x26A1;</span><span id="nba-track-text">DAY 0 SETUP</span></div>
+              <span class="nba-time-badge" id="nba-time-badge" style="font-size:11px;padding:3px 8px;border-radius:12px;background:rgba(56,189,248,0.12);color:var(--accent);border:1px solid rgba(56,189,248,0.25);font-weight:600;">⏱️ 10 min &bull; Low Load</span>
+            </div>
+            
             <div class="nba-title" id="nba-title">Orientation &rarr; Complete Day 0 Preparation Setup</div>
-            <div class="nba-why" id="nba-why">Configure your target goals, daily study budget, and focus style to generate your calibrated Day 1 plan.</div>
+            
+            <div class="nba-why-box" style="margin:10px 0 12px;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,0.03);border-left:3px solid var(--accent);">
+              <div style="font-size:10px;text-transform:uppercase;font-weight:700;letter-spacing:0.5px;color:var(--accent);margin-bottom:2px;">💡 Why this?</div>
+              <div class="nba-why" id="nba-why" style="font-size:12px;color:var(--text);line-height:1.45;">Configure your target goals, daily study budget, and focus style to generate your calibrated Day 1 plan.</div>
+            </div>
+
+            <div class="nba-benefit-box" style="margin-bottom:14px;font-size:11px;color:var(--text-sub);display:flex;align-items:center;gap:6px;">
+              <span style="color:var(--success);font-weight:700;">🎯 Benefit:</span>
+              <span id="nba-benefit-text">Calibrated 90-day roadmap with verified zero-state integrity</span>
+            </div>
+
             <div class="nba-meta-grid">
               <div class="nba-meta-item"><div class="nba-meta-label">Duration</div><div class="nba-meta-value" id="nba-duration">10 min</div></div>
               <div class="nba-meta-item"><div class="nba-meta-label">Accuracy</div><div class="nba-meta-value" id="nba-accuracy" style="color:var(--text-muted);">0%</div></div>
               <div class="nba-meta-item"><div class="nba-meta-label">Mistakes</div><div class="nba-meta-value" id="nba-mistakes">0 recorded</div></div>
               <div class="nba-meta-item"><div class="nba-meta-label">Supports</div><div class="nba-meta-value" id="nba-goals" style="font-size:11px;">GATE + Career</div></div>
             </div>
-            <button class="nba-start-btn" onclick="window.openDay0Onboarding&&openDay0Onboarding()" id="nba-start-btn">
-              <span>&#x1F680;</span> <span>Begin Day 0 Journey</span>
-            </button>
+
+            <div class="nba-actions-row" style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+              <button class="nba-start-btn" onclick="window.executeNbaAction?executeNbaAction():window.openDay0Onboarding&&openDay0Onboarding()" id="nba-start-btn" style="flex:2;min-width:140px;">
+                <span>▶</span> <span>START NOW</span>
+              </button>
+              <button class="nba-why-btn" onclick="openWhyEngineModal()" id="nba-why-btn" style="flex:1;min-width:110px;background:rgba(255,255,255,0.06);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 12px;transition:var(--transition);">
+                <span>💡</span> <span>WHY THIS?</span>
+              </button>
+              <button class="nba-alt-btn" onclick="showNbaAlternatives()" id="nba-alt-btn" style="background:transparent;border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-sub);font-size:12px;padding:8px 12px;cursor:pointer;" title="Change / Explore alternatives">
+                <span>⇄ CHANGE</span>
+              </button>
+            </div>
           </div>
 
           <div id="reschedule-alert" style="display:none;margin-top:12px;padding:14px 16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:var(--radius);font-size:13px;color:var(--text);">
@@ -1931,8 +1972,69 @@ WHERE p.package_lpa >= 10.0;</textarea>
   <div id="countdown-progress-bar"></div>
   <div id="pomodoro-display"></div>
   <button id="pomo-reset-btn" style="display:none;"></button>
-  <button id="pomo-skip-btn" style="display:none;"></button>
-  <button id="quick-ask-btn" style="display:none;"></button>
+</div>
+
+<!-- ─── MODAL: Next Best Action "Why Engine" (Metacognitive Decision Breakdown) ─── -->
+<div class="modal-overlay" id="why-engine-modal">
+  <div class="modal modal-tall" style="max-width: 840px;">
+    <button class="modal-close" data-close="why-engine-modal">&#x2715;</button>
+    <div class="modal-title" style="display:flex; align-items:center; gap:10px;">
+      <span>💡</span> Next Best Action Decision Intelligence &bull; "Why Engine"
+      <span class="badge-pill" style="font-size:10px; background:rgba(56,189,248,0.15); color:var(--accent); border:1px solid rgba(56,189,248,0.3);">Transparent Reasoning</span>
+    </div>
+    <div class="modal-subtitle">Every recommendation from GT JARVIS is backed by measurable evidence from your learning trajectory.</div>
+
+    <!-- Active Recommendation Spotlight -->
+    <div style="margin: 14px 0; padding: 14px 18px; border-radius: var(--radius-sm); background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.25);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="badge-pill" id="why-modal-track" style="font-size:10px; text-transform:uppercase;">Track</span>
+        <span id="why-modal-time" style="font-size:11px; color:var(--text-sub);">Estimated Time</span>
+      </div>
+      <div id="why-modal-title" style="font-size:1.15rem; font-weight:800; color:var(--text); margin-top:6px;">Target Action</div>
+    </div>
+
+    <!-- 6-Dimension Decision Matrix -->
+    <div class="why-engine-grid">
+      <!-- 1. WHAT -->
+      <div class="why-dimension-card">
+        <div class="why-dimension-header"><span>📌</span> 1. What is this?</div>
+        <div class="why-dimension-body" id="why-dim-what">Structured learning intervention focused on high-priority core competency.</div>
+      </div>
+      <!-- 2. WHY -->
+      <div class="why-dimension-card">
+        <div class="why-dimension-header"><span>📊</span> 2. Why this action?</div>
+        <div class="why-dimension-body" id="why-dim-why">Recent performance evidence indicates knowledge gaps or uncalibrated confidence that require reinforcement.</div>
+      </div>
+      <!-- 3. WHY NOW -->
+      <div class="why-dimension-card">
+        <div class="why-dimension-header"><span>⏱️</span> 3. Why right now?</div>
+        <div class="why-dimension-body" id="why-dim-now">Spaced repetition interval is active or upcoming interview timeline prioritizes this domain today.</div>
+      </div>
+      <!-- 4. WHY NOT SOMETHING ELSE -->
+      <div class="why-dimension-card">
+        <div class="why-dimension-header"><span>⚖️</span> 4. Why not other topics?</div>
+        <div class="why-dimension-body" id="why-dim-alt">Other subjects have either met maintenance thresholds or have lower immediate leverage for your primary goal.</div>
+      </div>
+      <!-- 5. TIME & COGNITIVE LOAD -->
+      <div class="why-dimension-card">
+        <div class="why-dimension-header"><span>🧠</span> 5. Cognitive Load</div>
+        <div class="why-dimension-body" id="why-dim-load">Calibrated to fit within your available study budget without causing study fatigue.</div>
+      </div>
+      <!-- 6. BENEFIT -->
+      <div class="why-dimension-card">
+        <div class="why-dimension-header"><span>🎯</span> 6. Expected Benefit</div>
+        <div class="why-dimension-body" id="why-dim-benefit">Measurable increase in readiness evidence across GATE, Placements, and SWE tracks.</div>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+      <button class="action-btn" onclick="closeModal('why-engine-modal')">Close</button>
+      <button class="submit-btn" onclick="closeModal('why-engine-modal');if(window.executeNbaAction)executeNbaAction();" style="padding:8px 24px;">
+        <span>▶</span> <span>Execute Recommendation</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="mock-interview-modal">
   <div class="modal modal-tall" style="max-width: 960px;">
@@ -3675,7 +3777,8 @@ function solve(arr) {
 <script src="app.js"></script>
 <script src="career.js"></script>
 <script src="labs.js" onerror="console.warn('career.js not yet present')"></script>
-<script src="focusSession.js" onerror="console.warn('focusSession.js not yet present')"></script>
+<script src="focusSession.js"></script>
+<script src="learningUniverse.js"></script>
 <script src="jarvis.js"></script>
 </body>
 </html>

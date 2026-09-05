@@ -653,20 +653,20 @@
       pulse += 0.04;
       const pulseFactor = Math.sin(pulse) * 4;
 
-      // Color scheme based on state
-      let mainColor = '#5B5BD6';
-      let glowColor = 'rgba(91, 91, 214, 0.4)';
+      // Color scheme based on state (Cinematic Editorial Palette)
+      let mainColor = '#38BDF8'; // Soft Cyan (IDLE)
+      let glowColor = 'rgba(56, 189, 248, 0.35)';
       if (state.status === 'LISTENING') {
-        mainColor = '#06B6D4';
-        glowColor = 'rgba(6, 182, 212, 0.6)';
-      } else if (state.status === 'PROCESSING') {
-        mainColor = '#F59E0B';
+        mainColor = '#F59E0B'; // Amber
         glowColor = 'rgba(245, 158, 11, 0.6)';
+      } else if (state.status === 'PROCESSING') {
+        mainColor = '#818CF8'; // Muted Violet
+        glowColor = 'rgba(129, 140, 248, 0.6)';
       } else if (state.status === 'SPEAKING') {
-        mainColor = '#10B981';
+        mainColor = '#10B981'; // Emerald
         glowColor = 'rgba(16, 185, 129, 0.6)';
       } else if (state.status === 'ERROR') {
-        mainColor = '#EF4444';
+        mainColor = '#EF4444'; // Red
         glowColor = 'rgba(239, 68, 68, 0.6)';
       }
 

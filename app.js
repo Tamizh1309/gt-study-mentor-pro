@@ -8964,11 +8964,17 @@ window.renderHomeView = function () {
   const misEl = document.getElementById('nba-mistakes');
   const goalsEl = document.getElementById('nba-goals');
   const startBtn = document.getElementById('nba-start-btn');
+  const timeBadge = document.getElementById('nba-time-badge');
+  const benefitEl = document.getElementById('nba-benefit-text');
+
+  window._activeNba = isDay0 ? { isDay0: true } : { isDay0: false, ...nba };
 
   if (isDay0) {
     if (trackEl) trackEl.textContent = 'DAY 0 SETUP';
+    if (timeBadge) timeBadge.textContent = '⏱️ 10 min • Low Load';
     if (titleEl) titleEl.textContent = 'Orientation → Complete Day 0 Preparation Setup';
     if (whyEl) whyEl.textContent = 'Configure your target roles (GATE, Placement, SWE, Internship), daily study budget, and focus style to generate your Day 1 plan.';
+    if (benefitEl) benefitEl.textContent = 'Calibrated 90-day roadmap with verified zero-state integrity';
     if (durEl) durEl.textContent = '10 min';
     if (accEl) { accEl.textContent = '0%'; accEl.style.color = 'var(--text-muted)'; }
     if (misEl) misEl.textContent = '0 recorded';
@@ -8979,8 +8985,10 @@ window.renderHomeView = function () {
     }
   } else if (nba) {
     if (trackEl) trackEl.textContent = nba.track || 'GATE 2027';
+    if (timeBadge) timeBadge.textContent = `⏱️ ${nba.estMinutes || 45} min • ${nba.load || 'Medium Load'}`;
     if (titleEl) titleEl.textContent = (nba.subject ? nba.subject + ' → ' : '') + (nba.action || 'Continue Plan');
     if (whyEl) whyEl.textContent = nba.why || 'Follow your calibrated 90-day plan.';
+    if (benefitEl) benefitEl.textContent = nba.benefit || 'Targeted interview & exam problem-solving mastery';
     if (durEl) durEl.textContent = (nba.estMinutes || 45) + ' min';
     if (accEl) { accEl.textContent = (nba.accuracy || 0) + '%'; accEl.style.color = nba.accuracy >= 70 ? 'var(--success)' : 'var(--warning)'; }
     if (misEl) misEl.textContent = (nba.pendingMistakes || 0) + ' pending';
@@ -9098,6 +9106,75 @@ window.renderHomeView = function () {
 };
 
 window.renderHomeDashboard = window.renderHomeView;
+
+// Next Best Action "Why Engine" & Action Execution Handlers
+window.openWhyEngineModal = function () {
+  const nba = window._activeNba || { isDay0: true };
+  const trackEl = document.getElementById('why-modal-track');
+  const timeEl = document.getElementById('why-modal-time');
+  const titleEl = document.getElementById('why-modal-title');
+  const dimWhat = document.getElementById('why-dim-what');
+  const dimWhy = document.getElementById('why-dim-why');
+  const dimNow = document.getElementById('why-dim-now');
+  const dimAlt = document.getElementById('why-dim-alt');
+  const dimLoad = document.getElementById('why-dim-load');
+  const dimBenefit = document.getElementById('why-dim-benefit');
+
+  if (nba.isDay0) {
+    if (trackEl) trackEl.textContent = 'Day 0 Setup';
+    if (timeEl) timeEl.textContent = '10 min • Low Load';
+    if (titleEl) titleEl.textContent = 'Orientation → Complete Day 0 Preparation Setup';
+    if (dimWhat) dimWhat.textContent = 'Initial profile calibration establishing target roles (GATE, Placement, SWE, Internship), daily study budget, and learning preferences.';
+    if (dimWhy) dimWhy.textContent = 'A preparation operating system cannot prescribe high-value study actions without knowing your target deadlines and available hours.';
+    if (dimNow) dimNow.textContent = 'Beginning Day 0 unlocks your custom Day 1 schedule and initializes the adaptive Progress Engine.';
+    if (dimAlt) dimAlt.textContent = 'Starting complex DSA or full mocks before configuring preferences leads to misaligned pacing and burnout.';
+    if (dimLoad) dimLoad.textContent = 'Low Cognitive Load (10 minutes). Simple guided selection without test pressure.';
+    if (dimBenefit) dimBenefit.textContent = 'Guarantees 100% strict zero-state calibration with personalized milestones for all 90 days.';
+  } else {
+    if (trackEl) trackEl.textContent = nba.track || 'Core Practice';
+    if (timeEl) timeEl.textContent = `${nba.estMinutes || 30} min • ${nba.load || 'Medium Load'}`;
+    if (titleEl) titleEl.textContent = (nba.subject ? nba.subject + ' → ' : '') + (nba.action || 'Targeted Practice');
+    if (dimWhat) dimWhat.textContent = nba.what || 'Targeted learning and active recall session covering key core CS concepts.';
+    if (dimWhy) dimWhy.textContent = nba.why || 'Identified from recent performance evidence, mistake clusters, or low rolling accuracy.';
+    if (dimNow) dimNow.textContent = nba.whyNow || 'Spaced repetition schedule or approaching assessment window makes today the optimal review day.';
+    if (dimAlt) dimAlt.textContent = nba.whyNotElse || 'Alternative subjects are either in stable retention or have lower immediate leverage for your goal.';
+    if (dimLoad) dimLoad.textContent = `${nba.load || 'Medium'} Cognitive Load (~${nba.estMinutes || 30} mins) designed for sustainable focus.`;
+    if (dimBenefit) dimBenefit.textContent = nba.benefit || 'Directly boosts verified readiness evidence across GATE, Placements, and SWE tracks.';
+  }
+
+  if (typeof window.openModal === 'function') {
+    window.openModal('why-engine-modal');
+  }
+};
+
+window.executeNbaAction = function () {
+  const nba = window._activeNba || { isDay0: true };
+  if (nba.isDay0) {
+    if (window.openDay0Onboarding) window.openDay0Onboarding();
+  } else if (window.FocusSession && typeof FocusSession.startNBA === 'function') {
+    FocusSession.startNBA();
+  } else if (window.navigateToView) {
+    window.navigateToView('practice', 'dsa');
+  }
+};
+
+window.showNbaAlternatives = function () {
+  if (window.navigateToView) {
+    window.navigateToView('prepare');
+    if (typeof showToast === 'function') {
+      showToast('Exploring alternative preparation tracks & subjects', 'info');
+    }
+  }
+};
+
+window.openJarvisModal = function () {
+  if (typeof window.navigateToView === 'function') {
+    window.navigateToView('mentor');
+  }
+  if (window.GTJarvis && typeof window.GTJarvis.toggleListening === 'function') {
+    window.GTJarvis.toggleListening();
+  }
+};
 
 // Global Day 0 Onboarding & Journey Reset Handlers
 window.openDay0Onboarding = function () {
