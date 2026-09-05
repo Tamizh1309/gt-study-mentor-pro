@@ -103,14 +103,48 @@ const puppeteer = require('puppeteer');
     console.log('📸 v2_feat_resume_ats.png captured.');
     await page.evaluate(() => closeModal('resume-ats-modal'));
 
-    // 7. Test Navigation across standard views
-    console.log('Navigating to PREPARE & PRACTICE...');
-    await page.evaluate(() => window.navigateToView('prepare', 'gate'));
+    // 7. Test Navigation & Exhaustive Sub-Tab Switching across Hubs
+    console.log('Testing Prepare Hub subtabs...');
+    await page.evaluate(() => {
+      window.navigateToView('prepare', 'gate');
+      window.switchPrepTab('placement');
+      window.switchPrepTab('swe');
+      window.switchPrepTab('intern');
+    });
     await new Promise(r => setTimeout(r, 400));
-    await page.evaluate(() => window.navigateToView('practice', 'dsa'));
+
+    console.log('Testing Practice Arena subtabs (DSA, GATE PYQs, Aptitude, CS Core, Mocks)...');
+    await page.evaluate(() => {
+      window.navigateToView('practice', 'dsa');
+      window.switchPracticeTab('gate-pyq');
+      window.switchPracticeTab('aptitude');
+      window.switchPracticeTab('cs-core');
+      window.switchPracticeTab('mock');
+    });
     await new Promise(r => setTimeout(r, 400));
-    await page.evaluate(() => window.navigateToView('career', 'apps'));
+
+    console.log('Testing Career Pipeline subtabs (Projects, Resume, Opportunities, Apps, Interviews, Companies)...');
+    await page.evaluate(() => {
+      window.navigateToView('career', 'opportunities');
+      window.switchCareerTab('projects');
+      window.switchCareerTab('resume');
+      window.switchCareerTab('applications');
+      window.switchCareerTab('interviews');
+      window.switchCareerTab('companies');
+    });
     await new Promise(r => setTimeout(r, 400));
+
+    console.log('Testing Progress Hub subtabs (Readiness, Mastery, Analytics, Mistakes, Smart Revision)...');
+    await page.evaluate(() => {
+      window.navigateToView('progress', 'readiness');
+      window.switchProgressTab('mastery');
+      window.switchProgressTab('analytics');
+      window.switchProgressTab('mistakes');
+      window.switchProgressTab('smart-revision');
+    });
+    await new Promise(r => setTimeout(r, 400));
+
+    console.log('Testing CSE Labs view...');
     await page.evaluate(() => window.navigateToView('cselabs'));
     await new Promise(r => setTimeout(r, 400));
 

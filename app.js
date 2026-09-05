@@ -3145,35 +3145,56 @@ function init() {
 //  REAL-TIME MULTIPLAYER (WEBSOCKET)
 // ══════════════════════════════════════════
 let ws = null;
+let wsReconnectAttempts = 0;
+const MAX_WS_RECONNECTS = 3;
 
 init();
 
 function initRealtime() {
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const customWsUrl = window.VITE_WS_URL || window.WS_URL;
+  
+  if (!isLocal && !customWsUrl) {
+    console.log('ℹ️ [Realtime] Static host detected without WS_URL. Realtime WebSocket gracefully disabled.');
+    return;
+  }
+
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${protocol}//${window.location.hostname}:3000`;
+  const wsUrl = customWsUrl || `${protocol}//${window.location.hostname}:3000`;
   
-  ws = new WebSocket(wsUrl);
-  
-  ws.onopen = () => {
-    console.log('🔗 Connected to Real-time Study Network');
-  };
-  
-  ws.onmessage = (event) => {
-    try {
-      const data = JSON.parse(event.data);
-      if (data.type === 'online_count') {
-        const el = document.getElementById('live-users-count');
-        if (el) el.textContent = data.count;
-      } else if (data.type === 'toast') {
-        showToast(data.message, 'success', '🎉');
+  try {
+    ws = new WebSocket(wsUrl);
+    
+    ws.onopen = () => {
+      wsReconnectAttempts = 0;
+      console.log('🔗 Connected to Real-time Study Network');
+    };
+    
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'online_count') {
+          const el = document.getElementById('live-users-count');
+          if (el) el.textContent = data.count;
+        } else if (data.type === 'toast') {
+          showToast(data.message, 'success', '🎉');
+        }
+      } catch(e) {}
+    };
+    
+    ws.onerror = () => {
+      // Quietly handle network errors without console spam
+    };
+    
+    ws.onclose = () => {
+      if (wsReconnectAttempts < MAX_WS_RECONNECTS) {
+        wsReconnectAttempts++;
+        setTimeout(initRealtime, 5000);
       }
-    } catch(e) {}
-  };
-  
-  ws.onclose = () => {
-    console.log('🔌 Disconnected from Real-time Study Network. Reconnecting in 5s...');
-    setTimeout(initRealtime, 5000);
-  };
+    };
+  } catch(e) {
+    console.log('ℹ️ [Realtime] WebSocket connection unavailable.');
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -8045,6 +8066,152 @@ window.rateHomeFSRS = function (rating) {
     btn.disabled = true;
   }
 };
+
+// ── PRACTICE ARENA TAB SWITCHER & ARENA RENDERERS ──
+window.switchPracticeTab = function (tab) {
+  const tabs = ['dsa', 'gate-pyq', 'aptitude', 'cs-core', 'mock'];
+  const validTab = (tab === 'pyq') ? 'gate-pyq' : (tab === 'cs') ? 'cs-core' : tabs.includes(tab) ? tab : 'dsa';
+
+  document.querySelectorAll('#view-practice .tab-pill').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+
+  const idMap = {
+    'dsa': 'pxtab-dsa',
+    'gate-pyq': 'pxtab-pyq',
+    'aptitude': 'pxtab-aptitude',
+    'cs-core': 'pxtab-cs',
+    'mock': 'pxtab-mock'
+  };
+
+  const activeBtn = document.getElementById(idMap[validTab] || 'pxtab-dsa');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.setAttribute('aria-selected', 'true');
+  }
+
+  const container = document.getElementById('practice-content-area');
+  if (!container) return;
+
+  if (validTab === 'dsa') renderDSAPracticeArena(container);
+  else if (validTab === 'gate-pyq') renderGATEPYQPracticeArena(container);
+  else if (validTab === 'aptitude') renderAptitudePracticeArena(container);
+  else if (validTab === 'cs-core') renderCSCorePracticeArena(container);
+  else if (validTab === 'mock') renderMockTestsArena(container);
+};
+
+function renderDSAPracticeArena(container) {
+  const patterns = [
+    { name: 'Arrays & Two Pointers', solved: 24, total: 30, acc: 88, difficulty: 'Medium' },
+    { name: 'Sliding Window & Hashing', solved: 18, total: 25, acc: 84, difficulty: 'Medium' },
+    { name: 'Binary Search On Answers', solved: 15, total: 20, acc: 75, difficulty: 'Medium' },
+    { name: 'Trees & Binary Search Trees', solved: 22, total: 35, acc: 70, difficulty: 'Hard' },
+    { name: 'Graphs (BFS, DFS & Topo Sort)', solved: 16, total: 30, acc: 62, difficulty: 'Hard' },
+    { name: 'Dynamic Programming (1D & 2D)', solved: 14, total: 40, acc: 58, difficulty: 'Hard' },
+    { name: 'Heaps & Priority Queues', solved: 12, total: 18, acc: 80, difficulty: 'Medium' },
+    { name: 'Tries & Disjoint Set Union (DSU)', solved: 8, total: 15, acc: 65, difficulty: 'Hard' }
+  ];
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px;">
+      ${patterns.map(p => `
+        <div class="track-card" style="padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong style="color:var(--text);font-size:13px;">${p.name}</strong>
+            <span class="badge-pill" style="font-size:10px;">${p.difficulty}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+            <span>Mastery: ${p.solved}/${p.total} Solved</span>
+            <span style="color:${p.acc >= 75 ? 'var(--success)' : p.acc >= 60 ? 'var(--warning)' : 'var(--danger)'};font-weight:700;">${p.acc}% Accuracy</span>
+          </div>
+          <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
+            <div style="width:${Math.round((p.solved/p.total)*100)}%;height:100%;background:var(--accent);"></div>
+          </div>
+          <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+            <button class="action-btn" onclick="openModal('code-studio-modal')" style="font-size:11px;padding:4px 10px;">Practice Pattern →</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderGATEPYQPracticeArena(container) {
+  const gateSubjects = [
+    { subject: 'Operating Systems', questions: 140, completed: 86, avgScore: '74%' },
+    { subject: 'Database Management Systems', questions: 120, completed: 72, avgScore: '81%' },
+    { subject: 'Computer Networks', questions: 110, completed: 58, avgScore: '68%' },
+    { subject: 'Theory of Computation', questions: 130, completed: 94, avgScore: '85%' },
+    { subject: 'Compiler Design', questions: 80, completed: 42, avgScore: '70%' },
+    { subject: 'Computer Organization & Architecture', questions: 105, completed: 50, avgScore: '64%' }
+  ];
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
+      ${gateSubjects.map(g => `
+        <div class="track-card" style="padding:16px;">
+          <div style="font-weight:800;color:var(--text);font-size:14px;margin-bottom:6px;">${g.subject}</div>
+          <div style="font-size:12px;color:var(--text-sub);margin-bottom:10px;">${g.completed} / ${g.questions} Historical PYQs Solved (${g.avgScore} Avg)</div>
+          <button class="action-btn" onclick="openGATEPredictorStudio()" style="font-size:11px;width:100%;text-align:center;">Launch GATE PYQ Drills →</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderAptitudePracticeArena(container) {
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+      <div class="track-card" style="padding:16px;">
+        <h4 style="color:var(--text);margin:0 0 8px;">📊 Quantitative Aptitude Drills</h4>
+        <p style="font-size:12px;color:var(--text-sub);line-height:1.5;">Time-Speed-Distance, Work & Pipes, Probability, Mixtures, P&C, Compound Interest.</p>
+        <button class="action-btn" onclick="openModal('puzzle-lab-modal')" style="margin-top:10px;">Start Speed Drills →</button>
+      </div>
+      <div class="track-card" style="padding:16px;">
+        <h4 style="color:var(--text);margin:0 0 8px;">🧠 Logical & Analytical Reasoning</h4>
+        <p style="font-size:12px;color:var(--text-sub);line-height:1.5;">Seating Arrangements, Blood Relations, Syllogisms, Direction Sense, Coding-Decoding.</p>
+        <button class="action-btn" onclick="openModal('puzzle-lab-modal')" style="margin-top:10px;">Solve Logic Puzzles →</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderCSCorePracticeArena(container) {
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+      <div class="track-card" style="padding:16px;">
+        <h4 style="color:var(--text);margin:0 0 8px;">⚡ OS Concurrency & Virtual Memory</h4>
+        <p style="font-size:12px;color:var(--text-sub);">Deadlocks, Banker's Algorithm, Page Replacement (LRU, Optimal), Semaphores.</p>
+        <button class="action-btn" onclick="openModal('code-studio-modal')" style="margin-top:10px;">Interactive Challenge →</button>
+      </div>
+      <div class="track-card" style="padding:16px;">
+        <h4 style="color:var(--text);margin:0 0 8px;">💾 DBMS Indexing & Transactions</h4>
+        <p style="font-size:12px;color:var(--text-sub);">B+ Tree Splitting, 2PL, Conflict Serializability, Normal Forms (BCNF, 3NF).</p>
+        <button class="action-btn" onclick="navigateToView('cselabs')" style="margin-top:10px;">Launch SQL Sandbox →</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderMockTestsArena(container) {
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
+      <div class="track-card" style="padding:16px;border-left:3px solid var(--primary);">
+        <span class="badge-pill" style="font-size:10px;">GATE 2027</span>
+        <h4 style="color:var(--text);margin:8px 0 6px;">GATE CS & IT Comprehensive Diagnostic Mock</h4>
+        <p style="font-size:12px;color:var(--text-sub);">65 Questions • 180 Minutes • Virtual Calculator • NAT & MSQ scoring.</p>
+        <button class="cta-pill-primary" onclick="openGATEPredictorStudio()" style="margin-top:10px;font-size:12px;padding:8px 18px;">Start Diagnostic Exam →</button>
+      </div>
+      <div class="track-card" style="padding:16px;border-left:3px solid var(--accent);">
+        <span class="badge-pill" style="font-size:10px;">Campus Placements</span>
+        <h4 style="color:var(--text);margin:8px 0 6px;">SDE-1 Company Technical Assessment</h4>
+        <p style="font-size:12px;color:var(--text-sub);">2 Coding Problems • 20 Core CS MCQs • 90 Minutes • Automated Test Cases.</p>
+        <button class="cta-pill-primary" onclick="openMockInterviewStudio()" style="margin-top:10px;font-size:12px;padding:8px 18px;">Start Placement Mock →</button>
+      </div>
+    </div>
+  `;
+}
 
 // ── PREPARE HUB TAB SWITCHER ──
 window.switchPrepareTab = function (tab) {
