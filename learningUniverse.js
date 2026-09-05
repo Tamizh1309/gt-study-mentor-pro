@@ -120,15 +120,7 @@
 
     ctx.clearRect(0, 0, width, height);
 
-    // 1. Atmospheric Deep Background Gradient
-    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-    bgGrad.addColorStop(0, '#050814'); // Midnight
-    bgGrad.addColorStop(0.5, '#070C1D');
-    bgGrad.addColorStop(1, '#0A0F24'); // Deep Navy
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, width, height);
-
-    // Ambient radial glow behind top center (editorial focal light)
+    // Subtle ambient focal glow behind top center
     const focalGrad = ctx.createRadialGradient(
       width * 0.5 + (mouseX - width / 2) * 0.1,
       height * 0.25 + (mouseY - height / 2) * 0.1,
@@ -137,8 +129,8 @@
       height * 0.35,
       width * 0.65
     );
-    focalGrad.addColorStop(0, 'rgba(56, 189, 248, 0.07)'); // Soft cyan glow
-    focalGrad.addColorStop(0.5, 'rgba(91, 91, 214, 0.04)'); // Indigo glow
+    focalGrad.addColorStop(0, 'rgba(56, 189, 248, 0.04)'); // Soft cyan glow
+    focalGrad.addColorStop(0.5, 'rgba(91, 91, 214, 0.02)'); // Indigo glow
     focalGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = focalGrad;
     ctx.fillRect(0, 0, width, height);
@@ -277,11 +269,7 @@
   }
 
   function drawStatic() {
-    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-    bgGrad.addColorStop(0, '#050814');
-    bgGrad.addColorStop(1, '#0A0F24');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height);
   }
 
   // Auto-init on DOM ready

@@ -165,7 +165,14 @@ label, .label-text { font-family: var(--font-family); font-weight: 500; }
 html { font-size: 16px; scroll-behavior: smooth; }
 body {
   font-family: var(--font-family) !important;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: 
+    radial-gradient(ellipse at 50% 30%, rgba(5, 8, 20, 0.15) 0%, rgba(5, 8, 20, 0.58) 100%),
+    url('background.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--text);
   min-height: 100vh;
   overflow: hidden;
@@ -178,8 +185,8 @@ body::before {
   content: '';
   position: fixed;
   top: -50%; left: -50%; width: 200%; height: 200%;
-  background: radial-gradient(circle at 50% 50%, rgba(91, 91, 214, 0.18) 0%, transparent 45%),
-              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 35%);
+  background: radial-gradient(circle at 50% 50%, rgba(91, 91, 214, 0.10) 0%, transparent 45%),
+              radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 35%);
   z-index: 0;
   animation: moveMesh 20s infinite alternate ease-in-out;
   pointer-events: none;
@@ -3873,12 +3880,12 @@ body.light-theme .modal {
 body {
   background-color: var(--bg);
   background-image: 
-    radial-gradient(circle at 15% 15%, rgba(108, 99, 255, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(0, 212, 255, 0.07) 0%, transparent 40%),
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+    radial-gradient(ellipse at 50% 30%, rgba(5, 8, 20, 0.18) 0%, rgba(5, 8, 20, 0.62) 100%),
+    url('background.jpg');
+  background-size: cover;
+  background-position: center center;
   background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 body.light-theme {
@@ -3946,14 +3953,14 @@ body.light-theme {
 }
 
 body {
-  background-color: var(--cyber-bg) !important;
+  background-color: var(--cyber-bg);
   background-image: 
-    radial-gradient(ellipse 90% 70% at 50% -20%, rgba(120, 119, 198, 0.28), transparent 70%),
-    radial-gradient(ellipse 50% 50% at 90% 40%, rgba(0, 240, 255, 0.15), transparent 60%),
-    radial-gradient(ellipse 50% 50% at 10% 70%, rgba(138, 43, 226, 0.15), transparent 60%),
-    repeating-linear-gradient(0deg, rgba(0, 240, 255, 0.025) 0px, rgba(0, 240, 255, 0.025) 1px, transparent 1px, transparent 48px),
-    repeating-linear-gradient(90deg, rgba(0, 240, 255, 0.025) 0px, rgba(0, 240, 255, 0.025) 1px, transparent 1px, transparent 48px) !important;
+    radial-gradient(ellipse at 50% 30%, rgba(5, 8, 20, 0.18) 0%, rgba(5, 8, 20, 0.62) 100%),
+    url('background.jpg') !important;
+  background-size: cover !important;
+  background-position: center center !important;
   background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
 }
 
 /* Unique Dual-Tone Tech SVG Icons */
@@ -4245,9 +4252,8 @@ body.high-contrast {
 
 /* Base Body Application Styling */
 body {
-  background-color: var(--bg-primary) !important;
   color: var(--text) !important;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-family: var(--font-family) !important;
 }
 
 /* ── Nested Sidebar Navigation Hierarchy (Section 7) ── */
