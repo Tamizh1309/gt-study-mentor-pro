@@ -769,7 +769,8 @@ async function submitMapPin() {
 async function fetchLeaderboard() {
   openModal('leaderboard-modal');
   try {
-    const res = await fetch('http://localhost:3000/api/leaderboard');
+    const apiBase = window.GT_API_BASE_URL || '';
+    const res = await fetch(`${apiBase}/api/leaderboard`);
     const data = await res.json();
     
     const list = document.getElementById('leaderboard-list');

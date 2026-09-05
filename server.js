@@ -124,19 +124,12 @@ app.get('/api/leaderboard', (req, res) => {
   db.get("SELECT SUM(total_score) as lifetimeXP FROM progress", [], (err, row) => {
     const userXP = row?.lifetimeXP || 0;
     
-    let leaderboard = [
-      { name: "Arjun M", xp: 14500, avatar: "👨‍💻" },
-      { name: "Sneha V", xp: 13200, avatar: "👩‍💻" },
-      { name: "Rahul S", xp: 11050, avatar: "👨‍🎓" },
-      { name: "Priya K", xp: 9500, avatar: "👩‍🎓" },
-      { name: "Karthik R", xp: 8200, avatar: "👨‍🏫" }
+    // Transparent evidence-based record: Only real student activity is tracked
+    const leaderboard = [
+      { name: "You", xp: userXP, avatar: "🎓", isUser: true, rank: 1, verified: true }
     ];
     
-    leaderboard.push({ name: "You", xp: userXP, avatar: "🎓", isUser: true });
-    leaderboard.sort((a, b) => b.xp - a.xp);
-    leaderboard.forEach((user, index) => user.rank = index + 1);
-    
-    res.json(leaderboard.slice(0, 10));
+    res.json(leaderboard);
   });
 });
 
