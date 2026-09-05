@@ -78,21 +78,6 @@
   </div>
 </div>
 
-<!-- Command Palette (Ctrl+K) -->
-<div id="command-palette-overlay" role="dialog" aria-modal="true" aria-label="Command palette" onclick="if(event.target===this)window.CommandPalette&&CommandPalette.close()">
-  <div class="command-palette-box">
-    <div class="command-palette-input-wrap">
-      <span class="command-palette-icon" aria-hidden="true">&#x2318;</span>
-      <input type="search" id="command-palette-input" class="command-palette-input"
-        placeholder="Search commands, topics, companies..." autocomplete="off" spellcheck="false"
-        aria-label="Search commands"
-        oninput="window.CommandPalette&&CommandPalette.filter(this.value)"
-        onkeydown="window.CommandPalette&&CommandPalette.keyNav(event)" />
-      <span class="command-palette-kbd">Esc</span>
-    </div>
-    <div class="command-list" id="command-list" role="listbox" aria-label="Commands"></div>
-  </div>
-</div>
 <div id="app">
 
 <aside id="sidebar" role="navigation" aria-label="Main navigation">
@@ -205,9 +190,9 @@
     </button>
 
     <div class="sidebar-section-label" aria-hidden="true">AI Mentor</div>
-    <button class="sidebar-nav-item" id="nav-mentor" onclick="navigateToView('mentor')">
+    <button class="sidebar-nav-item" id="nav-mentor" onclick="navigateToView('jarvis')">
       <span class="sidebar-nav-icon" aria-hidden="true">&#x1F916;</span>
-      <span class="sidebar-nav-label">GT AI Mentor</span>
+      <span class="sidebar-nav-label">GT JARVIS</span>
     </button>
 
     <button class="sidebar-nav-item" id="nav-settings" onclick="navigateToView('settings')">
@@ -215,11 +200,7 @@
       <span class="sidebar-nav-label">Settings</span>
     </button>
 
-    <div class="sidebar-section-label" aria-hidden="true">Design System</div>
-    <button class="sidebar-nav-item" id="nav-designs" onclick="navigateToView('designs')">
-      <span class="sidebar-nav-icon" aria-hidden="true">🎨</span>
-      <span class="sidebar-nav-label">25 UI/UX Screens</span>
-    </button>
+    
   </nav>
   <div class="sidebar-user-area">
     <div class="sidebar-user-card" onclick="openModal('profile-modal')" role="button" tabindex="0" aria-label="Open profile" onkeydown="if(event.key==='Enter')openModal('profile-modal')">
@@ -245,11 +226,7 @@
           <span id="header-stopwatch-time" style="font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--text);" aria-live="off">00:00:00</span>
           <button id="header-stopwatch-btn" onclick="toggleHeaderStopwatch()" style="font-size:11px;padding:3px 10px;font-weight:800;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;">&#x25B6; Focus</button>
         </div>
-        <button onclick="window.UIUXStudio&&window.UIUXStudio.openNotificationsModal()" style="display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-full);padding:5px 12px;color:var(--text);font-size:12px;cursor:pointer;" title="Screen 23: Notification Center">🔔 Alerts</button>
-        <button onclick="window.UIUXStudio&&window.UIUXStudio.openAchievementsModal()" style="display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-full);padding:5px 12px;color:var(--text);font-size:12px;cursor:pointer;" title="Screen 20: Achievements & Badges">🏆 Badges</button>
-        <button onclick="navigateToView('designs')" style="display:flex;align-items:center;gap:5px;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.3);border-radius:var(--radius-full);padding:5px 12px;color:var(--accent);font-size:12px;cursor:pointer;font-weight:700;" title="Complete 25-Screen UI/UX Master Specification">🎨 25 Screens</button>
-        <button onclick="window.CommandPalette&&CommandPalette.open()" style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-full);padding:5px 14px;color:var(--text-muted);font-size:12px;cursor:pointer;" aria-label="Open command palette (Ctrl+K)">&#x2318; Ctrl+K</button>
-        <button onclick="navigateToView('mentor')" style="display:flex;align-items:center;gap:6px;background:rgba(91,91,214,0.14);border:1px solid rgba(91,91,214,0.3);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light);font-size:12px;cursor:pointer;font-weight:600;">&#x1F916; Ask GT AI</button>
+        <button onclick="navigateToView('jarvis')" style="display:flex;align-items:center;gap:6px;background:rgba(109,99,255,0.15);border:1px solid rgba(109,99,255,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light);font-size:12px;cursor:pointer;font-weight:700;">🎙️ Ask JARVIS</button>
       </div>
     </header>
 
@@ -673,61 +650,7 @@
       </div>
     </section>
 
-    <!-- 25 UI/UX DESIGN SYSTEM STUDIO -->
-    <section class="view-panel" id="view-designs" aria-label="25 UI/UX Design System Studio">
-      <div class="editorial-hero-wrap" style="margin-bottom: 24px;">
-        <div class="editorial-brand-bar">
-          <div class="editorial-brand-left">
-            <span class="editorial-brand-title">GT STUDY MENTOR PRO</span>
-            <span class="editorial-brand-separator">•</span>
-            <span class="editorial-brand-day">UI/UX Master Specification • 25 Screens</span>
-          </div>
-          <button class="cta-pill-secondary" onclick="window.UIUXStudio&&window.UIUXStudio.openMasterBoard()" style="padding: 5px 14px; font-size: 11px;">
-            <span>🗺️</span> <span>View Master 5x5 Board</span>
-          </button>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
-          <div>
-            <h1 style="font-family: 'Instrument Serif', serif; font-size: 2.5rem; font-weight: 400; color: #FFFFFF; margin-bottom: 6px; line-height: 1.15;">
-              25 Integrated <span class="editorial-highlight">UI/UX Screens</span>
-            </h1>
-            <p style="font-size: 13px; color: var(--text-sub); max-width: 640px; line-height: 1.55;">
-              Explore the master design system governing GT Study Mentor Pro — from Landing and Onboarding to Practice Arenas, AI Mock Interviews, Focus Timers, Community Forums, and System States. Click any card to inspect or launch the live module.
-            </p>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="cta-pill-primary" onclick="window.UIUXStudio&&window.UIUXStudio.openMotivationModal()">
-              <span>✨</span> <span>Screen 24: Quotes</span>
-            </button>
-            <button class="cta-pill-secondary" onclick="window.UIUXStudio&&window.UIUXStudio.openCommunityModal()">
-              <span>👥</span> <span>Screen 19: Community</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Filter Bar & Search -->
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
-          <div class="design-filter-bar" style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <button class="design-filter-pill active" data-cat="all" onclick="window.UIUXStudio.setCategory('all')">All Screens (25)</button>
-            <button class="design-filter-pill" data-cat="core" onclick="window.UIUXStudio.setCategory('core')">Core Flow (1-5)</button>
-            <button class="design-filter-pill" data-cat="study" onclick="window.UIUXStudio.setCategory('study')">Practice & Review (6-10)</button>
-            <button class="design-filter-pill" data-cat="academic" onclick="window.UIUXStudio.setCategory('academic')">Prep & Labs (11-15)</button>
-            <button class="design-filter-pill" data-cat="career" onclick="window.UIUXStudio.setCategory('career')">Career & Habits (16-20)</button>
-            <button class="design-filter-pill" data-cat="system" onclick="window.UIUXStudio.setCategory('system')">System & Polish (21-25)</button>
-          </div>
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <span id="designs-count-label" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Showing 25 of 25 UI/UX Screens</span>
-            <input type="text" id="design-search-input" placeholder="Search 25 screens..." oninput="window.UIUXStudio.setSearch(this.value)" style="background: rgba(0,0,0,0.35); border: 1px solid var(--border-subtle); border-radius: var(--radius-full); padding: 6px 14px; font-size: 12px; color: var(--text); width: 180px;" />
-          </div>
-        </div>
-      </div>
-
-      <!-- 25 Screen Grid -->
-      <div class="designs-grid" id="designs-grid-container">
-        <!-- Dynamically rendered by uiUxDesignStudio.js -->
-      </div>
-    </section>
+    
 </div>
 </div>
 
@@ -1446,26 +1369,8 @@
 <!-- ─── MODAL: Advanced Pomodoro Log ─── -->
 
 
-<!-- ─── MODAL: Global Command Palette (Ctrl+K) ─── -->
 
-<div class="modal-overlay" id="command-palette-modal">
-  <div class="modal command-palette-dialog" style="max-width: 620px; padding: 0; overflow: hidden; border-radius: var(--radius);">
-    <div class="palette-search-wrap">
-      <span class="palette-icon">⚡</span>
-      <input type="text" id="palette-input" class="palette-input" placeholder="Type a command or search (e.g. 'GATE', 'OS', 'Resume', 'Timer')..." autocomplete="off" />
-      <span class="palette-shortcut-hint">ESC to close</span>
-    </div>
-    <div class="palette-results" id="palette-results">
-      <!-- Generated via JS -->
-    </div>
-    <div class="palette-footer">
-      <span><kbd>↑</kbd> <kbd>Ã¢â€ â€œ</kbd> to navigate</span>
-      <span><kbd>Ã¢â€ Âµ</kbd> to select</span>
-      <span><kbd>Ctrl+K</kbd> to toggle</span>
-    </div>
-  </div>
-</div>
-
+    
 <!-- ─── MODAL: Official GATE 2027 Virtual Calculator ─── -->
 
 <div class="modal-overlay" id="calculator-modal">
@@ -3881,6 +3786,6 @@ function solve(arr) {
 <script src="focusSession.js"></script>
 <script src="learningUniverse.js"></script>
 <script src="jarvis.js"></script>
-<script src="uiUxDesignStudio.js"></script>
+
 </body>
 </html>

@@ -766,31 +766,6 @@ async function submitMapPin() {
   }
 }
 
-async function fetchLeaderboard() {
-  openModal('leaderboard-modal');
-  try {
-    const apiBase = window.GT_API_BASE_URL || '';
-    const res = await fetch(`${apiBase}/api/leaderboard`);
-    const data = await res.json();
-    
-    const list = document.getElementById('leaderboard-list');
-    list.innerHTML = data.map(u => `
-      <div style="display:flex; align-items:center; background: ${u.isUser ? 'rgba(108,99,255,0.2)' : 'rgba(0,0,0,0.2)'}; border: 1px solid ${u.isUser ? 'var(--primary)' : 'var(--border-subtle)'}; padding: 12px; border-radius: 8px;">
-        <div style="font-size: 1.2rem; font-weight: bold; width: 30px; color: ${u.rank <= 3 ? 'var(--warning)' : 'var(--text-sec)'};">#${u.rank}</div>
-        <div style="font-size: 1.5rem; margin-right: 12px;">${u.avatar}</div>
-        <div style="flex:1;">
-          <div style="font-weight: bold; color: var(--text);">${u.name}</div>
-        </div>
-        <div style="font-weight: 800; color: var(--accent);">${u.xp} XP</div>
-      </div>
-    `).join('');
-  } catch (err) {
-    document.getElementById('leaderboard-list').innerHTML = '<div style="color:var(--error);">Failed to load leaderboard.</div>';
-  }
-}
-
-document.getElementById('open-leaderboard-btn')?.addEventListener('click', fetchLeaderboard);
-
 // View navigation listeners
 document.getElementById('nav-chat-btn')?.addEventListener('click', () => switchView('chat'));
 document.getElementById('nav-eval-btn')?.addEventListener('click', () => switchView('dashboard'));
@@ -2706,7 +2681,7 @@ document.addEventListener('keydown', (e) => {
 
   // ? key for help (outside inputs)
   if (!inInput && e.key === '?' && !e.altKey) {
-    openModal('command-palette-modal');
+    openModal('keyboard-shortcuts-modal');
     return;
   }
 
@@ -3868,135 +3843,6 @@ function initGATECalculator() {
 }
 
 // ══════════════════════════════════════════════════
-//  GLOBAL COMMAND PALETTE ENGINE (Ctrl+K)
-// ══════════════════════════════════════════════════
-
-const COMMAND_PALETTE_ITEMS = [
-  { icon: '💬', title: 'AI Mentor Chat', desc: 'Ask doubts, concept guidance & GATE queries', badge: 'Workspace', action: () => { closeModal('command-palette-modal'); document.getElementById('chat-input')?.focus(); } },
-  { icon: '🧮', title: 'GATE 2027 Scientific Calculator', desc: 'Official online virtual calculator for exam practice', badge: 'Tool', action: () => { closeModal('command-palette-modal'); openModal('calculator-modal'); } },
-  { icon: '📝', title: 'GATE CS Real PYQ Exam Simulator', desc: 'Timed 10-question test with official negative marking', badge: 'Test', action: () => { closeModal('command-palette-modal'); openModal('gate-exam-modal'); startExam(); } },
-  { icon: '🧪', title: 'Interactive Algorithm Visualizer', desc: 'Step through Binary Search, Kadane, & Two Pointers', badge: 'DSA Tool', action: () => { closeModal('command-palette-modal'); openModal('algo-visualizer-modal'); resetVisualizer(); } },
-  { icon: '🏢', title: 'Tech Placement & Company Directory', desc: 'Zoho, TCS, PayPal, Amazon salary & interview rounds', badge: 'Placement', action: () => { closeModal('command-palette-modal'); openModal('placement-directory-modal'); renderCompanyCards(); } },
-  { icon: '📅', title: 'Sync to Google Calendar (.ics)', desc: 'Download timetable file for Google/Apple Calendar', badge: 'Schedule', action: () => { closeModal('command-palette-modal'); exportToGoogleCalendarICS(); } },
-  { icon: '🗄️', title: 'SQL Query Playground & DBMS Sandbox', desc: 'Execute relational queries on mock tables', badge: 'DBMS Lab', action: () => { closeModal('command-palette-modal'); openModal('sql-playground-modal'); executeMockSQL(); } },
-  { icon: '🔤', title: 'TOC Regex & DFA Language Validator', desc: 'Test string acceptance in regular languages', badge: 'TOC Tool', action: () => { closeModal('command-palette-modal'); openModal('toc-regex-modal'); loadTOCPreset('p1'); } },
-  { icon: '📊', title: 'GATE 100-Mark Weightage Matrix', desc: 'Syllabus blueprint & topic marks distribution', badge: 'Syllabus', action: () => { closeModal('command-palette-modal'); openModal('weightage-matrix-modal'); renderWeightageMatrix(); } },
-  { icon: '⭐', title: 'STAR Behavioral Interview Studio', desc: 'Build compelling HR interview responses', badge: 'Placement', action: () => { closeModal('command-palette-modal'); openModal('star-builder-modal'); loadSTARPrompt('bug'); } },
-  { icon: '⚡', title: 'IEEE 754 & Bitwise Manipulation Studio', desc: '32-bit floating point and binary bit operators', badge: 'Digital Lab', action: () => { closeModal('command-palette-modal'); openModal('ieee-bitwise-modal'); convertIEEEFloat(); } },
-  { icon: '🏗️', title: 'System Design & Architecture Studio', desc: 'High-Level Distributed System Design Blueprint', badge: 'HLD Studio', action: () => { closeModal('command-palette-modal'); openModal('system-design-modal'); renderSystemDesign(); } },
-  { icon: '🌐', title: 'CIDR & Subnet Calculator Lab', desc: 'Calculate IPv4 broadcast, masks, & host ranges', badge: 'CN Lab', action: () => { closeModal('command-palette-modal'); openModal('cidr-subnet-modal'); calculateSubnet(); } },
-  { icon: '🎙️', title: 'AI Voice Mock Interviewer (Skilldunia Inspired)', desc: 'Real-time voice practice with audio waveform & rubric scoring', badge: 'AI Mock', action: () => { closeModal('command-palette-modal'); openModal('ai-mock-interview-modal'); generateMockQuestion(); } },
-  { icon: '🧭', title: 'Interactive Visual Career Map', desc: 'Track milestone progress from student to tier-1 engineer', badge: 'Career Map', action: () => { closeModal('command-palette-modal'); openModal('career-map-modal'); renderCareerMap(); } },
-  { icon: '🎯', title: 'GATE Subject Mastery Hub', desc: 'Track syllabus progress across 10 CS core subjects', badge: 'GATE Prep', action: () => { closeModal('command-palette-modal'); openModal('mastery-modal'); } },
-  { icon: '📄', title: 'AI Resume & ATS Reviewer', desc: 'Score your resume against Zoho, TCS, FAANG criteria', badge: 'Placement', action: () => { closeModal('command-palette-modal'); openModal('resume-modal'); } },
-  { icon: '🧠', title: 'AI Mock Interview', desc: 'Simulate technical and HR interviews with scoring', badge: 'Placement', action: () => { closeModal('command-palette-modal'); openModal('interview-scorecard-modal'); } },
-  { icon: '📊', title: 'Analytics & Performance Dashboard', desc: 'XP trend, subject radar, and study velocity metrics', badge: 'Analytics', action: () => { closeModal('command-palette-modal'); openModal('analytics-modal'); renderAnalyticsModal(); } },
-  { icon: '🧮', title: 'GATE Score & Rank Predictor', desc: 'Predict AIR and IIT/NIT eligibility from mock tests', badge: 'Predictor', action: () => { closeModal('command-palette-modal'); openModal('predictor-modal'); } },
-  { icon: '📖', title: 'Formula & Algorithm Sheet', desc: 'Searchable cheat sheet for GATE CS & DSA', badge: 'Cheat Sheet', action: () => { closeModal('command-palette-modal'); openModal('formulas-modal'); } },
-  { icon: '💡', title: 'AI Structured Doubt Solver', desc: 'Get concept + analogy + GATE PYQ + code', badge: 'AI Tool', action: () => { closeModal('command-palette-modal'); openModal('doubt-solver-modal'); } },
-  { icon: '🃏', title: 'Spaced Repetition Flashcards', desc: '5-box Leitner system for high-yield recall', badge: 'Study Tool', action: () => { closeModal('command-palette-modal'); openModal('flashcard-modal'); } },
-  { icon: '🏆', title: 'Achievements & Badge Gallery', desc: 'Unlock 20+ milestones and track accomplishments', badge: 'Gamification', action: () => { closeModal('command-palette-modal'); openModal('badges-modal'); renderBadgeGallery(); } },
-  { icon: '🎧', title: 'Lo-Fi Focus Soundboard', desc: 'Synthesized ambient rain, binaural beats & ocean sounds', badge: 'Lo-Fi', action: () => { closeModal('command-palette-modal'); openModal('lofi-modal'); } },
-  { icon: '💻', title: 'Live Code Editor & Sandbox', desc: 'Execute JavaScript/algorithms with live console', badge: 'Code', action: () => { closeModal('command-palette-modal'); openModal('code-editor-modal'); } },
-  { icon: '🗺️', title: 'Tamil Nadu Placements Map', desc: 'Interactive map of tech hubs & internship drives', badge: 'Placement', action: () => { closeModal('command-palette-modal'); openModal('drop-pin-modal'); } },
-  { icon: '🍅', title: 'Pomodoro Focus Timer', desc: '25/5 interval timer with automated session logging', badge: 'Productivity', action: () => { closeModal('command-palette-modal'); togglePomodoro(); } },
-  { icon: '📝', title: 'Daily Study Plan', desc: 'Customized schedule tailored to today\'s week and day type', badge: 'Schedule', action: () => { closeModal('command-palette-modal'); openModal('dailyplan-modal'); } },
-  { icon: '🗓️', title: '3-Month Master Roadmap', desc: 'Week-by-week curriculum for GATE CS & Placements', badge: 'Curriculum', action: () => { closeModal('command-palette-modal'); openModal('roadmap-modal'); } },
-  { icon: '⚡', title: 'AI Engine & Gateway Config', desc: 'Configure GPT-5.4 / FreeLLMAPI Gateway', badge: 'AI', action: () => { closeModal('command-palette-modal'); openModal('ai-engine-modal'); if (typeof initAIEngineModal === 'function') initAIEngineModal(); } },
-  { icon: '⌨️', title: 'Keyboard Shortcuts Cheatsheet', desc: 'Quick keybindings for all functions', badge: 'Help', action: () => { closeModal('command-palette-modal'); openModal('keyboard-shortcuts-modal'); } },
-];
-
-let selectedPaletteIndex = 0;
-
-function renderPaletteResults(query = '') {
-  const container = document.getElementById('palette-results');
-  if (!container) return;
-
-  const q = query.toLowerCase().trim();
-  const filtered = COMMAND_PALETTE_ITEMS.filter(item => 
-    !q || item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) || item.badge.toLowerCase().includes(q)
-  );
-
-  if (filtered.length === 0) {
-    container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">No commands matching "' + query + '"</div>';
-    return;
-  }
-
-  if (selectedPaletteIndex >= filtered.length) selectedPaletteIndex = 0;
-
-  container.innerHTML = filtered.map((item, idx) => {
-    const isAct = idx === selectedPaletteIndex;
-    return '<div class="palette-item ' + (isAct ? 'active' : '') + '" data-index="' + idx + '"><div class="palette-item-icon">' + item.icon + '</div><div class="palette-item-info"><div class="palette-item-title">' + item.title + '</div><div class="palette-item-desc">' + item.desc + '</div></div><span class="palette-item-badge">' + item.badge + '</span></div>';
-  }).join('');
-
-  container.querySelectorAll('.palette-item').forEach((el, idx) => {
-    el.addEventListener('click', () => {
-      filtered[idx].action();
-    });
-  });
-}
-
-function initCommandPalette() {
-  const modal = document.getElementById('command-palette-modal');
-  const input = document.getElementById('palette-input');
-  const triggerBtn = document.getElementById('open-palette-btn');
-
-  function openPalette() {
-    openModal('command-palette-modal');
-    if (input) {
-      input.value = '';
-      input.focus();
-    }
-    selectedPaletteIndex = 0;
-    renderPaletteResults('');
-  }
-
-  triggerBtn?.addEventListener('click', openPalette);
-
-  input?.addEventListener('input', () => {
-    selectedPaletteIndex = 0;
-    renderPaletteResults(input.value);
-  });
-
-  input?.addEventListener('keydown', (e) => {
-    const q = input.value.toLowerCase().trim();
-    const filtered = COMMAND_PALETTE_ITEMS.filter(item => 
-      !q || item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) || item.badge.toLowerCase().includes(q)
-    );
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      selectedPaletteIndex = (selectedPaletteIndex + 1) % Math.max(1, filtered.length);
-      renderPaletteResults(input.value);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      selectedPaletteIndex = (selectedPaletteIndex - 1 + filtered.length) % Math.max(1, filtered.length);
-      renderPaletteResults(input.value);
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (filtered[selectedPaletteIndex]) {
-        filtered[selectedPaletteIndex].action();
-      }
-    }
-  });
-
-  // Global Ctrl+K / Cmd+K listener
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      if (modal?.classList.contains('open')) {
-        closeModal('command-palette-modal');
-      } else {
-        openPalette();
-      }
-    } else if (e.altKey && e.key.toLowerCase() === 'q') {
-      e.preventDefault();
-      openModal('calculator-modal');
-    }
-  });
-}
-
-// ══════════════════════════════════════════════════
 //  WEB SPEECH VOICE AI INPUT
 // ══════════════════════════════════════════════════
 
@@ -4074,16 +3920,14 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Initialize Calculator, Command Palette, and Voice AI
+// Initialize Calculator and Voice AI
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initGATECalculator();
-    initCommandPalette();
     initVoiceAI();
   });
 } else {
   initGATECalculator();
-  initCommandPalette();
   initVoiceAI();
 }
 
@@ -5430,8 +5274,7 @@ function initPlacementEcosystem() {
   });
   document.getElementById('mob-nav-calc')?.addEventListener('click', () => openModal('calculator-modal'));
   document.getElementById('mob-nav-menu')?.addEventListener('click', () => {
-    openModal('command-palette-modal');
-    document.getElementById('palette-input')?.focus();
+    openModal('mobile-more-modal');
   });
 }
 
@@ -7880,8 +7723,8 @@ const ROUTES = {
   progress: 'view-progress',
   jarvis: 'view-chat',
   cselabs: 'view-cselabs',
-  settings: 'view-settings',
-  designs: 'view-designs'
+  resources: 'view-resources',
+  settings: 'view-settings'
 };
 window.ROUTES = ROUTES;
 
@@ -7934,8 +7777,7 @@ window.navigateToView = function (viewName, subtab) {
   const viewMap = {
     ...ROUTES,
     'mentor': 'view-chat',
-    'chat': 'view-chat',
-    'resources': 'view-resources'
+    'chat': 'view-chat'
   };
 
   document.querySelectorAll('.view-panel').forEach(p => { p.classList.remove('active'); });
@@ -7952,8 +7794,7 @@ window.navigateToView = function (viewName, subtab) {
     'practice': subtab === 'dsa' ? 'nav-dsa' : subtab === 'gate-pyq' ? 'nav-pyq' : subtab === 'aptitude' ? 'nav-aptitude' : subtab === 'cs-core' ? 'nav-cs-core' : subtab === 'mock' ? 'nav-mock' : 'nav-dsa',
     'career': subtab === 'applications' ? 'nav-applications' : subtab === 'interviews' ? 'nav-interviews' : subtab === 'companies' ? 'nav-companies' : 'nav-opportunities',
     'progress': subtab === 'mastery' ? 'nav-mastery' : subtab === 'mistakes' ? 'nav-mistakes' : subtab === 'analytics' ? 'nav-analytics' : 'nav-readiness',
-    'cselabs': 'nav-labs', 'resources': 'nav-resources', 'mentor': 'nav-mentor', 'chat': 'nav-mentor', 'settings': 'nav-settings',
-    'designs': 'nav-designs'
+    'cselabs': 'nav-labs', 'resources': 'nav-resources', 'jarvis': 'nav-mentor', 'mentor': 'nav-mentor', 'chat': 'nav-mentor', 'settings': 'nav-settings'
   };
   const activeBtnId = sidebarBtnMap[viewName];
   if (activeBtnId) {
@@ -7961,11 +7802,11 @@ window.navigateToView = function (viewName, subtab) {
     if (btn) { btn.classList.add('active'); btn.setAttribute('aria-current', 'page'); }
   }
 
-  const mobileMap = { 'home': 'mob-nav-home', 'prepare': 'mob-nav-prepare', 'practice': 'mob-nav-practice', 'progress': 'mob-nav-progress', 'mentor': 'mob-nav-mentor', 'chat': 'mob-nav-mentor', 'designs': 'mob-nav-home' };
+  const mobileMap = { 'home': 'mob-nav-home', 'prepare': 'mob-nav-prepare', 'practice': 'mob-nav-practice', 'progress': 'mob-nav-progress', 'jarvis': 'mob-nav-jarvis', 'mentor': 'mob-nav-jarvis', 'chat': 'mob-nav-jarvis' };
   const mobBtn = document.getElementById(mobileMap[viewName]);
   if (mobBtn) mobBtn.classList.add('active');
 
-  const titles = { 'home': 'Home', 'prepare': 'Preparation Hub', 'practice': 'Practice Arena', 'career': 'Career Pipeline', 'progress': 'Progress & Analytics', 'cselabs': 'CSE Labs', 'resources': 'Resources', 'mentor': 'GT AI Mentor', 'chat': 'GT AI Mentor', 'settings': 'Settings', 'designs': '25 UI/UX Screens' };
+  const titles = { 'home': 'Home', 'prepare': 'Preparation Hub', 'practice': 'Practice Arena', 'career': 'Career Pipeline', 'progress': 'Progress & Analytics', 'cselabs': 'CSE Labs', 'resources': 'Resources', 'jarvis': 'GT JARVIS', 'mentor': 'GT JARVIS', 'chat': 'GT JARVIS', 'settings': 'Settings' };
   const headerTitle = document.getElementById('main-header-title');
   if (headerTitle) headerTitle.textContent = titles[viewName] || viewName;
 
@@ -7978,7 +7819,6 @@ window.navigateToView = function (viewName, subtab) {
     if (viewName === 'cselabs') renderCSELabs();
     if (viewName === 'resources') renderResourcesLibrary();
     if (viewName === 'settings') renderSettingsView();
-    if (viewName === 'designs' && window.UIUXStudio) window.UIUXStudio.init();
   } catch (e) { console.warn('[navigate] Renderer error:', viewName, e); }
 };
 
@@ -8773,88 +8613,9 @@ window.saveProfileField = function (key, value) {
 };
 
 // ── COMMAND PALETTE ──
-window.CommandPalette = (function () {
-  const COMMANDS = [
-    { id: 'today-plan', label: "Start Today's Plan", sub: 'Focus on your Next Best Action now', icon: '\uD83D\uDE80', kbd: 'Alt+T', action: () => { window.FocusSession && FocusSession.startNBA(); } },
-    { id: 'ask-mentor', label: 'Ask GT AI Mentor', sub: 'Open the AI chat with your context', icon: '\uD83E\uDD16', kbd: 'Alt+A', action: () => { navigateToView('mentor'); } },
-    { id: 'mistake-book', label: 'Open Mistake Book', sub: 'Review your recorded mistakes', icon: '\uD83D\uDCD4', kbd: 'Alt+M', action: () => { navigateToView('progress','mistakes'); } },
-    { id: 'smart-revision', label: 'Start Smart Revision', sub: 'FSRS-powered spaced repetition cards', icon: '\uD83D\uDD04', kbd: 'Alt+R', action: () => { openModal('flashcard-modal'); } },
-    { id: 'practice-dsa', label: 'Practice DSA', sub: 'Open DSA Tracker', icon: '\uD83E\uDDE9', kbd: 'Alt+D', action: () => { navigateToView('practice','dsa'); } },
-    { id: 'practice-gate', label: 'Practice GATE PYQ', sub: 'GATE exam mode with virtual calculator', icon: '\u26A1', kbd: 'Alt+G', action: () => { openModal('gate-exam-modal'); } },
-    { id: 'sql-lab', label: 'Open SQL Lab', sub: 'Write and execute SQL queries', icon: '\uD83D\uDDC3\uFE0F', kbd: 'Alt+S', action: () => { openModal('sql-playground-modal'); } },
-    { id: 'find-company', label: 'Find Company', sub: 'Browse the opportunity board', icon: '\uD83C\uDFE2', kbd: 'Alt+C', action: () => { navigateToView('career','companies'); } },
-    { id: 'add-application', label: 'Add Application', sub: 'Track a new job application', icon: '\uD83D\uDCE8', kbd: 'Alt+P', action: () => { navigateToView('career','applications'); } },
-    { id: 'open-resume', label: 'Open Resume Optimizer', sub: 'ATS checker and optimization', icon: '\uD83D\uDCC4', kbd: 'Alt+V', action: () => { openModal('resume-ats-modal'); } },
-    { id: 'gate-readiness', label: 'GATE Preparation Readiness', sub: 'Inspect syllabus coverage & PYQ factor analysis', icon: '⚡', kbd: 'Alt+G', action: () => { navigateToView('progress','readiness'); } }
-  ];
-
-  let filtered = [...COMMANDS];
-  let highlighted = 0;
-  let isOpen = false;
-
-  function render(list) {
-    const el = document.getElementById('command-list');
-    if (!el) return;
-    el.innerHTML = list.map((cmd, i) => `
-      <div class="command-item ${i===highlighted?'highlighted':''}" role="option" aria-selected="${i===highlighted}" onclick="CommandPalette.run('${cmd.id}')"
-        onmouseover="CommandPalette.highlight(${i})">
-        <span class="command-item-icon" aria-hidden="true">${cmd.icon}</span>
-        <div class="command-item-text">
-          <div class="command-item-label">${cmd.label}</div>
-          <div class="command-item-sub">${cmd.sub}</div>
-        </div>
-        ${cmd.kbd ? `<span class="command-item-kbd">${cmd.kbd}</span>` : ''}
-      </div>`).join('');
-  }
-
-  return {
-    open: function () {
-      const overlay = document.getElementById('command-palette-overlay');
-      if (overlay) { overlay.classList.add('active'); }
-      const input = document.getElementById('command-palette-input');
-      if (input) { input.value = ''; input.focus(); }
-      filtered = [...COMMANDS];
-      highlighted = 0;
-      render(filtered);
-      isOpen = true;
-    },
-    close: function () {
-      const overlay = document.getElementById('command-palette-overlay');
-      if (overlay) overlay.classList.remove('active');
-      isOpen = false;
-    },
-    filter: function (query) {
-      const q = (query || '').toLowerCase();
-      filtered = q ? COMMANDS.filter(c => c.label.toLowerCase().includes(q) || c.sub.toLowerCase().includes(q)) : [...COMMANDS];
-      highlighted = 0;
-      render(filtered);
-    },
-    highlight: function (idx) {
-      highlighted = idx;
-      render(filtered);
-    },
-    keyNav: function (e) {
-      if (e.key === 'Escape') { this.close(); return; }
-      if (e.key === 'ArrowDown') { highlighted = Math.min(highlighted+1, filtered.length-1); render(filtered); e.preventDefault(); }
-      if (e.key === 'ArrowUp') { highlighted = Math.max(highlighted-1, 0); render(filtered); e.preventDefault(); }
-      if (e.key === 'Enter' && filtered[highlighted]) { this.run(filtered[highlighted].id); }
-    },
-    run: function (id) {
-      const cmd = COMMANDS.find(c => c.id === id);
-      if (cmd) { this.close(); cmd.action(); }
-    }
-  };
-})();
-
-// Register Ctrl+K / Cmd+K
+// Global Escape handler for open modals
 document.addEventListener('keydown', function (e) {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-    e.preventDefault();
-    window.CommandPalette && CommandPalette.open();
-  }
   if (e.key === 'Escape') {
-    window.CommandPalette && CommandPalette.close();
-    // Also close topmost modal
     const openModals = document.querySelectorAll('.modal-overlay[style*="flex"]');
     if (openModals.length > 0) {
       const topModal = openModals[openModals.length - 1];

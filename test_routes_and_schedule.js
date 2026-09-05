@@ -66,7 +66,7 @@ const puppeteer = require('puppeteer');
   console.log('✅ 120m chip active after click:', is120Active);
 
   // Test navigation to all primary routes
-  const routesToTest = ['prepare', 'practice', 'career', 'progress', 'cselabs', 'designs', 'home'];
+  const routesToTest = ['prepare', 'practice', 'career', 'progress', 'cselabs', 'jarvis', 'home'];
   for (const r of routesToTest) {
     await page.evaluate((routeName) => {
       window.navigateToView(routeName);

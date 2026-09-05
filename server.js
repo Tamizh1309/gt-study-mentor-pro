@@ -120,18 +120,6 @@ app.post('/api/placements', (req, res) => {
   });
 });
 
-app.get('/api/leaderboard', (req, res) => {
-  db.get("SELECT SUM(total_score) as lifetimeXP FROM progress", [], (err, row) => {
-    const userXP = row?.lifetimeXP || 0;
-    
-    // Transparent evidence-based record: Only real student activity is tracked
-    const leaderboard = [
-      { name: "You", xp: userXP, avatar: "🎓", isUser: true, rank: 1, verified: true }
-    ];
-    
-    res.json(leaderboard);
-  });
-});
 
 // ── Daily Evaluation Engine ──
 app.get('/api/progress/:date', (req, res) => {
