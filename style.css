@@ -8938,4 +8938,48 @@ body::after {
 
 /* End GT NeoDepth UI v3.0 */
 
+/* ── Dynamic Scheduling Chips (Blueprint Section 13) ── */
+.dynamic-schedule-picker-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  margin-bottom: 12px;
+}
+
+.dynamic-schedule-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.time-budget-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: var(--font-mono, monospace);
+}
+
+.time-budget-chip:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.time-budget-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary-light, #818cf8);
+  box-shadow: 0 0 10px rgba(109, 99, 255, 0.45);
+}
+
 

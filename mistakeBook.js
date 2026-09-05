@@ -24,6 +24,7 @@ const MistakeBookModule = (function () {
   let smartRevisionCards = [];
 
   function load() {
+    if (typeof localStorage === 'undefined') return;
     try {
       const savedM = localStorage.getItem(MISTAKES_STORAGE_KEY);
       if (savedM) {
@@ -55,6 +56,7 @@ const MistakeBookModule = (function () {
   }
 
   function save() {
+    if (typeof localStorage === 'undefined') return;
     try {
       localStorage.setItem(MISTAKES_STORAGE_KEY, JSON.stringify(mistakes));
       localStorage.setItem(SMART_REV_STORAGE_KEY, JSON.stringify(smartRevisionCards));
@@ -81,20 +83,56 @@ const MistakeBookModule = (function () {
       return mistakes.filter(m => !m.resolved && m.mistakeType === 'Misconception').length;
     },
 
-    // Step 1 & 2: Log Wrong Answer & Category
-    recordMistake: function (question, subject, topic, userWrongAnswer, correctAnswer, concept, mistakeType) {
+    // Step 1 & 2: Log Wrong Answer & Structured Mistake Intelligence (Blueprint Section 11)
+    recordMistake: function (question, subject, topic, userWrongAnswer, correctAnswer, concept, mistakeType, options = {}) {
       const validCategory = MISTAKE_CATEGORIES.includes(mistakeType) ? mistakeType : 'Concept gap';
+      const conf = (options.confidence || 'medium').toLowerCase();
+      const isRepeated = !!options.isRepeated;
+
+      // Severity Determination (Blueprint Section 11: Wrong + High Confidence = CRITICAL)
+      let severity = options.severity;
+      if (!severity) {
+        if (conf === 'high' || isRepeated) {
+          severity = 'CRITICAL';
+        } else if (validCategory === 'Misconception') {
+          severity = 'HIGH';
+        } else if (validCategory === 'Calculation' || validCategory === 'Careless') {
+          severity = 'LOW';
+        } else {
+          severity = 'MEDIUM';
+        }
+      }
+
+      // Next Review Date
+      const today = new Date();
+      const reviewDate = new Date(today);
+      if (severity === 'CRITICAL' || severity === 'HIGH') {
+        // Immediate review today
+      } else if (severity === 'MEDIUM') {
+        reviewDate.setDate(reviewDate.getDate() + 1);
+      } else {
+        reviewDate.setDate(reviewDate.getDate() + 2);
+      }
+      const nextReviewDate = reviewDate.toISOString().split('T')[0];
+
       const newMistake = {
         id: 'mstk-' + Date.now(),
-        question: question.trim(),
+        questionId: options.questionId || ('q-' + Date.now()),
+        question: (question || '').trim(),
         subject: subject || 'Computer Science',
         topic: topic || 'General',
         userWrongAnswer: userWrongAnswer || 'Incorrect choice',
         correctAnswer: correctAnswer || 'Refer to concept notes',
         concept: concept || 'Core concept review needed',
         mistakeType: validCategory,
+        confidence: conf,
+        timeSpent: options.timeSpent || 0,
+        hintUsed: !!options.hintUsed,
+        attemptNumber: options.attemptNumber || 1,
+        severity: severity,
         stage: 'Smart Revision', // Automatically enrolled in Smart Revision
-        dateAdded: new Date().toISOString().split('T')[0],
+        dateAdded: today.toISOString().split('T')[0],
+        nextReviewDate: nextReviewDate,
         attempts: 1,
         resolved: false
       };
@@ -104,19 +142,29 @@ const MistakeBookModule = (function () {
       smartRevisionCards.unshift({
         id: 'srev-' + Date.now(),
         mistakeId: newMistake.id,
-        topic: (subject || '') + ' ? ' + (topic || ''),
+        topic: (subject || '') + ' • ' + (topic || ''),
         question: newMistake.question,
-        answer: newMistake.correctAnswer + '\n\n?? Key Concept: ' + newMistake.concept,
-        stability: 1.5,
-        difficulty: 5.0,
+        answer: newMistake.correctAnswer + '\n\n💡 Key Concept: ' + newMistake.concept,
+        stability: severity === 'CRITICAL' ? 1.0 : 1.5,
+        difficulty: severity === 'CRITICAL' ? 7.0 : 5.0,
         dueDays: 0,
         repetitions: 0,
         lapses: 0,
-        status: 'Due Today'
+        status: 'Due Today',
+        severity: severity
       });
 
       save();
       return newMistake;
+    },
+
+    getMistakesBySeverity: function (sev) {
+      if (!sev) return mistakes;
+      return mistakes.filter(m => m.severity === String(sev).toUpperCase());
+    },
+
+    getCriticalMistakesCount: function () {
+      return mistakes.filter(m => !m.resolved && m.severity === 'CRITICAL').length;
     },
 
     // Step 3: Send to Smart Revision
@@ -227,4 +275,7 @@ const MistakeBookModule = (function () {
 
 if (typeof window !== 'undefined') {
   window.MistakeBookModule = MistakeBookModule;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = MistakeBookModule;
 }

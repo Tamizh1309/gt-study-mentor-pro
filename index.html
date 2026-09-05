@@ -389,9 +389,18 @@
           </div>
 
           <div class="nd-card" style="padding:16px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
               <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);">&#x1F4CB; Today's Plan</div>
               <button onclick="openModal('smart-planner-modal')" style="background:none;border:none;color:var(--primary-light);font-size:11px;cursor:pointer;font-weight:600;">Edit &#x270E;</button>
+            </div>
+            <!-- Dynamic Available Time Selector (Blueprint Section 13) -->
+            <div class="dynamic-schedule-picker-wrap">
+              <span style="font-size:11px;color:var(--text-muted);font-weight:600;">⏱️ Available Time:</span>
+              <div class="dynamic-schedule-picker" id="home-dynamic-schedule-picker">
+                <button type="button" class="time-budget-chip" data-time="30" onclick="window.setDynamicTimeBudget(30)" title="Quick 30-min Sprint">30m</button>
+                <button type="button" class="time-budget-chip active" data-time="60" onclick="window.setDynamicTimeBudget(60)" title="Standard 60-min Focus">60m</button>
+                <button type="button" class="time-budget-chip" data-time="120" onclick="window.setDynamicTimeBudget(120)" title="Deep 120-min Block">120m</button>
+              </div>
             </div>
             <div class="today-timeline" id="today-timeline-list">
               <div style="color:var(--text-muted);font-size:13px;padding:8px 0;">Loading today's tasks...</div>

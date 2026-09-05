@@ -323,6 +323,7 @@ int shortestPathGrid(vector<vector<int>>& grid) {
   ];
 
   function load() {
+    if (typeof localStorage === 'undefined') return;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -343,6 +344,7 @@ int shortestPathGrid(vector<vector<int>>& grid) {
   }
 
   function save() {
+    if (typeof localStorage === 'undefined') return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (e) {
@@ -679,6 +681,154 @@ int shortestPathGrid(vector<vector<int>>& grid) {
       return iitCutoffsDatabase;
     },
 
+    setDailyBudget: function (minutes) {
+      const budget = Number(minutes) || 60;
+      state.dailyBudgetMinutes = budget;
+      state.dailyTargetHours = +(budget / 60).toFixed(1);
+      save();
+      return state.dailyBudgetMinutes;
+    },
+
+    getDailyBudget: function () {
+      return state.dailyBudgetMinutes || 60;
+    },
+
+    generateDynamicSchedule: function (availableMinutes = 60) {
+      const budget = Number(availableMinutes) || state.dailyBudgetMinutes || 60;
+      state.dailyBudgetMinutes = budget;
+      state.dailyTargetHours = +(budget / 60).toFixed(1);
+
+      // If Day 0 zero state, maintain Day 0 orientation task
+      if (state.currentDay === 0 || state.status === 'NOT_STARTED') {
+        state.todayTasks = [
+          {
+            id: 'task-d0-orient',
+            track: 'Orientation',
+            subject: 'Career & Goals',
+            topic: 'Complete Day 0 Preparation Setup',
+            estMinutes: Math.min(15, budget),
+            completed: false,
+            highLeverageNote: 'Calibrates 90-day trajectory & target tracks',
+            time: '09:00'
+          }
+        ];
+        save();
+        return state.todayTasks;
+      }
+
+      // Dynamic distribution according to Blueprint Section 13
+      const topWeak = state.weakTopics && state.weakTopics.length ? state.weakTopics[0] : null;
+      const weakTopicName = topWeak ? `${topWeak.subject}: ${topWeak.topic}` : 'DBMS — Normalization';
+      const weakSubject = topWeak ? topWeak.subject : 'Core CS';
+
+      if (budget <= 30) {
+        // 30 minutes: 20m Critical Revision, 10m Practice
+        state.todayTasks = [
+          {
+            id: 'task-dyn-1',
+            track: 'Revision',
+            subject: weakSubject,
+            topic: `Critical Revision (${weakTopicName})`,
+            estMinutes: 20,
+            completed: false,
+            highLeverageNote: 'Targeted recall on high-severity mistakes',
+            time: '09:00'
+          },
+          {
+            id: 'task-dyn-2',
+            track: 'Practice',
+            subject: 'Problem Solving',
+            topic: 'High-Yield Pattern Verification',
+            estMinutes: 10,
+            completed: false,
+            highLeverageNote: 'Fast accuracy calibration & validation',
+            time: '09:20'
+          }
+        ];
+      } else if (budget <= 60) {
+        // 60 minutes: 30m Weak Topic, 20m Revision, 10m Career
+        state.todayTasks = [
+          {
+            id: 'task-dyn-1',
+            track: 'Core CS',
+            subject: weakSubject,
+            topic: `Weak Topic Mastery (${weakTopicName})`,
+            estMinutes: 30,
+            completed: false,
+            highLeverageNote: 'Concept consolidation from error analytics',
+            time: '09:00'
+          },
+          {
+            id: 'task-dyn-2',
+            track: 'Revision',
+            subject: 'Spaced Repetition',
+            topic: 'Smart Revision Queue & Cards',
+            estMinutes: 20,
+            completed: false,
+            highLeverageNote: 'Spaced recall to combat memory decay curve',
+            time: '09:35'
+          },
+          {
+            id: 'task-dyn-3',
+            track: 'Career',
+            subject: 'Applications',
+            topic: 'Resume Tailoring & 1 Pipeline Action',
+            estMinutes: 10,
+            completed: false,
+            highLeverageNote: 'Consistent outcome-driven job momentum',
+            time: '10:00'
+          }
+        ];
+      } else {
+        // 120 minutes: 40m Weak Topic, 30m DSA, 30m Smart Revision, 20m Career
+        state.todayTasks = [
+          {
+            id: 'task-dyn-1',
+            track: 'Core CS',
+            subject: weakSubject,
+            topic: `Deep Weak Topic Remediation (${weakTopicName})`,
+            estMinutes: 40,
+            completed: false,
+            highLeverageNote: 'Deep concept repair + edge case coverage',
+            time: '09:00'
+          },
+          {
+            id: 'task-dyn-2',
+            track: 'DSA',
+            subject: 'Data Structures',
+            topic: 'Blind 75 / Striver A2Z Coding Patterns',
+            estMinutes: 30,
+            completed: false,
+            highLeverageNote: 'High-frequency algorithmic pattern mastery',
+            time: '09:45'
+          },
+          {
+            id: 'task-dyn-3',
+            track: 'Revision',
+            subject: 'Smart Revision',
+            topic: 'Full Spaced Repetition Due Deck',
+            estMinutes: 30,
+            completed: false,
+            highLeverageNote: 'Complete FSRS queue clearance',
+            time: '10:20'
+          },
+          {
+            id: 'task-dyn-4',
+            track: 'Career',
+            subject: 'Engineering / Mock',
+            topic: 'System Architecture or Mock Interview Session',
+            estMinutes: 20,
+            completed: false,
+            highLeverageNote: 'ATS resume tuning or technical vocal drill',
+            time: '10:55'
+          }
+        ];
+      }
+
+      save();
+      return state.todayTasks;
+    },
+
     resetToDefaults: function () {
       localStorage.removeItem(STORAGE_KEY);
       location.reload();
@@ -896,5 +1046,9 @@ if (typeof window !== 'undefined') {
       missingList.innerHTML = missing.map(k => `<span class="badge-pill" style="color:var(--warning); border-color:var(--warning);">${k}</span>`).join(' ');
     }
   };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = PrepIntelligenceEngine;
 }
 

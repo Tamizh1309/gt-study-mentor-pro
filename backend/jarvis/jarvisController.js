@@ -19,13 +19,43 @@
 const express = require('express');
 const router = express.Router();
 
-const { classifyIntent } = require('./intentEngine');
-const { getStudentContext } = require('./contextEngine');
+const { orchestrate } = require('./orchestrator');
 const { resolveAction } = require('./actionEngine');
-const { generateResponse } = require('./aiProvider');
+const { getStudentContext } = require('./contextEngine');
 const { getProactiveRecommendations } = require('./recommendationEngine');
-const { appendMessage, getHistory } = require('./memoryService');
-const { cleanTextForSpeech, getSpeechConfig } = require('./voiceService');
+const { getHistory } = require('./memoryService');
+const { getSpeechConfig } = require('./voiceService');
+
+/**
+ * POST /api/jarvis/orchestrate
+ * Complete master orchestration pipeline (Blueprint Section 6)
+ */
+router.post('/orchestrate', async (req, res) => {
+  try {
+    const {
+      message = '',
+      context: clientContext = {},
+      sessionId = 'default-session',
+      mode = 'study'
+    } = req.body;
+
+    const result = await orchestrate({
+      input: message,
+      clientContext,
+      sessionId,
+      mode
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error('[JARVIS Orchestrator Error]', err);
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Internal orchestration error',
+      source: 'error-fallback'
+    });
+  }
+});
 
 /**
  * POST /api/jarvis/chat
@@ -48,52 +78,16 @@ router.post('/chat', async (req, res) => {
       });
     }
 
-    // 1. Ingest & normalize real student context (never invent fake metrics)
-    const context = getStudentContext(clientContext);
-
-    // 2. Classify user intent
-    const intentResult = classifyIntent(trimmed);
-
-    // 3. Check if this maps to a safe application action
-    const action = resolveAction(intentResult.intent, intentResult.parameters);
-
-    // 4. Save student message to conversation memory
-    appendMessage(sessionId, 'user', trimmed);
-
-    // 5. Generate AI response (or action confirmation)
-    let replyText = '';
-    let source = 'local-intelligence';
-
-    if (action && action.spokenConfirmation) {
-      replyText = action.spokenConfirmation;
-      source = 'action-engine';
-    } else {
-      // Generate answer using AI provider (with automatic local CSE fallback)
-      const aiResult = await generateResponse(trimmed, context, mode);
-      replyText = aiResult.text;
-      source = aiResult.source;
-    }
-
-    // 6. Save assistant response to conversation memory
-    appendMessage(sessionId, 'assistant', replyText);
-
-    // 7. Clean text for natural speech synthesis
-    const spokenText = cleanTextForSpeech(replyText);
-
-    // 8. Fetch proactive recommendations based on context
-    const recommendations = getProactiveRecommendations(context);
-
-    // 9. Return structured response
-    res.json({
-      success: true,
-      reply: replyText,
-      spokenText,
-      intent: intentResult,
-      action,
-      recommendations,
-      source,
-      speechConfig: getSpeechConfig()
+    // Execute via central orchestrator
+    const result = await orchestrate({
+      input: trimmed,
+      clientContext,
+      sessionId,
+      mode
     });
+
+    // Return unified contract
+    res.json(result);
 
   } catch (err) {
     console.error('[JARVIS Controller Error]', err);

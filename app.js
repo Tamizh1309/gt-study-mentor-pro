@@ -7871,16 +7871,71 @@ window.showFullDoubtSolution = showFullDoubtSolution;
 window.currentV2View = 'home';
 window.currentV2Subtab = null;
 
+// ── CONSOLIDATED ROUTER & VALIDATION (Blueprint Solutions 20 & 21) ──
+const ROUTES = {
+  home: 'view-home',
+  prepare: 'view-prepare',
+  practice: 'view-practice',
+  career: 'view-career',
+  progress: 'view-progress',
+  jarvis: 'view-chat',
+  cselabs: 'view-cselabs',
+  settings: 'view-settings',
+  designs: 'view-designs'
+};
+window.ROUTES = ROUTES;
+
+window.validateRoutes = function () {
+  let validCount = 0;
+  const entries = Object.entries(ROUTES);
+  const total = entries.length;
+  const missing = [];
+
+  for (const [route, panelId] of entries) {
+    const el = document.getElementById(panelId);
+    if (el) {
+      validCount++;
+    } else {
+      missing.push(`${route} (#${panelId})`);
+    }
+  }
+
+  if (validCount === total) {
+    console.info(`[ROUTER] ${validCount}/${total} routes valid`);
+  } else {
+    console.warn(`[ROUTER] Only ${validCount}/${total} routes valid. Missing: ${missing.join(', ')}`);
+  }
+
+  return { validCount, total, ok: validCount === total };
+};
+
+// ── DYNAMIC TIME BUDGET CONTROLLER (Blueprint Section 13) ──
+window.setDynamicTimeBudget = function (minutes) {
+  const m = Number(minutes) || 60;
+  if (window.PrepIntelligenceEngine && typeof window.PrepIntelligenceEngine.generateDynamicSchedule === 'function') {
+    window.PrepIntelligenceEngine.generateDynamicSchedule(m);
+  }
+  document.querySelectorAll('.time-budget-chip').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.getAttribute('data-time')) === m);
+  });
+  if (typeof window.renderHomeView === 'function') {
+    window.renderHomeView();
+  }
+  if (typeof showToast === 'function') {
+    showToast(`⏱️ Schedule calibrated for ${m}m available time`, 'success');
+  }
+};
+
 // ── GLOBAL VIEW NAVIGATION (GT NeoDepth v3) ──
 window.navigateToView = function (viewName, subtab) {
   window.currentV2View = viewName;
   window.currentV2Subtab = subtab || null;
 
   const viewMap = {
-    'home': 'view-home', 'prepare': 'view-prepare', 'practice': 'view-practice',
-    'career': 'view-career', 'progress': 'view-progress', 'cselabs': 'view-cselabs',
-    'resources': 'view-resources', 'mentor': 'view-chat', 'chat': 'view-chat', 'settings': 'view-settings',
-    'designs': 'view-designs'
+    ...ROUTES,
+    'mentor': 'view-chat',
+    'chat': 'view-chat',
+    'resources': 'view-resources'
   };
 
   document.querySelectorAll('.view-panel').forEach(p => { p.classList.remove('active'); });
@@ -9441,4 +9496,15 @@ window.toggleHomeTimelineTask = function (id) {
   if (typeof showToast === 'function') showToast('Task marked as completed! 🎉', 'success');
   if (typeof renderHomeView === 'function') renderHomeView();
 };
+
+// ── AUTOMATIC STARTUP ROUTE VALIDATION (Blueprint Section 21) ──
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof window.validateRoutes === 'function') window.validateRoutes();
+    });
+  } else {
+    if (typeof window.validateRoutes === 'function') window.validateRoutes();
+  }
+}
 
