@@ -21,25 +21,24 @@
  * @returns {object} Normalized student context
  */
 function getStudentContext(clientPayload = {}) {
-  // Safe defaults matching the current 90-Day OS state
+  const currentDay = clientPayload.day ?? 0;
+  const isStarted = currentDay > 0;
+
   return {
-    day: clientPayload.day || 27,
+    day: currentDay,
     totalDays: clientPayload.totalDays || 90,
-    phase: clientPayload.phase || 'Phase 1: Foundation (Days 1–30)',
-    activeTrack: clientPayload.activeTrack || 'SWE & GATE 2027',
+    status: isStarted ? 'ACTIVE' : 'NOT_STARTED',
+    phase: clientPayload.phase || (isStarted ? `Phase 1: Foundation (Day ${currentDay})` : 'Day 0: Setup & Orientation'),
+    activeTrack: clientPayload.activeTrack || 'Not configured yet',
     readinessScores: {
-      gate: clientPayload.readiness?.gate ?? 76,
-      placement: clientPayload.readiness?.placement ?? 78,
-      swe: clientPayload.readiness?.swe ?? 81,
-      internship: clientPayload.readiness?.internship ?? 68
+      gate: clientPayload.readiness?.gate ?? 0,
+      placement: clientPayload.readiness?.placement ?? 0,
+      swe: clientPayload.readiness?.swe ?? 0,
+      internship: clientPayload.readiness?.internship ?? 0
     },
-    todayTasks: Array.isArray(clientPayload.todayTasks) ? clientPayload.todayTasks : [
-      { id: 't1', title: 'DSA: Tree Traversal & Recursion Patterns', status: 'pending', duration: 45 },
-      { id: 't2', title: 'GATE OS: Deadlock Avoidance (Banker\'s Algorithm)', status: 'pending', duration: 45 },
-      { id: 't3', title: 'Smart Revision: Spaced Repetition Queue (2 items)', status: 'due', duration: 20 }
-    ],
-    pendingMistakes: clientPayload.pendingMistakes ?? 2,
-    weakTopics: clientPayload.weakTopics || ['Deadlocks', 'Graph DFS/BFS', 'TCP Subnetting'],
+    todayTasks: Array.isArray(clientPayload.todayTasks) ? clientPayload.todayTasks : [],
+    pendingMistakes: clientPayload.pendingMistakes ?? 0,
+    weakTopics: Array.isArray(clientPayload.weakTopics) ? clientPayload.weakTopics : [],
     currentFocusSession: clientPayload.currentFocusSession || null,
     currentView: clientPayload.currentView || 'home'
   };

@@ -93,20 +93,22 @@ async function callGeminiAPI(prompt, context, mode, apiKey) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   // Build a concise system prompt with student context
+  const currentDay = context.day ?? 0;
   const systemInstruction = `You are JARVIS, an intelligent, calm, concise, and highly supportive personal study and career AI assistant inside GT Study Mentor Pro for a Computer Science student preparing for GATE 2027, Placements, SWE, and Internships.
 Current Mode: ${mode.toUpperCase()}
 Student Context:
-- Active Day: Day 27 / 90 (Phase 1: Foundation)
-- Readiness Scores: GATE 76%, Placements 78%, SWE 81%, Internship 68%
-- Pending Mistakes in Mistake Book: ${context.pendingMistakes || 2}
-- Target: ${context.targetRole || 'Software Engineering / GATE 2027'}
+- Active Day: Day ${currentDay} / 90 (${context.phase || (currentDay === 0 ? 'Day 0: Setup & Orientation' : `Phase 1: Foundation (Day ${currentDay})`)})
+- Readiness Scores: GATE ${context.readinessScores?.gate ?? 0}%, Placements ${context.readinessScores?.placement ?? 0}%, SWE ${context.readinessScores?.swe ?? 0}%, Internship ${context.readinessScores?.internship ?? 0}%
+- Pending Mistakes in Mistake Book: ${context.pendingMistakes ?? 0}
+- Target: ${context.targetRole || 'Not configured yet'}
 
 Personality & Rules:
 1. Speak naturally, professionally, and concisely (2-4 paragraphs max).
 2. Answer the user's actual question directly from first principles.
-3. If in DSA mode and the user is solving a problem, offer Socratic hints before the full solution.
-4. If appropriate, recommend a safe next action inside the app (e.g. "Shall I start a 45-minute focus session?").
-5. Never invent fake metrics or selection probabilities.`;
+3. If Day is 0 or no study history exists, do NOT invent fake progress, weak topics, or past scores. State honestly that they are at Day 0 and guide them to begin.
+4. If in DSA mode and the user is solving a problem, offer Socratic hints before the full solution.
+5. If appropriate, recommend a safe next action inside the app (e.g. "Shall I start a 45-minute focus session?").
+6. Never invent fake metrics or selection probabilities.`;
 
   const body = {
     contents: [
@@ -162,13 +164,29 @@ function generateLocalCSEAnswer(prompt, context = {}, mode = 'study') {
     }
   }
 
-  // 2. Mode-specific contextual answers
+  // 2. Weak area query check (Rule: Never invent fake weak areas)
+  if (lower.includes('weak')) {
+    if (!context.day || context.day === 0 || !context.weakTopics || context.weakTopics.length === 0) {
+      return "I don't have enough tracked data yet to identify a weak area. As you practice DSA, attempt quizzes, and complete focus sessions, any recurring errors will be tracked in your Mistake Book!";
+    }
+    return `Based on your tracked activity, your current areas requiring reinforcement are: ${context.weakTopics.join(', ')}. Would you like to start a focused practice session on one of them?`;
+  }
+
+  // 3. Day 0 Planning guidance
+  if (!context.day || context.day === 0) {
+    if (lower.includes('what should i study') || lower.includes('what to do') || lower.includes('plan') || lower.includes('today')) {
+      return "Welcome to Day 0 of your 90-Day Career Preparation OS! Your first step is completing your Day 0 onboarding setup. Once configured, we will launch Day 1 with your foundational DSA and Core CS study blocks. Click 'Begin Day 0' on your dashboard to get started!";
+    }
+  }
+
+  // 4. Mode-specific contextual answers
   if (mode === 'dsa' || lower.includes('dsa') || lower.includes('algorithm') || lower.includes('code')) {
     return "In DSA problem solving, always start with: 1) Identify input constraints & edge cases, 2) State the brute-force approach and its Big-O, 3) Optimize using standard patterns (Two-pointers, Sliding window, Frequency hashing, or DP).\n\nShall I open today's DSA practice board or test a problem together?";
   }
 
   if (mode === 'gate' || lower.includes('gate')) {
-    return "For GATE CS preparation, foundational weightage lies in Operating Systems (Deadlocks, Virtual Memory), DBMS (Normalization, Transactions), Computer Networks (Subnetting, TCP/IP), and Theory of Computation (Regular Expressions, Decidability).\n\nYour tracked GATE readiness is currently at 76%. Your Next Best Action is revising Deadlock avoidance PYQs.";
+    const gateScore = context.readinessScores?.gate ?? 0;
+    return `For GATE CS preparation, foundational weightage lies in Operating Systems (Deadlocks, Virtual Memory), DBMS (Normalization, Transactions), Computer Networks (Subnetting, TCP/IP), and Theory of Computation (Regular Expressions, Decidability).\n\nYour tracked GATE readiness is currently ${gateScore}%. Start your foundational syllabus blocks to begin building your score!`;
   }
 
   if (mode === 'interview' || lower.includes('interview')) {
@@ -179,8 +197,9 @@ function generateLocalCSEAnswer(prompt, context = {}, mode = 'study') {
     return "To make your resume ATS-ready: 1) Frame achievements using Google's X-Y-Z formula: 'Accomplished [X], as measured by [Y], by doing [Z]'. 2) Include quantifiable metrics (latency reduction, QPS, memory footprint). 3) Highlight systems projects like distributed consensus clusters or high-throughput servers.\n\nI can open the Resume ATS scanner for you.";
   }
 
-  // 3. Default friendly contextual guidance
-  return `I understand your goal. As your personal preparation assistant, I'm tracking your Day 27 milestones across GATE 2027, Placements, SWE, and Internships.\n\nYour highest-priority task right now is completing your planned DSA and core CS revision blocks. You can ask me any technical CS concept, request hints for a problem, or ask me to "Start a focus session" anytime!`;
+  // 5. Default friendly contextual guidance
+  const day = context.day ?? 0;
+  return `I'm tracking your preparation journey across GATE 2027, Placements, SWE, and Internships. You are currently at Day ${day} of 90. You can ask me any technical CS concept, request Socratic hints for a problem, or ask me to "Start a focus session" anytime!`;
 }
 
 module.exports = {

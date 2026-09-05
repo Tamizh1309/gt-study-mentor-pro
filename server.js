@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { db, syncDailyData } = require('./database');
+const { db, syncDailyData, getPreparationState, completeOnboarding, resetPreparationJourney } = require('./database');
 const WebSocket = require('ws');
 const http = require('http');
 
@@ -53,6 +53,28 @@ app.use(express.static(__dirname));
 // ── GT JARVIS Voice & AI Preparation Assistant ──
 const jarvisRouter = require('./backend/jarvis/jarvisController');
 app.use('/api/jarvis', jarvisRouter);
+
+// ── Day 0 Preparation State & Journey Management Endpoints ──
+app.get('/api/preparation/state', (req, res) => {
+  getPreparationState((err, state) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(state);
+  });
+});
+
+app.post('/api/preparation/onboarding', (req, res) => {
+  completeOnboarding(req.body, (err, state) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true, state });
+  });
+});
+
+app.post('/api/preparation/reset', (req, res) => {
+  resetPreparationJourney((err, state) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true, message: 'Preparation journey reset to Day 0 zero-state.', state });
+  });
+});
 
 // ── Placements & Internships Endpoint ──
 app.get('/api/placements', (req, res) => {

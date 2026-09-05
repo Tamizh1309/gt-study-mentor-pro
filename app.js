@@ -864,7 +864,7 @@ function getSystemPrompt() {
   const year = (typeof profileData !== 'undefined' ? profileData.year : '4th Year B.E. CS') || '4th Year B.E. CS';
   const college = (typeof profileData !== 'undefined' && profileData.college ? profileData.college : 'KGISL Institute of Technology');
   const targets = (typeof profileData !== 'undefined' ? (profileData.targetCompanies || []).join(', ') : '') || 'Zoho, TCS, Amazon';
-  const currentDay = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getState().currentDay : 27;
+  const currentDay = (typeof PrepIntelligenceEngine !== 'undefined') ? (PrepIntelligenceEngine.getState().currentDay ?? 0) : 0;
 
   return `You are "GT AI Mentor" — a dedicated preparation coach for a B.E CSE student preparing for GATE CS 2027, placements, and software engineering roles.
 
@@ -8327,10 +8327,11 @@ window.renderSettingsView = function () {
         </div>
       </div>
       <div class="nd-card" style="padding:20px;">
-        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:14px;">\uD83D\uDCBE Data Management</div>
+        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:14px;">💾 Data Management & Journey Reset</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button onclick="openModal('backup-restore-modal')" style="padding:8px 16px;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.28);border-radius:var(--radius-sm);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;">\uD83D\uDCE6 Backup &amp; Restore</button>
-          <button onclick="if(confirm('Reset ALL data? This cannot be undone.'))PrepIntelligenceEngine&&PrepIntelligenceEngine.resetToDefaults()" style="padding:8px 16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.22);border-radius:var(--radius-sm);color:var(--danger);font-size:12px;font-weight:700;cursor:pointer;">\u26A0;\uFE0F Reset All Data</button>
+          <button onclick="openModal('backup-restore-modal')" style="padding:8px 16px;background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.28);border-radius:var(--radius-sm);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;">📦 Backup &amp; Restore</button>
+          <button onclick="window.resetPreparationJourney&&resetPreparationJourney()" style="padding:8px 16px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);color:var(--danger);font-size:12px;font-weight:700;cursor:pointer;">🔄 Reset Preparation Journey (Day 0)</button>
+          <button onclick="if(confirm('Reset ALL data? This cannot be undone.'))PrepIntelligenceEngine&&PrepIntelligenceEngine.resetToDefaults()" style="padding:8px 16px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18);border-radius:var(--radius-sm);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;">⚠️ Clear Cache &amp; Reload</button>
         </div>
       </div>
     </div>`;
@@ -8625,7 +8626,7 @@ window.getStudentState = function () {
   const careerOpps = (typeof CareerModule !== 'undefined') ? CareerModule.getOpportunities() : [];
   const careerApps = (typeof CareerModule !== 'undefined') ? CareerModule.getApplications() : [];
   const sessions = (typeof FocusSession !== 'undefined') ? FocusSession.getSessionLog() : [];
-  const profile = JSON.parse(localStorage.getItem('gt_student_profile') || '{"name":"Tamizharasan E","target":"GATE + SDE","currentDay":27}');
+  const profile = JSON.parse(localStorage.getItem('gt_student_profile') || '{"name":"Student","target":"GATE + Placement","currentDay":0}');
 
   return {
     profile: profile,
@@ -8635,7 +8636,7 @@ window.getStudentState = function () {
       swe: 'Backend / Systems Engineer',
       internship: 'Summer 2027 SDE Intern'
     },
-    schedule: { currentDay: prep.currentDay || 27, totalDays: 90, phase: Math.ceil((prep.currentDay || 27) / 30) },
+    schedule: { currentDay: prep.currentDay || 0, totalDays: 90, phase: Math.ceil((prep.currentDay || 0) / 30) },
     dayPlan: prep.todayTasks || [],
     studySessions: sessions,
     topicMastery: prep.competencyMatrix || [],
@@ -8737,74 +8738,126 @@ window.startSkillFocusSession = function (key) {
 window.renderHomeView = function () {
   const prep = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getState() : null;
   const nba = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getNextBestAction() : null;
+  const isDay0 = !prep || prep.currentDay === 0 || prep.status === 'NOT_STARTED';
 
-  // 1. Next Best Action (Hero Card)
-  if (nba) {
-    const trackEl = document.getElementById('nba-track-text');
-    const titleEl = document.getElementById('nba-title');
-    const whyEl = document.getElementById('nba-why');
-    const durEl = document.getElementById('nba-duration');
-    const accEl = document.getElementById('nba-accuracy');
-    const misEl = document.getElementById('nba-mistakes');
-    const goalsEl = document.getElementById('nba-goals');
-
-    if (trackEl) trackEl.textContent = nba.track || 'GATE 2027';
-    if (titleEl) titleEl.textContent = (nba.subject ? nba.subject + ' → ' : '') + (nba.action || 'OS Deadlocks');
-    if (whyEl) whyEl.textContent = nba.why || 'Accuracy 48% • Recent mistakes • Smart Revision due • High GATE + interview relevance';
-    if (durEl) durEl.textContent = (nba.estMinutes || 45) + ' min';
-    if (accEl) accEl.textContent = (nba.accuracy || 48) + '%';
-    if (misEl) misEl.textContent = (nba.pendingMistakes || 2) + ' pending';
-    if (goalsEl) goalsEl.textContent = nba.supports || 'GATE + SWE';
+  // 0. Update Day Greeting & Ring
+  const homeDayLabel = document.getElementById('home-day-label');
+  if (homeDayLabel) {
+    homeDayLabel.textContent = isDay0
+      ? 'Day 0 / 90 • Preparation Zero-State & Setup'
+      : `Day ${prep.currentDay} / 90 • Phase ${Math.ceil(prep.currentDay / 30)}: Foundation`;
   }
 
-  // 2. Today\'s Plan Spatial Timeline
+  const ringDayText = document.getElementById('ring-day-text');
+  const ringMain = document.getElementById('ring-main');
+  const ringPctText = document.querySelector('.progress-ring-svg text:last-of-type');
+  if (ringDayText) ringDayText.textContent = isDay0 ? '0' : prep.currentDay;
+  if (ringPctText) {
+    const pct = isDay0 ? 0 : Math.round((prep.currentDay / 90) * 100);
+    ringPctText.textContent = `${pct}% done`;
+  }
+  if (ringMain) {
+    const maxOffset = 339.29;
+    const pct = isDay0 ? 0 : (prep.currentDay / 90);
+    ringMain.style.strokeDashoffset = maxOffset - (maxOffset * pct);
+  }
+
+  // 1. Next Best Action (Hero Card)
+  const trackEl = document.getElementById('nba-track-text');
+  const titleEl = document.getElementById('nba-title');
+  const whyEl = document.getElementById('nba-why');
+  const durEl = document.getElementById('nba-duration');
+  const accEl = document.getElementById('nba-accuracy');
+  const misEl = document.getElementById('nba-mistakes');
+  const goalsEl = document.getElementById('nba-goals');
+  const startBtn = document.getElementById('nba-start-btn');
+
+  if (isDay0) {
+    if (trackEl) trackEl.textContent = 'DAY 0 SETUP';
+    if (titleEl) titleEl.textContent = 'Orientation → Complete Day 0 Preparation Setup';
+    if (whyEl) whyEl.textContent = 'Configure your target roles (GATE, Placement, SWE, Internship), daily study budget, and focus style to generate your Day 1 plan.';
+    if (durEl) durEl.textContent = '10 min';
+    if (accEl) { accEl.textContent = '0%'; accEl.style.color = 'var(--text-muted)'; }
+    if (misEl) misEl.textContent = '0 recorded';
+    if (goalsEl) goalsEl.textContent = 'GATE + Career';
+    if (startBtn) {
+      startBtn.innerHTML = `<span>🚀</span> <span>Begin Day 0 Journey</span>`;
+      startBtn.onclick = function () { window.openDay0Onboarding && window.openDay0Onboarding(); };
+    }
+  } else if (nba) {
+    if (trackEl) trackEl.textContent = nba.track || 'GATE 2027';
+    if (titleEl) titleEl.textContent = (nba.subject ? nba.subject + ' → ' : '') + (nba.action || 'Continue Plan');
+    if (whyEl) whyEl.textContent = nba.why || 'Follow your calibrated 90-day plan.';
+    if (durEl) durEl.textContent = (nba.estMinutes || 45) + ' min';
+    if (accEl) { accEl.textContent = (nba.accuracy || 0) + '%'; accEl.style.color = nba.accuracy >= 70 ? 'var(--success)' : 'var(--warning)'; }
+    if (misEl) misEl.textContent = (nba.pendingMistakes || 0) + ' pending';
+    if (goalsEl) goalsEl.textContent = nba.supports || 'Core Goals';
+    if (startBtn) {
+      startBtn.innerHTML = `<span>▶️</span> <span>Start Focus Session</span>`;
+      startBtn.onclick = function () { window.FocusSession && FocusSession.startNBA(); };
+    }
+  }
+
+  // 2. Today's Plan Spatial Timeline
   const timelineContainer = document.getElementById('today-timeline-list');
   const progText = document.getElementById('today-progress-text');
   const progBar = document.getElementById('today-progress-bar');
-  const tasks = (prep && prep.todayTasks && prep.todayTasks.length) ? prep.todayTasks : [
-    { id: 't1', time: '07:00', topic: 'OS Deadlocks: Banker’s Algorithm', duration: '45m', completed: true, track: 'GATE' },
-    { id: 't2', time: '09:00', topic: 'DSA: Binary Tree Maximum Path Sum', duration: '60m', completed: false, active: true, track: 'SWE' },
-    { id: 't3', time: '18:30', topic: 'DBMS: B+ Tree Insertion & Splitting', duration: '45m', completed: false, track: 'GATE' },
-    { id: 't4', time: '21:00', topic: 'Smart Revision: Spaced Review Queue', duration: '30m', completed: false, track: 'Cross-Goal' }
-  ];
+  const tasks = (prep && prep.todayTasks && prep.todayTasks.length) ? prep.todayTasks : [];
 
-  const doneCount = tasks.filter(t => t.completed).length;
-  if (progText) progText.textContent = doneCount + '/' + tasks.length + ' tasks';
-  if (progBar) progBar.style.width = Math.round((doneCount / Math.max(1, tasks.length)) * 100) + '%';
-
-  if (timelineContainer) {
-    timelineContainer.innerHTML = tasks.map((t, idx) => {
-      const isDone = t.completed;
-      const isActive = !isDone && (t.active || idx === doneCount);
-      return `
-        <div class="timeline-item ${isDone ? 'done' : ''} ${isActive ? 'active' : ''}" style="${isActive ? 'background:rgba(91,91,214,0.06);padding:8px 10px;border-radius:var(--radius-sm);margin:4px 0;' : ''}">
-          <div class="timeline-dot" style="${isDone ? 'background:var(--success);border-color:var(--success);' : isActive ? 'background:var(--primary);border-color:var(--primary);' : 'background:transparent;border-color:var(--text-muted);'}"></div>
-          <div style="flex:1;">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="font-size:11px;font-weight:700;color:${isActive ? 'var(--primary-light)' : 'var(--text-muted)'};font-family:var(--font-mono);">${t.time || ('0' + (7 + idx * 3) + ':00')}</span>
-              <span style="font-size:10px;padding:1px 6px;border-radius:var(--radius-full);background:rgba(255,255,255,0.05);color:var(--text-muted);">${t.duration || '45m'}</span>
-            </div>
-            <div style="font-size:13px;font-weight:${isActive ? '700' : '500'};color:${isDone ? 'var(--text-muted)' : 'var(--text)'};text-decoration:${isDone ? 'line-through' : 'none'};margin-top:2px;">
-              ${t.topic || (t.subject + ': ' + t.topic)}
-            </div>
-            ${isActive ? `
-              <div style="display:flex;gap:6px;margin-top:8px;">
-                <button onclick="window.FocusSession&&FocusSession.startNBA()" style="font-size:10px;padding:3px 10px;border-radius:4px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:700;">▶ Focus</button>
-                <button onclick="toggleHomeTimelineTask('${t.id}')" style="font-size:10px;padding:3px 8px;border-radius:4px;background:var(--surface-mid);color:var(--text-sub);border:1px solid var(--border-subtle);cursor:pointer;">✓ Done</button>
-              </div>` : ''}
-          </div>
+  if (isDay0 || tasks.length === 0) {
+    if (progText) progText.textContent = '0/0 tasks';
+    if (progBar) progBar.style.width = '0%';
+    if (timelineContainer) {
+      timelineContainer.innerHTML = `
+        <div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px;background:rgba(255,255,255,0.02);border:1px dashed var(--border-subtle);border-radius:var(--radius-sm);">
+          <div style="font-size:24px;margin-bottom:6px;">📋</div>
+          <div style="font-weight:600;color:var(--text-sub);margin-bottom:4px;">No tasks logged yet for Day 0</div>
+          <div>Complete your orientation to generate and schedule Day 1 milestones.</div>
+          <button onclick="window.openDay0Onboarding&&openDay0Onboarding()" style="margin-top:10px;padding:6px 14px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;">
+            Setup Day 1 Plan
+          </button>
         </div>`;
-    }).join('');
+    }
+  } else {
+    const doneCount = tasks.filter(t => t.completed).length;
+    if (progText) progText.textContent = doneCount + '/' + tasks.length + ' tasks';
+    if (progBar) progBar.style.width = Math.round((doneCount / Math.max(1, tasks.length)) * 100) + '%';
+
+    if (timelineContainer) {
+      timelineContainer.innerHTML = tasks.map((t, idx) => {
+        const isDone = t.completed;
+        const isActive = !isDone && (t.active || idx === doneCount);
+        return `
+          <div class="timeline-item ${isDone ? 'done' : ''} ${isActive ? 'active' : ''}" style="${isActive ? 'background:rgba(91,91,214,0.06);padding:8px 10px;border-radius:var(--radius-sm);margin:4px 0;' : ''}">
+            <div class="timeline-dot" style="${isDone ? 'background:var(--success);border-color:var(--success);' : isActive ? 'background:var(--primary);border-color:var(--primary);' : 'background:transparent;border-color:var(--text-muted);'}"></div>
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:11px;font-weight:700;color:${isActive ? 'var(--primary-light)' : 'var(--text-muted)'};font-family:var(--font-mono);">${t.time || ('0' + (7 + idx * 3) + ':00')}</span>
+                <span style="font-size:10px;padding:1px 6px;border-radius:var(--radius-full);background:rgba(255,255,255,0.05);color:var(--text-muted);">${t.estMinutes ? t.estMinutes + 'm' : (t.duration || '45m')}</span>
+              </div>
+              <div style="font-size:13px;font-weight:${isActive ? '700' : '500'};color:${isDone ? 'var(--text-muted)' : 'var(--text)'};text-decoration:${isDone ? 'line-through' : 'none'};margin-top:2px;">
+                ${t.topic || (t.subject + ': ' + t.topic)}
+              </div>
+              ${isActive ? `
+                <div style="display:flex;gap:6px;margin-top:8px;">
+                  <button onclick="window.FocusSession&&FocusSession.startNBA()" style="font-size:10px;padding:3px 10px;border-radius:4px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:700;">▶ Focus</button>
+                  <button onclick="toggleHomeTimelineTask('${t.id}')" style="font-size:10px;padding:3px 8px;border-radius:4px;background:var(--surface-mid);color:var(--text-sub);border:1px solid var(--border-subtle);cursor:pointer;">✓ Done</button>
+                </div>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
   }
 
   // 3. 3D Readiness Cards (4 Goals: GATE 2027, Placements, SWE, Internships)
   const readinessContainer = document.getElementById('readiness-orbs-container');
   if (readinessContainer) {
+    const rScores = prep?.readinessScores || {};
     const rData = [
-      { key: 'gate', name: 'GATE 2027', score: 76, color: 'var(--gate-color)', trend: '+4% pace', focus: 'OS: Deadlocks & Paging', action: 'PYQ Practice', view: 'prepare', tab: 'gate' },
-      { key: 'placement', name: 'Placements', score: 78, color: 'var(--placement-color)', trend: '+5% this wk', focus: 'DSA: Trees & Dynamic Prog', action: 'Striver Tracker', view: 'prepare', tab: 'placement' },
-      { key: 'swe', name: 'Software Eng', score: 81, color: 'var(--swe-color)', trend: '+3% quality', focus: 'REST APIs & Distributed Raft', action: 'Launch Lab', view: 'cselabs', tab: null },
-      { key: 'internship', name: 'Internship', score: 68, color: 'var(--intern-color)', trend: '+6% velocity', focus: 'ATS Score & Tech Portfolio', action: 'View Pipeline', view: 'career', tab: 'opportunities' }
+      { key: 'gate', name: 'GATE 2027', score: rScores.gate?.score ?? 0, color: 'var(--gate-color)', trend: isDay0 ? 'No data yet' : 'Evidence-based', focus: isDay0 ? 'Pending Diagnostic' : 'OS & Core CS', action: 'PYQ Practice', view: 'prepare', tab: 'gate' },
+      { key: 'placement', name: 'Placements', score: rScores.placement?.score ?? 0, color: 'var(--placement-color)', trend: isDay0 ? 'No data yet' : 'Evidence-based', focus: isDay0 ? 'Pending Diagnostic' : 'DSA & Patterns', action: 'Striver Tracker', view: 'prepare', tab: 'placement' },
+      { key: 'swe', name: 'Software Eng', score: rScores.swe?.score ?? 0, color: 'var(--swe-color)', trend: isDay0 ? 'No data yet' : 'Evidence-based', focus: isDay0 ? 'Pending Lab Activity' : 'Full-Stack & Systems', action: 'Launch Lab', view: 'cselabs', tab: null },
+      { key: 'internship', name: 'Internship', score: rScores.internship?.score ?? 0, color: 'var(--intern-color)', trend: isDay0 ? 'No data yet' : 'Evidence-based', focus: isDay0 ? 'Resume Calibration' : 'Portfolio & Outreach', action: 'View Pipeline', view: 'career', tab: 'opportunities' }
     ];
 
     readinessContainer.innerHTML = rData.map(r => `
@@ -8834,22 +8887,108 @@ window.renderHomeView = function () {
   // 5. Weak Areas List
   const weakList = document.getElementById('weak-topics-list');
   if (weakList) {
-    const weaks = [
-      { subject: 'OS', topic: 'Deadlocks (Banker’s Algorithm)', accuracy: 48, goal: 'GATE + Placement' },
-      { subject: 'DSA', topic: 'Dynamic Programming on Trees', accuracy: 54, goal: 'SWE' },
-      { subject: 'DBMS', topic: 'Conflict Serializability & 2PL', accuracy: 58, goal: 'GATE' },
-      { subject: 'CN', topic: 'CIDR Subnetting & Supernetting', accuracy: 62, goal: 'Placement' }
-    ];
-    weakList.innerHTML = weaks.map(w => `
-      <div class="weak-topic-pill" onclick="navigateToView('progress','mistakes')" title="Click to open Smart Revision">
-        <span style="font-weight:700;color:var(--text);">${w.subject}: ${w.topic}</span>
-        <span class="weak-accuracy-badge">${w.accuracy}% Acc</span>
-        <span style="font-size:10px;color:var(--text-muted);">(${w.goal})</span>
-      </div>`).join('');
+    const weaks = (prep && Array.isArray(prep.weakTopics)) ? prep.weakTopics : [];
+    if (weaks.length === 0) {
+      weakList.innerHTML = `
+        <div style="padding:12px;color:var(--text-muted);font-size:12px;text-align:center;width:100%;">
+          No weak areas identified yet. Practice questions to record topic diagnostics.
+        </div>`;
+    } else {
+      weakList.innerHTML = weaks.map(w => `
+        <div class="weak-topic-pill" onclick="navigateToView('progress','mistakes')" title="Click to open Smart Revision">
+          <span style="font-weight:700;color:var(--text);">${w.subject}: ${w.topic}</span>
+          <span class="weak-accuracy-badge">${w.accuracy}% Acc</span>
+          <span style="font-size:10px;color:var(--text-muted);">(${w.track || 'General'})</span>
+        </div>`).join('');
+    }
   }
 };
 
 window.renderHomeDashboard = window.renderHomeView;
+
+// Global Day 0 Onboarding & Journey Reset Handlers
+window.openDay0Onboarding = function () {
+  if (typeof openModal === 'function') {
+    openModal('day0-onboarding-modal');
+  } else {
+    const m = document.getElementById('day0-onboarding-modal');
+    if (m) m.classList.add('active');
+  }
+};
+
+window.submitDay0Onboarding = async function (e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const nameInput = document.getElementById('d0-name');
+  const targetSelect = document.getElementById('d0-target');
+  const levelSelect = document.getElementById('d0-level');
+  const hoursSelect = document.getElementById('d0-hours');
+  const sessionSelect = document.getElementById('d0-session');
+
+  const payload = {
+    name: nameInput?.value?.trim() || 'Student',
+    target: targetSelect?.value || 'GATE + Placement',
+    skillLevel: levelSelect?.value || 'Beginner',
+    dailyHours: parseFloat(hoursSelect?.value || '2.0'),
+    focusInterval: parseInt(sessionSelect?.value || '45')
+  };
+
+  try {
+    const res = await fetch('/api/preparation/onboarding', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      if (typeof closeModal === 'function') closeModal('day0-onboarding-modal');
+      if (window.PrepIntelligenceEngine) {
+        await PrepIntelligenceEngine.syncWithServer();
+      }
+      if (typeof showToast === 'function') {
+        showToast(`Welcome ${payload.name}! Day 1 Plan initialized 🚀`, 'success');
+      }
+      window.renderHomeView();
+    } else {
+      throw new Error('Onboarding failed on server');
+    }
+  } catch (err) {
+    console.warn('[Onboarding] Error submitting:', err);
+    if (typeof closeModal === 'function') closeModal('day0-onboarding-modal');
+    if (typeof showToast === 'function') showToast('Started Day 1 in offline mode!', 'info');
+    if (window.PrepIntelligenceEngine) {
+      const st = PrepIntelligenceEngine.getState();
+      st.currentDay = 1;
+      st.status = 'ACTIVE';
+      window.renderHomeView();
+    }
+  }
+};
+
+window.resetPreparationJourney = async function () {
+  if (!confirm('⚠️ Are you sure you want to reset your Preparation Journey to Day 0?\n\nThis will clear all daily progress, task completions, and streaks back to zero. Your question bank and labs will be preserved.')) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/preparation/reset', { method: 'POST' });
+    if (res.ok) {
+      if (window.PrepIntelligenceEngine) {
+        PrepIntelligenceEngine.resetToZeroState();
+      }
+      if (typeof showToast === 'function') {
+        showToast('Preparation Journey reset to Day 0 zero-state', 'info');
+      }
+      setTimeout(() => location.reload(), 600);
+    } else {
+      throw new Error('Reset failed');
+    }
+  } catch (err) {
+    console.warn('[Reset] Reset journey fallback:', err);
+    if (window.PrepIntelligenceEngine) {
+      PrepIntelligenceEngine.resetToZeroState();
+    }
+    location.reload();
+  }
+};
 
 window.toggleHomeTimelineTask = function (id) {
   if (typeof showToast === 'function') showToast('Task marked as completed! 🎉', 'success');

@@ -217,10 +217,10 @@
   </nav>
   <div class="sidebar-user-area">
     <div class="sidebar-user-card" onclick="openModal('profile-modal')" role="button" tabindex="0" aria-label="Open profile" onkeydown="if(event.key==='Enter')openModal('profile-modal')">
-      <div class="sidebar-avatar" aria-hidden="true">T</div>
+      <div class="sidebar-avatar" aria-hidden="true">S</div>
       <div class="sidebar-user-info">
-        <div class="sidebar-user-name">Tamizharasan E</div>
-        <div class="sidebar-user-status">&#x25CF; Day 27 &bull; Lv.8 Pro</div>
+        <div class="sidebar-user-name">Student</div>
+        <div class="sidebar-user-status">&#x25CF; Day 0 &bull; Ready to Start</div>
       </div>
     </div>
   </div>
@@ -247,11 +247,11 @@
     <!-- HOME VIEW -->
     <section class="view-panel active" id="view-home" aria-label="Home Dashboard">
       <div class="home-greeting">
-        <div class="home-greeting-day" id="home-day-label">Day 27 / 90 &bull; Phase 1: Foundation</div>
-        <div class="home-greeting-text" id="home-greeting-full">Good <span id="home-time-greeting">Evening</span>, <span id="home-name">Tamizharasan</span>! &#x1F44B;</div>
+        <div class="home-greeting-day" id="home-day-label">Day 0 / 90 &bull; Preparation Zero-State &amp; Setup</div>
+        <div class="home-greeting-text" id="home-greeting-full">Good <span id="home-time-greeting">Day</span>, <span id="home-name">Student</span>! &#x1F44B;</div>
         <div class="home-phase-badge">
           <span>&#x1F3C6;</span>
-          <span id="home-phase-text">Phase 1 &bull; Foundation Sprint &bull; 30% Complete</span>
+          <span id="home-phase-text">Orientation &bull; Day 0 Zero-State &bull; 0% Complete</span>
         </div>
       </div>
 
@@ -267,17 +267,17 @@
           </div>
 
           <div class="nba-card nd-card-lift" id="nba-main-card">
-            <div class="nba-track-badge" id="nba-track-badge"><span>&#x26A1;</span><span id="nba-track-text">GATE 2027</span></div>
-            <div class="nba-title" id="nba-title">Loading recommendation...</div>
-            <div class="nba-why" id="nba-why">Analyzing your preparation data...</div>
+            <div class="nba-track-badge" id="nba-track-badge"><span>&#x26A1;</span><span id="nba-track-text">DAY 0 SETUP</span></div>
+            <div class="nba-title" id="nba-title">Orientation &rarr; Complete Day 0 Preparation Setup</div>
+            <div class="nba-why" id="nba-why">Configure your target goals, daily study budget, and focus style to generate your calibrated Day 1 plan.</div>
             <div class="nba-meta-grid">
-              <div class="nba-meta-item"><div class="nba-meta-label">Duration</div><div class="nba-meta-value" id="nba-duration">45 min</div></div>
-              <div class="nba-meta-item"><div class="nba-meta-label">Accuracy</div><div class="nba-meta-value" id="nba-accuracy" style="color:var(--danger);">48%</div></div>
-              <div class="nba-meta-item"><div class="nba-meta-label">Mistakes</div><div class="nba-meta-value" id="nba-mistakes">2 pending</div></div>
-              <div class="nba-meta-item"><div class="nba-meta-label">Supports</div><div class="nba-meta-value" id="nba-goals" style="font-size:11px;">GATE + SWE</div></div>
+              <div class="nba-meta-item"><div class="nba-meta-label">Duration</div><div class="nba-meta-value" id="nba-duration">10 min</div></div>
+              <div class="nba-meta-item"><div class="nba-meta-label">Accuracy</div><div class="nba-meta-value" id="nba-accuracy" style="color:var(--text-muted);">0%</div></div>
+              <div class="nba-meta-item"><div class="nba-meta-label">Mistakes</div><div class="nba-meta-value" id="nba-mistakes">0 recorded</div></div>
+              <div class="nba-meta-item"><div class="nba-meta-label">Supports</div><div class="nba-meta-value" id="nba-goals" style="font-size:11px;">GATE + Career</div></div>
             </div>
-            <button class="nba-start-btn" onclick="window.FocusSession&&FocusSession.startNBA()" id="nba-start-btn">
-              <span>&#x25B6;&#xFE0F;</span> <span>Start Focus Session</span>
+            <button class="nba-start-btn" onclick="window.openDay0Onboarding&&openDay0Onboarding()" id="nba-start-btn">
+              <span>&#x1F680;</span> <span>Begin Day 0 Journey</span>
             </button>
           </div>
 
@@ -295,17 +295,17 @@
         <div class="home-right-col">
           <div class="nd-card" style="padding:16px;margin-bottom:16px;text-align:center;">
             <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:12px;">&#x1F4C5; 90-Day Journey</div>
-            <svg width="140" height="140" viewBox="0 0 140 140" class="progress-ring-svg" aria-label="90-day progress: 30% complete" role="img" style="transform:rotate(-90deg);">
+            <svg width="140" height="140" viewBox="0 0 140 140" class="progress-ring-svg" aria-label="90-day progress: 0% complete" role="img" style="transform:rotate(-90deg);">
               <circle cx="70" cy="70" r="54" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
               <circle id="ring-main" cx="70" cy="70" r="54" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"
-                stroke-dasharray="339.29" stroke-dashoffset="237.5"
+                stroke-dasharray="339.29" stroke-dashoffset="339.29"
                 style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);"/>
-              <text x="70" y="66" text-anchor="middle" font-size="26" font-weight="900" fill="var(--text)" font-family="Poppins,sans-serif" transform="rotate(90,70,70)" id="ring-day-text">27</text>
+              <text x="70" y="66" text-anchor="middle" font-size="26" font-weight="900" fill="var(--text)" font-family="Poppins,sans-serif" transform="rotate(90,70,70)" id="ring-day-text">0</text>
               <text x="70" y="82" text-anchor="middle" font-size="12" fill="var(--text-muted)" font-family="Poppins,sans-serif" transform="rotate(90,70,70)">/ 90 days</text>
-              <text x="70" y="95" text-anchor="middle" font-size="10" fill="var(--success)" font-family="Poppins,sans-serif" font-weight="700" transform="rotate(90,70,70)">30% done</text>
+              <text x="70" y="95" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="Poppins,sans-serif" font-weight="700" transform="rotate(90,70,70)">0% done</text>
             </svg>
             <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;">
-              <span style="font-size:10px;padding:3px 9px;border-radius:var(--radius-full);background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:var(--accent);font-weight:700;">P1 &#x2713;</span>
+              <span style="font-size:10px;padding:3px 9px;border-radius:var(--radius-full);background:var(--surface);border:1px solid var(--border-subtle);color:var(--text-muted);">P1</span>
               <span style="font-size:10px;padding:3px 9px;border-radius:var(--radius-full);background:var(--surface);border:1px solid var(--border-subtle);color:var(--text-muted);">P2</span>
               <span style="font-size:10px;padding:3px 9px;border-radius:var(--radius-full);background:var(--surface);border:1px solid var(--border-subtle);color:var(--text-muted);">P3</span>
             </div>
@@ -672,8 +672,82 @@
   </div>
 </div>
 
+<!-- Day 0 Onboarding Modal -->
+<div class="modal-overlay" id="day0-onboarding-modal" role="dialog" aria-modal="true" aria-label="Welcome to Day 0 Setup">
+  <div class="modal" style="max-width:560px;">
+    <button class="modal-close" data-close="day0-onboarding-modal" aria-label="Close">&#x2715;</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div style="font-size:28px;">🚀</div>
+      <div>
+        <div class="modal-title" style="margin-bottom:2px;">Welcome to Your Day 0</div>
+        <div class="modal-subtitle">Your personalized 90-day career preparation starts here.</div>
+      </div>
+    </div>
 
+    <form onsubmit="window.submitDay0Onboarding&&submitDay0Onboarding(event)">
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:14px;">
+        <div>
+          <label for="d0-name" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">1. Your Preferred Name</label>
+          <input type="text" id="d0-name" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;" placeholder="e.g. Tamizharasan" required />
+        </div>
 
+        <div>
+          <label for="d0-target" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">2. Primary Target Goals</label>
+          <select id="d0-target" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
+            <option value="GATE + Placement" selected>GATE CS 2027 + Campus Placements</option>
+            <option value="GATE 2027">GATE CS 2027 Exclusively (IISc / IITs / PSUs)</option>
+            <option value="Software Engineering">Software Engineering (Tier-1 Product SDE)</option>
+            <option value="Internship">Summer 2027 SDE Internships</option>
+            <option value="All Tracks">All 4 Tracks (Balanced Master Plan)</option>
+          </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label for="d0-level" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">3. Skill Level</label>
+            <select id="d0-level" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
+              <option value="Beginner" selected>Beginner (Foundations first)</option>
+              <option value="Intermediate">Intermediate (Revising core CS)</option>
+              <option value="Advanced">Advanced (Problem drills &amp; mocks)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="d0-hours" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">4. Daily Study Budget</label>
+            <select id="d0-hours" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
+              <option value="1.0">1 Hour / day (Steady pace)</option>
+              <option value="2.0" selected>2 Hours / day (Balanced)</option>
+              <option value="3.0">3 Hours / day (Accelerated)</option>
+              <option value="4.0">4+ Hours / day (Deep Sprint)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="d0-session" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">5. Preferred Focus Session Length</label>
+          <select id="d0-session" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
+            <option value="25">25 min (Pomodoro Classic)</option>
+            <option value="45" selected>45 min (Recommended Deep Work)</option>
+            <option value="60">60 min (Full Block)</option>
+            <option value="90">90 min (Extended Focus)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
+        <button type="button" class="modal-close" data-close="day0-onboarding-modal" style="padding:10px 18px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</button>
+        <button type="submit" class="submit-btn" style="padding:10px 24px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:13px;cursor:pointer;">Launch Day 1 Plan 🚀</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profile-modal" role="dialog" aria-modal="true" aria-label="Student Profile">
+  <div class="modal">
+    <button class="modal-close" data-close="profile-modal" aria-label="Close">&#x2715;</button>
+    <div class="modal-title">👤 Student Profile</div>
+    <div class="modal-subtitle">Your preparation identity and target companies</div>
     <div class="progress-form">
       <div class="form-group">
         <label class="form-label">Your Name</label>

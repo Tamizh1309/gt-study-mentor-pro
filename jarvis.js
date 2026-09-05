@@ -442,19 +442,39 @@
   // 7. Context Collector (Reads Real Local Data)
   // ──────────────────────────────────────────────────────────────────────────
   function collectLocalStudentContext() {
-    let pendingMistakes = 2;
+    let pendingMistakes = 0;
     if (window.MistakeBookModule && typeof MistakeBookModule.getMistakes === 'function') {
       const list = MistakeBookModule.getMistakes();
       pendingMistakes = list.filter(m => !m.resolved).length;
     }
 
+    const prepState = (window.PrepIntelligenceEngine && typeof PrepIntelligenceEngine.getState === 'function')
+      ? PrepIntelligenceEngine.getState()
+      : null;
+
+    const day = prepState ? (prepState.currentDay ?? 0) : 0;
+    const readiness = {
+      gate: prepState?.readinessScores?.gate?.score ?? 0,
+      placement: prepState?.readinessScores?.placement?.score ?? 0,
+      swe: prepState?.readinessScores?.swe?.score ?? 0,
+      internship: prepState?.readinessScores?.internship?.score ?? 0
+    };
+
+    let phase = 'Day 0: Onboarding & Orientation';
+    if (day >= 1 && day <= 30) phase = 'Phase 1: Foundation (Days 1–30)';
+    else if (day >= 31 && day <= 60) phase = 'Phase 2: Core Deep Dive (Days 31–60)';
+    else if (day >= 61) phase = 'Phase 3: Mocks & Execution (Days 61–90)';
+
     return {
-      day: 27,
+      day,
       totalDays: 90,
-      phase: 'Phase 1: Foundation (Days 1–30)',
-      readiness: { gate: 76, placement: 78, swe: 81, internship: 68 },
+      phase,
+      status: prepState?.status || (day === 0 ? 'NOT_STARTED' : 'ACTIVE'),
+      readiness,
       pendingMistakes,
-      activeTrack: 'SWE & GATE 2027',
+      weakTopics: (prepState && Array.isArray(prepState.weakTopics)) ? prepState.weakTopics : [],
+      todayTasks: (prepState && Array.isArray(prepState.todayTasks)) ? prepState.todayTasks : [],
+      activeTrack: '90-Day Career Preparation OS',
       currentMode: state.mode
     };
   }
@@ -464,6 +484,7 @@
   // ──────────────────────────────────────────────────────────────────────────
   function generateClientFallback(prompt, mode) {
     const lower = prompt.toLowerCase();
+    const ctx = collectLocalStudentContext();
 
     if (/focus|study|timer/i.test(lower)) {
       return {
@@ -490,16 +511,33 @@
     }
 
     if (/progress|score|analytics/i.test(lower)) {
+      if (ctx.day === 0) {
+        return {
+          text: "You are currently at Day 0. All metrics start at 0% and will advance as you log study sessions, quizzes, and problem sets.",
+          spoken: "You are at Day 0. Your preparation readiness will update as you record real study activity.",
+          action: { type: 'show_progress' }
+        };
+      }
       return {
-        text: "Here is your preparation progress breakdown. Your GATE readiness is 76% and SWE readiness is 81%.",
+        text: `Here is your preparation progress breakdown: GATE ${ctx.readiness.gate}%, SWE ${ctx.readiness.swe}%, Placement ${ctx.readiness.placement}%, Internship ${ctx.readiness.internship}%.`,
         spoken: "Displaying your preparation progress and readiness scores.",
         action: { type: 'show_progress' }
       };
     }
 
+    if (/weak|weakness|struggle/i.test(lower)) {
+      return {
+        text: "I don't have enough tracked practice or quiz data yet to identify a weak topic. Complete practice questions or a diagnostic quiz to build evidence.",
+        spoken: "I don't have enough tracked data yet to identify a weak area. Start your first practice session to begin tracking.",
+        action: null
+      };
+    }
+
     return {
-      text: `I've noted your question regarding "${prompt}". Your active preparation focus is Day 27 foundation. Ask me to start a focus session, explain a CS topic, or test a DSA problem!`,
-      spoken: "I'm ready to assist with your study plan, concepts, or focus sessions.",
+      text: ctx.day === 0 
+        ? `Welcome to Day 0! You can complete your onboarding setup, start your first focus session, or ask me any Computer Science question.`
+        : `I've noted your question regarding "${prompt}". Ask me to start a focus session, explain a CS concept, or test a DSA problem!`,
+      spoken: ctx.day === 0 ? "Welcome to Day 0. Let's get your preparation started." : "I'm ready to assist with your study plan, concepts, or focus sessions.",
       action: null
     };
   }

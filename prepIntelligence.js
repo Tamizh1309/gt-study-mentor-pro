@@ -8,140 +8,71 @@
 const PrepIntelligenceEngine = (function () {
   const STORAGE_KEY = 'gt_mentor_prep_intel_v2';
 
-  // Default initial state backed by actual tracked data structure
-  let state = {
-    currentDay: 27,
+  // Default initial state backed by actual tracked data structure (Strict Day 0 Zero-State)
+  const defaultZeroState = {
+    currentDay: 0,
     totalDays: 90,
-    dailyTargetHours: 6.0,
-    completedMinutes: 222, // 3h 42m
-    streakDays: 14,
+    dailyTargetHours: 2.0,
+    completedMinutes: 0,
+    streakDays: 0,
+    status: 'NOT_STARTED',
     readinessScores: {
       gate: {
-        score: 75,
-        syllabusCoverage: 82,
-        pyqAccuracy: 71,
-        revision: 79,
-        mocks: 68,
-        weakAreas: 64,
-        confidence: 'Moderate',
-        explanation: 'Derived from 82% syllabus coverage, 71% PYQ accuracy, 79% revision pace, 68% mock average, and 64% weak area remediation. Not a rank or selection probability.'
+        score: 0,
+        syllabusCoverage: 0,
+        pyqAccuracy: 0,
+        revision: 0,
+        mocks: 0,
+        weakAreas: 0,
+        confidence: 'None',
+        explanation: 'No tracked activity yet. Complete study blocks, PYQs, and revision to build verified readiness.'
       },
       placement: {
-        score: 78,
-        dsa: 82,
-        csCore: 79,
-        aptitude: 84,
-        projects: 85,
-        interviews: 68,
-        confidence: 'High',
-        explanation: 'Weighted across DSA problem solving (82%), CS Core (79%), Aptitude & Reasoning (84%), Project Depth (85%), and Technical Interviews (68%).'
+        score: 0,
+        dsa: 0,
+        csCore: 0,
+        aptitude: 0,
+        projects: 0,
+        interviews: 0,
+        confidence: 'None',
+        explanation: 'No placement assessments or problems solved yet.'
       },
       swe: {
-        score: 80,
-        programming: 88,
-        projectDepth: 85,
-        git: 80,
-        testing: 72,
-        deployment: 70,
-        systemDesign: 68,
-        confidence: 'High',
-        explanation: 'Tracks practical developer competency: programming fluency (88%), project depth (85%), Git workflows (80%), unit testing (72%), CI/CD deployment (70%), and system design (68%).'
+        score: 0,
+        programming: 0,
+        projectDepth: 0,
+        git: 0,
+        testing: 0,
+        deployment: 0,
+        systemDesign: 0,
+        confidence: 'None',
+        explanation: 'Practical software engineering evidence starts at 0% until coding labs and projects are completed.'
       },
       internship: {
-        score: 74,
-        skills: 82,
-        projects: 85,
-        resume: 84,
-        applications: 75,
-        interviewReadiness: 66,
-        confidence: 'Moderate',
-        explanation: 'Evaluated on core skills (82%), portfolio projects (85%), ATS resume strength (84%), active application rate (75%), and interview preparedness (66%).'
+        score: 0,
+        skills: 0,
+        projects: 0,
+        resume: 0,
+        applications: 0,
+        interviewReadiness: 0,
+        confidence: 'None',
+        explanation: 'Internship readiness will track after resume calibration and active pipeline tracking.'
       }
     },
-    todayTasks: [
-      {
-        id: 'task-1',
-        track: 'GATE',
-        subject: 'Operating Systems',
-        topic: 'Deadlocks (Banker\'s Algorithm & RAG)',
-        estMinutes: 45,
-        completed: false,
-        priority: 'CRITICAL',
-        highLeverageNote: 'Contributes to GATE (4 marks) + Amazon/Microsoft OS round.'
-      },
-      {
-        id: 'task-2',
-        track: 'SOFTWARE',
-        subject: 'DSA',
-        topic: 'Binary Trees (Maximum Path Sum & Diameter)',
-        estMinutes: 60,
-        completed: true,
-        priority: 'HIGH',
-        highLeverageNote: 'Overlaps with Placement Coding + Technical Interviews.'
-      },
-      {
-        id: 'task-3',
-        track: 'PLACEMENT',
-        subject: 'Quantitative Aptitude',
-        topic: 'Probability & Bayes Theorem Drills',
-        estMinutes: 30,
-        completed: false,
-        priority: 'HIGH',
-        highLeverageNote: 'Overlaps with GATE General Aptitude + TCS/Zoho Aptitude.'
-      },
-      {
-        id: 'task-4',
-        track: 'INTERNSHIP',
-        subject: 'Career & Resume',
-        topic: 'Improve Project 1 Quantifiable Metrics & Deploy Link',
-        estMinutes: 30,
-        completed: false,
-        priority: 'MEDIUM',
-        highLeverageNote: 'Directly boosts Resume Readiness score by +6 points.'
-      }
-    ],
+    todayTasks: [],
     competencyMatrix: [
-      { skill: 'DSA', gate: 82, placement: 91, swe: 88, intern: 84, highLeverage: true },
-      { skill: 'DBMS', gate: 91, placement: 76, swe: 79, intern: 74, highLeverage: true },
-      { skill: 'Operating Systems', gate: 87, placement: 72, swe: 75, intern: 69, highLeverage: true },
-      { skill: 'Computer Networks', gate: 84, placement: 68, swe: 74, intern: 65, highLeverage: false },
-      { skill: 'Projects', gate: null, placement: 71, swe: 89, intern: 94, highLeverage: true },
-      { skill: 'Quantitative Aptitude', gate: 79, placement: 91, swe: 60, intern: 68, highLeverage: true },
-      { skill: 'Technical Interviews', gate: null, placement: 64, swe: 72, intern: 61, highLeverage: false }
+      { skill: 'DSA', gate: 0, placement: 0, swe: 0, intern: 0, highLeverage: true },
+      { skill: 'DBMS', gate: 0, placement: 0, swe: 0, intern: 0, highLeverage: true },
+      { skill: 'Operating Systems', gate: 0, placement: 0, swe: 0, intern: 0, highLeverage: true },
+      { skill: 'Computer Networks', gate: 0, placement: 0, swe: 0, intern: 0, highLeverage: false },
+      { skill: 'Projects', gate: null, placement: 0, swe: 0, intern: 0, highLeverage: true },
+      { skill: 'Quantitative Aptitude', gate: 0, placement: 0, swe: 0, intern: 0, highLeverage: true },
+      { skill: 'Technical Interviews', gate: null, placement: 0, swe: 0, intern: 0, highLeverage: false }
     ],
-    weakTopics: [
-      {
-        id: 'wt-1',
-        topic: 'Deadlocks',
-        subject: 'Operating Systems',
-        accuracy: 48,
-        prerequisiteScore: 82,
-        reason: 'Your recent accuracy is 48%, while prerequisite CPU scheduling concepts are at 82%. Crucial for GATE and SWE technical interviews.',
-        action: 'Revise Banker\'s Algorithm & Resource Allocation Graph',
-        track: 'GATE + SWE'
-      },
-      {
-        id: 'wt-2',
-        topic: 'Graph Shortest Paths (Dijkstra vs Bellman-Ford)',
-        subject: 'Algorithms',
-        accuracy: 54,
-        prerequisiteScore: 86,
-        reason: 'Negative cycle edge cases misidentified in recent mocks.',
-        action: 'Practice 6 PYQ Graph Edge Cases',
-        track: 'GATE + Placement'
-      },
-      {
-        id: 'wt-3',
-        topic: 'Normalization & Canonical Cover',
-        subject: 'DBMS',
-        accuracy: 59,
-        prerequisiteScore: 90,
-        reason: 'BCNF vs 3NF lossless join / dependency preservation confusion.',
-        action: 'Solve 10 Decomposition Drills',
-        track: 'GATE + SWE'
-      }
-    ]
+    weakTopics: []
   };
+
+  let state = JSON.parse(JSON.stringify(defaultZeroState));
 
   // ── 1. MOCK INTERVIEW DATASET ──
   const mockInterviewTracks = {
@@ -339,14 +270,14 @@ int shortestPathGrid(vector<vector<int>>& grid) {
       phase: 1,
       title: 'Foundation Sprint',
       days: 'Day 1 – 30',
-      progress: 90, // current day 27 is 90% of phase 1
+      progress: 0,
       color: '#63D8FF',
       milestones: [
-        { label: 'C Programming & Pointers Mastery', done: true },
-        { label: 'Discrete Mathematics & Linear Algebra', done: true },
-        { label: 'Striver A2Z DSA (Arrays, Strings, Two Pointers)', done: true },
-        { label: 'GATE 2015–2020 OS & DBMS PYQs (150 Qs)', done: true },
-        { label: 'ATS Resume Clean LaTeX Draft Built', done: true }
+        { label: 'C Programming & Pointers Mastery', done: false },
+        { label: 'Discrete Mathematics & Linear Algebra', done: false },
+        { label: 'Striver A2Z DSA (Arrays, Strings, Two Pointers)', done: false },
+        { label: 'GATE 2015–2020 OS & DBMS PYQs (150 Qs)', done: false },
+        { label: 'ATS Resume Clean LaTeX Draft Built', done: false }
       ]
     },
     {
@@ -396,10 +327,18 @@ int shortestPathGrid(vector<vector<int>>& grid) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        state = Object.assign({}, state, parsed);
+        // If saved data is from the old hardcoded Day 27 build, discard it to enforce Day 0 reset
+        if (parsed.currentDay === 27 || (parsed.readinessScores && parsed.readinessScores.gate && parsed.readinessScores.gate.score === 75)) {
+          console.info('[GT PrepEngine] Migrating old hardcoded Day 27 state to clean Day 0 zero-state');
+          state = JSON.parse(JSON.stringify(defaultZeroState));
+          save();
+        } else {
+          state = Object.assign({}, defaultZeroState, parsed);
+        }
       }
     } catch (e) {
       console.warn('Could not load prep intelligence state', e);
+      state = JSON.parse(JSON.stringify(defaultZeroState));
     }
   }
 
@@ -497,14 +436,76 @@ int shortestPathGrid(vector<vector<int>>& grid) {
     },
 
     getNextBestAction: function () {
-      const topWeak = state.weakTopics[0];
+      if (state.currentDay === 0 || state.status === 'NOT_STARTED') {
+        return {
+          action: 'Complete Day 0 Setup & Orientation',
+          subject: 'Orientation',
+          why: 'Configure your career targets, daily study hours, and preferred focus intervals to generate your Day 1 plan.',
+          cta: 'Begin Day 0 Setup',
+          track: 'DAY 0 SETUP',
+          isDay0: true,
+          estMinutes: 10,
+          accuracy: 0,
+          pendingMistakes: 0,
+          supports: 'GATE + SWE + Career'
+        };
+      }
+      const topWeak = state.weakTopics && state.weakTopics.length ? state.weakTopics[0] : null;
       return {
-        action: topWeak ? 'Revise ' + topWeak.topic : 'Complete Today\'s Plan',
-        subject: topWeak ? topWeak.subject : 'Core CS',
-        why: topWeak ? topWeak.reason : 'Maintains your consistent daily study velocity.',
+        action: topWeak ? 'Revise ' + topWeak.topic : (state.todayTasks.length ? 'Focus: ' + state.todayTasks[0].topic : 'Start Practice Session'),
+        subject: topWeak ? topWeak.subject : (state.todayTasks.length ? state.todayTasks[0].subject : 'General'),
+        why: topWeak ? topWeak.reason : 'Maintains your consistent daily study velocity and builds active evidence.',
         cta: topWeak ? topWeak.action : 'Start Today\'s Plan',
-        track: topWeak ? topWeak.track : 'GATE + Placement'
+        track: topWeak ? topWeak.track : 'Preparation OS',
+        isDay0: false,
+        estMinutes: topWeak ? 45 : (state.todayTasks.length ? state.todayTasks[0].estMinutes : 30),
+        accuracy: topWeak ? topWeak.accuracy : 0,
+        pendingMistakes: 0,
+        supports: 'Career Goals'
       };
+    },
+
+    syncWithServer: async function () {
+      try {
+        const res = await fetch('/api/preparation/state');
+        if (res.ok) {
+          const remote = await res.json();
+          if (remote && remote.profile) {
+            state.currentDay = remote.profile.current_day ?? 0;
+            state.status = remote.profile.status ?? 'NOT_STARTED';
+            state.totalDays = remote.profile.total_days ?? 90;
+            if (remote.readiness) {
+              state.readinessScores.gate.score = remote.readiness.gate_score ?? 0;
+              state.readinessScores.placement.score = remote.readiness.placement_score ?? 0;
+              state.readinessScores.swe.score = remote.readiness.swe_score ?? 0;
+              state.readinessScores.internship.score = remote.readiness.internship_score ?? 0;
+            }
+            if (Array.isArray(remote.todayTasks)) {
+              state.todayTasks = remote.todayTasks.map(t => ({
+                id: 'db-' + t.id,
+                track: t.track,
+                subject: t.subject,
+                topic: t.topic,
+                estMinutes: t.est_minutes,
+                completed: !!t.completed,
+                priority: t.priority
+              }));
+            }
+            save();
+          }
+        }
+      } catch (err) {
+        console.warn('[PrepEngine] Could not sync with server:', err);
+      }
+      return state;
+    },
+
+    resetToZeroState: function () {
+      state = JSON.parse(JSON.stringify(defaultZeroState));
+      save();
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('gt_mentor_prep_intel_v2');
+      localStorage.removeItem('gt_prep_state');
     },
 
     toggleTask: function (taskId) {
