@@ -33,7 +33,31 @@ function getProactiveRecommendations(context = {}) {
     }];
   }
 
-  // 1. Check for pending mistakes in Mistake Book
+  // 1. Critical Check: Confident Misconceptions (Metacognitive Intelligence 2.0)
+  if (context.confidentMisconceptions > 0) {
+    recommendations.push({
+      id: 'rec-misconception',
+      title: `${context.confidentMisconceptions} Confident Misconception(s) Detected`,
+      reason: "You answered with high confidence but an incorrect foundational concept. Correcting misconceptions before they solidify is critical.",
+      suggestedAction: "review_mistakes",
+      priority: 'critical',
+      voicePrompt: `I noticed ${context.confidentMisconceptions} high-confidence misconception in your recent practice. Let us review the correct model now.`
+    });
+  }
+
+  // 2. Check for weak practice topics with low rolling accuracy
+  if (context.weakPracticeTopic && context.weakPracticeTopic.accuracy < 65) {
+    recommendations.push({
+      id: 'rec-weak-practice',
+      title: `Reinforce ${context.weakPracticeTopic.topic} (${context.weakPracticeTopic.accuracy}% Accuracy)`,
+      reason: `Recent practice attempts in ${context.weakPracticeTopic.topic} indicate knowledge gaps. A 15-minute adaptive drill will rebuild foundational mastery.`,
+      suggestedAction: "start_quiz",
+      priority: 'high',
+      voicePrompt: `Your accuracy in ${context.weakPracticeTopic.topic} is currently ${context.weakPracticeTopic.accuracy}%. Shall we run an adaptive drill?`
+    });
+  }
+
+  // 3. Check for pending mistakes in Mistake Book
   if (context.pendingMistakes > 0) {
     recommendations.push({
       id: 'rec-mistakes',

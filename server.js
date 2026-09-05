@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { db, syncDailyData, getPreparationState, completeOnboarding, resetPreparationJourney } = require('./database');
+const { db, syncDailyData, getPreparationState, completeOnboarding, resetPreparationJourney, recordPracticeAttempt, getPracticeAnalytics } = require('./database');
 const WebSocket = require('ws');
 const http = require('http');
 
@@ -73,6 +73,24 @@ app.post('/api/preparation/reset', (req, res) => {
   resetPreparationJourney((err, state) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ success: true, message: 'Preparation journey reset to Day 0 zero-state.', state });
+  });
+});
+
+// ── Practice Data & Intelligence 2.0 Endpoints ──
+app.post('/api/practice/attempt', (req, res) => {
+  recordPracticeAttempt(req.body, (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (result && result.outcomeType === 'WRONG_CONFIDENT') {
+      broadcast({ type: 'toast', message: `⚠️ Confident misconception flagged in ${req.body.topic || 'Practice'}. JARVIS prioritized review.` });
+    }
+    res.json({ success: true, attempt: result });
+  });
+});
+
+app.get('/api/practice/analytics', (req, res) => {
+  getPracticeAnalytics((err, analytics) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(analytics);
   });
 });
 

@@ -627,6 +627,10 @@ int shortestPathGrid(vector<vector<int>>& grid) {
       };
     },
 
+    calculateGateRank: function (marks, category) {
+      return this.predictGateRank(marks, category);
+    },
+
     getCodeTemplates: function () {
       return codeSandboxTemplates;
     },
@@ -667,6 +671,14 @@ int shortestPathGrid(vector<vector<int>>& grid) {
       return ics.join('\r\n');
     },
 
+    getMockInterviewTracks: function () {
+      return mockInterviewTracks;
+    },
+
+    getIitCutoffs: function () {
+      return iitCutoffsDatabase;
+    },
+
     resetToDefaults: function () {
       localStorage.removeItem(STORAGE_KEY);
       location.reload();
@@ -677,4 +689,212 @@ int shortestPathGrid(vector<vector<int>>& grid) {
 // Attach to window
 if (typeof window !== 'undefined') {
   window.PrepIntelligenceEngine = PrepIntelligenceEngine;
+
+  // ── STUDIO UI CONTROLLERS ──
+  let currentInterviewTrack = 'sde1';
+  let currentInterviewIdx = 0;
+  let interviewTimer = null;
+  let interviewSeconds = 0;
+
+  window.initMockInterview = function () {
+    currentInterviewTrack = 'sde1';
+    currentInterviewIdx = 0;
+    window.switchInterviewTrack('sde1');
+    startInterviewTimer();
+  };
+
+  function startInterviewTimer() {
+    if (interviewTimer) clearInterval(interviewTimer);
+    interviewSeconds = 0;
+    interviewTimer = setInterval(() => {
+      interviewSeconds++;
+      const mins = String(Math.floor(interviewSeconds / 60)).padStart(2, '0');
+      const secs = String(interviewSeconds % 60).padStart(2, '0');
+      const lbl = document.getElementById('int-timer-label');
+      if (lbl) lbl.textContent = `⏱️ Time Elapsed: ${mins}:${secs}`;
+    }, 1000);
+  }
+
+  window.switchInterviewTrack = function (trackId) {
+    currentInterviewTrack = trackId;
+    currentInterviewIdx = 0;
+    document.querySelectorAll('#int-tab-sde1, #int-tab-gate, #int-tab-hr').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById(`int-tab-${trackId.replace('_oral','').replace('_star','')}`);
+    if (btn) btn.classList.add('active');
+
+    const tracks = PrepIntelligenceEngine.getMockInterviewTracks();
+    const list = tracks[trackId] || [];
+    const q = list[currentInterviewIdx] || list[0];
+    if (!q) return;
+
+    const catLbl = document.getElementById('int-question-category');
+    const qText = document.getElementById('int-question-text');
+    const hintBox = document.getElementById('int-hint-box');
+    const ansInput = document.getElementById('int-answer-input');
+
+    if (catLbl) catLbl.textContent = q.category;
+    if (qText) qText.textContent = q.question;
+    if (hintBox) {
+      hintBox.style.display = 'none';
+      hintBox.innerHTML = '<strong>💡 Hint:</strong> ' + q.hint;
+    }
+    if (ansInput) ansInput.value = '';
+  };
+
+  window.toggleInterviewHint = function () {
+    const box = document.getElementById('int-hint-box');
+    if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  };
+
+  window.speakCurrentInterviewQuestion = function () {
+    const qText = document.getElementById('int-question-text')?.textContent;
+    if (qText && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(qText);
+      window.speechSynthesis.speak(u);
+    }
+  };
+
+  window.evaluateInterviewAnswer = function () {
+    const tracks = PrepIntelligenceEngine.getMockInterviewTracks();
+    const list = tracks[currentInterviewTrack] || [];
+    const q = list[currentInterviewIdx] || list[0];
+    const userAns = (document.getElementById('int-answer-input')?.value || '').toLowerCase();
+
+    let matchedKeywords = 0;
+    if (q && q.expectedKeywords) {
+      q.expectedKeywords.forEach(kw => {
+        if (userAns.includes(kw.toLowerCase())) matchedKeywords++;
+      });
+    }
+    const totalKw = (q && q.expectedKeywords) ? q.expectedKeywords.length : 1;
+    const kwPct = Math.round((matchedKeywords / totalKw) * 100);
+    const conceptScore = Math.min(10, Math.max(2, Math.round((kwPct / 10))));
+
+    const scoreConcept = document.getElementById('int-score-concept');
+    const scoreKw = document.getElementById('int-score-keywords');
+    const tanglishExp = document.getElementById('int-tanglish-exp');
+
+    if (scoreConcept) scoreConcept.textContent = `${conceptScore} / 10`;
+    if (scoreKw) scoreKw.textContent = `${kwPct}%`;
+    if (tanglishExp && q) {
+      tanglishExp.textContent = q.tanglishExplanation || 'Well explained! Focus on time and space trade-offs.';
+    }
+  };
+
+  window.nextInterviewQuestion = function () {
+    const tracks = PrepIntelligenceEngine.getMockInterviewTracks();
+    const list = tracks[currentInterviewTrack] || [];
+    currentInterviewIdx = (currentInterviewIdx + 1) % list.length;
+    window.switchInterviewTrack(currentInterviewTrack);
+  };
+
+  // GATE Predictor
+  let currentPredictorCat = 'GEN';
+  window.setPredictorCategory = function (cat) {
+    currentPredictorCat = cat;
+    document.querySelectorAll('#pred-cat-gen, #pred-cat-obc, #pred-cat-scst, #pred-cat-ews').forEach(b => b.classList.remove('active'));
+    const idMap = { GEN: 'pred-cat-gen', OBC: 'pred-cat-obc', SC: 'pred-cat-scst', EWS: 'pred-cat-ews' };
+    const btn = document.getElementById(idMap[cat]);
+    if (btn) btn.classList.add('active');
+    window.runGatePredictor();
+  };
+
+  window.runGatePredictor = function () {
+    const input = document.getElementById('pred-marks-input');
+    const marks = parseFloat(input ? input.value : 68) || 0;
+    const res = PrepIntelligenceEngine.calculateGateRank(marks, currentPredictorCat);
+
+    const scoreVal = document.getElementById('pred-score-val');
+    const airVal = document.getElementById('pred-air-val');
+    const pctVal = document.getElementById('pred-pct-val');
+    const grid = document.getElementById('pred-admissions-grid');
+
+    if (scoreVal) scoreVal.textContent = `${res.estimatedScore} / 1000`;
+    if (airVal) airVal.textContent = `AIR ${res.estimatedAIR}`;
+    if (pctVal) pctVal.textContent = `${res.percentile}%`;
+
+    if (grid) {
+      grid.innerHTML = res.recommendations.map(r => `
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:8px; padding:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:var(--text); font-size:12px;">${r.institute}</strong>
+            <span style="font-size:10px; font-weight:700; color:${r.badgeColor}; border:1px solid ${r.badgeColor}; border-radius:4px; padding:2px 6px;">${r.status}</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">${r.program} • Cutoff: ${r.cutoffScore}</div>
+          <div style="font-size:10px; color:var(--success); margin-top:4px;">Avg: ${r.placementAvg}</div>
+        </div>
+      `).join('');
+    }
+  };
+
+  // CSE Code Studio
+  window.loadCodeStudioTemplate = function (tplId) {
+    const tpls = PrepIntelligenceEngine.getCodeTemplates();
+    const tpl = tpls[tplId] || tpls['sliding-window'];
+    if (!tpl) return;
+    const editor = document.getElementById('code-editor-area');
+    const complexity = document.getElementById('code-complexity-badge');
+    const tanglish = document.getElementById('code-tanglish-box');
+
+    if (editor) editor.value = tpl.cpp;
+    if (complexity) complexity.textContent = tpl.complexity;
+    if (tanglish) tanglish.textContent = tpl.tanglish;
+  };
+
+  window.runCodeStudioSimulation = function () {
+    const outBox = document.getElementById('code-terminal-output');
+    if (outBox) {
+      outBox.innerHTML = '<span style="color:var(--success);">[Process exited with status 0]</span>\nOutput:\nMax Sum Subarray: 9\nVerification: O(N) single-pass completed.';
+    }
+  };
+
+  // 90-Day Gantt Roadmap
+  window.renderGanttRoadmap = function () {
+    const container = document.getElementById('gantt-chart-container');
+    if (!container) return;
+    const phases = PrepIntelligenceEngine.getGanttPhases();
+    container.innerHTML = phases.map(p => `
+      <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:8px; padding:12px; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="color:var(--primary); font-size:13px;">${p.phase}: ${p.title}</strong>
+          <span style="font-size:11px; color:var(--text-sub);">${p.days}</span>
+        </div>
+        <div style="font-size:11px; color:var(--text); margin-top:4px;">Focus: ${p.focus}</div>
+        <div style="font-size:10px; color:var(--success); margin-top:2px;">Milestone: ${p.milestone}</div>
+      </div>
+    `).join('');
+  };
+
+  window.downloadScheduleIcs = function () {
+    const content = PrepIntelligenceEngine.generateIcsFileContent();
+    const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'GT_Mentor_Pro_Schedule.ics';
+    a.click();
+  };
+
+  // ATS Resume Studio
+  window.scanJobDescriptionKeywords = function () {
+    const jd = (document.getElementById('ats-jd-input')?.value || '').toLowerCase();
+    const coreKeywords = ['c++', 'dsa', 'operating systems', 'postgresql', 'docker', 'rest api', 'git', 'system design', 'python', 'java'];
+    const matched = coreKeywords.filter(kw => jd.includes(kw));
+    const missing = coreKeywords.filter(kw => !jd.includes(kw));
+    const score = Math.round((matched.length / coreKeywords.length) * 100);
+
+    const scoreBox = document.getElementById('ats-score-display');
+    const matchedList = document.getElementById('ats-matched-list');
+    const missingList = document.getElementById('ats-missing-list');
+
+    if (scoreBox) scoreBox.textContent = `${score}% Match`;
+    if (matchedList) {
+      matchedList.innerHTML = matched.map(k => `<span class="badge-pill" style="color:var(--success); border-color:var(--success);">${k}</span>`).join(' ');
+    }
+    if (missingList) {
+      missingList.innerHTML = missing.map(k => `<span class="badge-pill" style="color:var(--warning); border-color:var(--warning);">${k}</span>`).join(' ');
+    }
+  };
 }
+

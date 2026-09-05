@@ -103,6 +103,25 @@ function initializeTables() {
       )
     `);
 
+    // Practice Attempts Table (Metacognitive & Adaptive Learning 2.0)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS practice_attempts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question_id TEXT,
+        subject TEXT,
+        topic TEXT,
+        difficulty TEXT,
+        selected_option TEXT,
+        correct_option TEXT,
+        is_correct INTEGER,
+        confidence_level INTEGER DEFAULT 3,
+        outcome_type TEXT,
+        time_spent_seconds INTEGER DEFAULT 0,
+        hint_used INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Seed mock placement data if empty
     db.get("SELECT COUNT(*) as count FROM placements", (err, row) => {
       if (row && row.count === 0) {
@@ -228,12 +247,138 @@ function resetPreparationJourney(callback) {
     // Reset Readiness to 0% across all tracks
     db.run("UPDATE user_readiness SET gate = 0, placement = 0, swe = 0, internship = 0 WHERE id = 1");
 
-    // Clear personal activity logs
+    // Clear personal activity logs and practice attempts
     db.run("DELETE FROM daily_tasks");
     db.run("DELETE FROM focus_logs");
     db.run("DELETE FROM progress");
+    db.run("DELETE FROM practice_attempts");
 
     getPreparationState(callback);
+  });
+}
+
+function recordPracticeAttempt(attempt, callback) {
+  const {
+    questionId = 'q_unknown',
+    subject = 'General CS',
+    topic = 'General',
+    difficulty = 'Medium',
+    selectedOption = '',
+    correctOption = '',
+    isCorrect = false,
+    confidenceLevel = 3,
+    timeSpentSeconds = 0,
+    hintUsed = 0
+  } = attempt;
+
+  const validConfidence = Math.max(1, Math.min(5, parseInt(confidenceLevel, 10) || 3));
+  const isCorrectBool = Boolean(isCorrect);
+  
+  // Metacognitive categorization
+  let outcomeType = 'CORRECT_CONFIDENT';
+  if (isCorrectBool) {
+    outcomeType = validConfidence >= 4 ? 'CORRECT_CONFIDENT' : 'CORRECT_UNCERTAIN';
+  } else {
+    outcomeType = validConfidence >= 4 ? 'WRONG_CONFIDENT' : 'WRONG_UNCERTAIN';
+  }
+
+  const query = `
+    INSERT INTO practice_attempts 
+    (question_id, subject, topic, difficulty, selected_option, correct_option, is_correct, confidence_level, outcome_type, time_spent_seconds, hint_used)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.run(query, [
+    questionId,
+    subject,
+    topic,
+    difficulty,
+    String(selectedOption),
+    String(correctOption),
+    isCorrectBool ? 1 : 0,
+    validConfidence,
+    outcomeType,
+    parseInt(timeSpentSeconds, 10) || 0,
+    hintUsed ? 1 : 0
+  ], function(err) {
+    if (err) return callback ? callback(err) : null;
+    const attemptId = this.lastID;
+
+    // Award XP if correct (10 XP)
+    if (isCorrectBool) {
+      db.run("UPDATE user_profile SET xp = xp + 10 WHERE id = 1");
+    }
+
+    if (callback) {
+      callback(null, {
+        attemptId,
+        questionId,
+        isCorrect: isCorrectBool,
+        confidenceLevel: validConfidence,
+        outcomeType
+      });
+    }
+  });
+}
+
+function getPracticeAnalytics(callback) {
+  const sql = `
+    SELECT 
+      COUNT(*) as totalAttempts,
+      SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correctAttempts,
+      SUM(CASE WHEN outcome_type = 'CORRECT_CONFIDENT' THEN 1 ELSE 0 END) as correctConfident,
+      SUM(CASE WHEN outcome_type = 'CORRECT_UNCERTAIN' THEN 1 ELSE 0 END) as correctUncertain,
+      SUM(CASE WHEN outcome_type = 'WRONG_CONFIDENT' THEN 1 ELSE 0 END) as wrongConfident,
+      SUM(CASE WHEN outcome_type = 'WRONG_UNCERTAIN' THEN 1 ELSE 0 END) as wrongUncertain,
+      AVG(time_spent_seconds) as avgTimeSpent
+    FROM practice_attempts
+  `;
+
+  db.get(sql, [], (err, summary) => {
+    if (err) return callback(err);
+
+    // Recent 10 accuracy
+    db.all("SELECT is_correct FROM practice_attempts ORDER BY id DESC LIMIT 10", [], (err2, recentRows) => {
+      const recentAttempts = (recentRows || []).length;
+      const recentCorrect = (recentRows || []).filter(r => r.is_correct === 1).length;
+      const recentAccuracy = recentAttempts > 0 ? Math.round((recentCorrect / recentAttempts) * 100) : 0;
+      const totalAttempts = summary?.totalAttempts || 0;
+      const overallAccuracy = totalAttempts > 0 ? Math.round(((summary.correctAttempts || 0) / totalAttempts) * 100) : 0;
+
+      // Weak topics (where wrong attempts exist or misconceptions)
+      db.all(`
+        SELECT topic, subject,
+               COUNT(*) as attempts,
+               SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correct,
+               SUM(CASE WHEN outcome_type = 'WRONG_CONFIDENT' THEN 1 ELSE 0 END) as confidentMisconceptions
+        FROM practice_attempts
+        GROUP BY topic, subject
+        HAVING attempts >= 1
+        ORDER BY confidentMisconceptions DESC, (1.0 * correct / attempts) ASC
+        LIMIT 5
+      `, [], (err3, weakTopics) => {
+        callback(null, {
+          totalAttempts,
+          correctAttempts: summary?.correctAttempts || 0,
+          overallAccuracy,
+          recentAccuracy,
+          avgTimeSpent: Math.round(summary?.avgTimeSpent || 0),
+          metacognitive: {
+            correctConfident: summary?.correctConfident || 0,
+            correctUncertain: summary?.correctUncertain || 0,
+            wrongConfident: summary?.wrongConfident || 0, // High risk misconception
+            wrongUncertain: summary?.wrongUncertain || 0
+          },
+          weakTopics: (weakTopics || []).map(t => ({
+            topic: t.topic,
+            subject: t.subject,
+            attempts: t.attempts,
+            accuracy: Math.round((t.correct / t.attempts) * 100),
+            confidentMisconceptions: t.confidentMisconceptions
+          }))
+        });
+      });
+    });
   });
 }
 
@@ -243,5 +388,8 @@ module.exports = {
   syncDailyData: seedPlacements,
   getPreparationState,
   completeOnboarding,
-  resetPreparationJourney
+  resetPreparationJourney,
+  recordPracticeAttempt,
+  getPracticeAnalytics
 };
+

@@ -38,7 +38,10 @@ function getStudentContext(clientPayload = {}) {
     },
     todayTasks: Array.isArray(clientPayload.todayTasks) ? clientPayload.todayTasks : [],
     pendingMistakes: clientPayload.pendingMistakes ?? 0,
+    confidentMisconceptions: clientPayload.confidentMisconceptions ?? 0,
+    weakPracticeTopic: clientPayload.weakPracticeTopic || null,
     weakTopics: Array.isArray(clientPayload.weakTopics) ? clientPayload.weakTopics : [],
+    practiceAnalytics: clientPayload.practiceAnalytics || null,
     currentFocusSession: clientPayload.currentFocusSession || null,
     currentView: clientPayload.currentView || 'home'
   };

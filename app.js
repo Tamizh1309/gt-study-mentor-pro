@@ -6524,10 +6524,32 @@ function renderPrepQuizzes(list) {
     return;
   }
 
+  window._questionConfidence = window._questionConfidence || {};
+
+  window.setQuestionConfidence = function (qId, val, btn) {
+    window._questionConfidence[qId] = parseInt(val, 10);
+    if (btn && btn.parentElement) {
+      btn.parentElement.querySelectorAll('.conf-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  };
+
   container.innerHTML = list.map(q => {
+    window._questionConfidence[q.id] = window._questionConfidence[q.id] || 3;
     return '<div class="quiz-card" id="quiz-card-' + q.id + '">' +
-      '<span class="quiz-cat-pill">' + q.category + '</span>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+        '<span class="quiz-cat-pill">' + q.category + '</span>' +
+        '<span style="font-size:11px;color:var(--text-sub);">Estimated: 90s</span>' +
+      '</div>' +
       '<div class="quiz-q-title">' + q.question + '</div>' +
+      '<div class="confidence-selector" style="display:flex;align-items:center;gap:6px;margin:8px 0 10px;font-size:11px;color:var(--text-sub);">' +
+        '<span style="font-weight:600;">Confidence:</span>' +
+        '<button type="button" class="conf-pill active" onclick="setQuestionConfidence(\'' + q.id + '\', 3, this)">3 Medium</button>' +
+        '<button type="button" class="conf-pill" onclick="setQuestionConfidence(\'' + q.id + '\', 1, this)">1 Guess</button>' +
+        '<button type="button" class="conf-pill" onclick="setQuestionConfidence(\'' + q.id + '\', 2, this)">2 Low</button>' +
+        '<button type="button" class="conf-pill" onclick="setQuestionConfidence(\'' + q.id + '\', 4, this)">4 High</button>' +
+        '<button type="button" class="conf-pill" onclick="setQuestionConfidence(\'' + q.id + '\', 5, this)">5 Certain</button>' +
+      '</div>' +
       '<div class="quiz-options-list">' +
         q.options.map((opt, idx) => {
           return '<button class="quiz-option-btn" onclick="checkQuizAnswer(\'' + q.id + '\', ' + idx + ', ' + q.answer + ')">' +
@@ -6536,15 +6558,17 @@ function renderPrepQuizzes(list) {
         }).join('') +
       '</div>' +
       '<div class="quiz-explanation" id="quiz-exp-' + q.id + '" style="display:none;">' +
+        '<div id="quiz-badge-' + q.id + '"></div>' +
         '<strong>💡 Explanation:</strong> ' + q.explanation +
       '</div>' +
     '</div>';
   }).join('');
 }
 
-function checkQuizAnswer(qId, selectedIdx, correctIdx) {
+async function checkQuizAnswer(qId, selectedIdx, correctIdx) {
   const card = document.getElementById('quiz-card-' + qId);
   const expBox = document.getElementById('quiz-exp-' + qId);
+  const badgeBox = document.getElementById('quiz-badge-' + qId);
   if (!card) return;
 
   const buttons = card.querySelectorAll('.quiz-option-btn');
@@ -6554,9 +6578,88 @@ function checkQuizAnswer(qId, selectedIdx, correctIdx) {
     if (idx === selectedIdx && idx !== correctIdx) btn.classList.add('wrong');
   });
 
+  // Lock confidence selector
+  const confPills = card.querySelectorAll('.conf-pill');
+  confPills.forEach(p => p.style.pointerEvents = 'none');
+
+  const confidence = window._questionConfidence[qId] || 3;
+  const isCorrect = (selectedIdx === correctIdx);
+  const qData = (prepQuizzesData || []).find(q => q.id === qId) || {};
+  const selectedOptText = qData.options ? qData.options[selectedIdx] : '';
+  const correctOptText = qData.options ? qData.options[correctIdx] : '';
+
+  // Determine Metacognitive Outcome Type
+  let outcomeType = 'CORRECT_CONFIDENT';
+  if (isCorrect) {
+    outcomeType = confidence >= 4 ? 'CORRECT_CONFIDENT' : 'CORRECT_UNCERTAIN';
+  } else {
+    outcomeType = confidence >= 4 ? 'WRONG_CONFIDENT' : 'WRONG_UNCERTAIN';
+  }
+
+  // Render Metacognitive Badge
+  if (badgeBox) {
+    if (outcomeType === 'WRONG_CONFIDENT') {
+      badgeBox.innerHTML = '<div class="metacognitive-badge wrong-confident">' +
+        '<span>⚠️ Confident Misconception Detected (Confidence: ' + confidence + '/5)</span>' +
+        '<span style="font-weight:400;font-size:11px;color:var(--text-sub);">You answered with high certainty, but the core premise is inaccurate. Automatically flagged for high-priority Smart Revision.</span>' +
+      '</div>';
+    } else if (outcomeType === 'CORRECT_UNCERTAIN') {
+      badgeBox.innerHTML = '<div class="metacognitive-badge correct-uncertain">' +
+        '<span>💡 Correct with Uncertainty (Confidence: ' + confidence + '/5)</span>' +
+        '<span style="font-weight:400;font-size:11px;color:var(--text-sub);">Correct answer! However, low confidence indicates recall fragility. Scheduled for active recall review.</span>' +
+      '</div>';
+    } else if (outcomeType === 'CORRECT_CONFIDENT') {
+      badgeBox.innerHTML = '<div class="metacognitive-badge correct-confident">' +
+        '<span>🎯 Solid Mastery Verified (Confidence: ' + confidence + '/5)</span>' +
+        '<span style="font-weight:400;font-size:11px;color:var(--text-sub);">Accurate answer with high calibration. Keep up the consistent focus!</span>' +
+      '</div>';
+    } else {
+      badgeBox.innerHTML = '<div class="metacognitive-badge wrong-uncertain">' +
+        '<span>📚 Concept Gap (Confidence: ' + confidence + '/5)</span>' +
+        '<span style="font-weight:400;font-size:11px;color:var(--text-sub);">Identified knowledge gap. Added to your Mistake Book for structured revision.</span>' +
+      '</div>';
+    }
+  }
+
   if (expBox) expBox.style.display = 'block';
 
-  if (selectedIdx === correctIdx) {
+  // Record mistake if incorrect
+  if (!isCorrect && window.MistakeBookModule && typeof MistakeBookModule.recordMistake === 'function') {
+    const mistakeCat = (outcomeType === 'WRONG_CONFIDENT') ? 'Misconception' : 'Concept gap';
+    MistakeBookModule.recordMistake(
+      qData.question || 'Practice Question',
+      qData.category || 'General CS',
+      qData.category || 'Practice',
+      selectedOptText,
+      correctOptText,
+      qData.explanation || 'Review concept explanation',
+      mistakeCat
+    );
+  }
+
+  // Send practice attempt to backend
+  try {
+    await fetch('/api/practice/attempt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionId: qId,
+        subject: qData.category || 'General CS',
+        topic: qData.category || 'Practice',
+        difficulty: 'Medium',
+        selectedOption: selectedOptText,
+        correctOption: correctOptText,
+        isCorrect: isCorrect,
+        confidenceLevel: confidence,
+        timeSpentSeconds: 45,
+        hintUsed: 0
+      })
+    });
+  } catch (e) {
+    console.warn('[Practice Attempt] Could not persist to server:', e);
+  }
+
+  if (isCorrect) {
     addXP(10, 'Correct Answer in Free Preparation Assessment!');
   }
 }
@@ -7165,6 +7268,7 @@ function renderQBankArchive(list) {
   }
 
   container.innerHTML = list.map(q => {
+    window._questionConfidence[q.id] = window._questionConfidence[q.id] || 3;
     return '<div class="quiz-card" id="qbank-card-' + q.id + '">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;">' +
         '<div style="display:flex;gap:6px;align-items:center;">' +
@@ -7174,6 +7278,14 @@ function renderQBankArchive(list) {
         '<span class="badge-pill" style="font-size:9px;">' + q.difficulty + '</span>' +
       '</div>' +
       '<div class="quiz-q-title" style="margin:4px 0;">' + q.question + '</div>' +
+      '<div class="confidence-selector" style="display:flex;align-items:center;gap:6px;margin:8px 0 10px;font-size:11px;color:var(--text-sub);">' +
+        '<span style="font-weight:600;">Confidence:</span>' +
+        '<button type="button" class="conf-pill active" onclick="setQuestionConfidence(\'' + q.id + '\', 3, this)">3 Medium</button>' +
+        '<button type="button" class="conf-pill" onclick="setQuestionConfidence(\'' + q.id + '\', 1, this)">1 Guess</button>' +
+        '<button type="button" class="conf-pill" onclick="setQuestionConfidence(\'' + q.id + '\', 2, this)">2 Low</button>' +
+        '<button type="button" class="conf-pill" onclick="setQuestionConfidence(\'' + q.id + '\', 4, this)">4 High</button>' +
+        '<button type="button" class="conf-pill" onclick="setQuestionConfidence(\'' + q.id + '\', 5, this)">5 Certain</button>' +
+      '</div>' +
       '<div class="quiz-options-list">' +
         q.options.map((opt, idx) => {
           return '<button class="quiz-option-btn" onclick="checkQBankAnswer(\'' + q.id + '\', ' + idx + ', ' + q.answer + ')">' +
@@ -7182,15 +7294,17 @@ function renderQBankArchive(list) {
         }).join('') +
       '</div>' +
       '<div class="quiz-explanation" id="qbank-exp-' + q.id + '" style="display:none;">' +
+        '<div id="qbank-badge-' + q.id + '"></div>' +
         '<strong>💡 Detailed Walkthrough:</strong> ' + q.explanation +
       '</div>' +
     '</div>';
   }).join('');
 }
 
-function checkQBankAnswer(qId, selectedIdx, correctIdx) {
+async function checkQBankAnswer(qId, selectedIdx, correctIdx) {
   const card = document.getElementById('qbank-card-' + qId);
   const expBox = document.getElementById('qbank-exp-' + qId);
+  const badgeBox = document.getElementById('qbank-badge-' + qId);
   if (!card) return;
 
   const buttons = card.querySelectorAll('.quiz-option-btn');
@@ -7200,9 +7314,88 @@ function checkQBankAnswer(qId, selectedIdx, correctIdx) {
     if (idx === selectedIdx && idx !== correctIdx) btn.classList.add('wrong');
   });
 
+  // Lock confidence selector
+  const confPills = card.querySelectorAll('.conf-pill');
+  confPills.forEach(p => p.style.pointerEvents = 'none');
+
+  const confidence = window._questionConfidence[qId] || 3;
+  const isCorrect = (selectedIdx === correctIdx);
+  const qData = (qbankArchiveData || []).find(q => q.id === qId) || {};
+  const selectedOptText = qData.options ? qData.options[selectedIdx] : '';
+  const correctOptText = qData.options ? qData.options[correctIdx] : '';
+
+  // Determine Metacognitive Outcome Type
+  let outcomeType = 'CORRECT_CONFIDENT';
+  if (isCorrect) {
+    outcomeType = confidence >= 4 ? 'CORRECT_CONFIDENT' : 'CORRECT_UNCERTAIN';
+  } else {
+    outcomeType = confidence >= 4 ? 'WRONG_CONFIDENT' : 'WRONG_UNCERTAIN';
+  }
+
+  // Render Metacognitive Badge
+  if (badgeBox) {
+    if (outcomeType === 'WRONG_CONFIDENT') {
+      badgeBox.innerHTML = '<div class="metacognitive-badge wrong-confident">' +
+        '<span>⚠️ Confident Misconception Detected (Confidence: ' + confidence + '/5)</span>' +
+        '<span style="font-weight:400;font-size:11px;color:var(--text-sub);">High confidence error in ' + (qData.company || 'Company') + ' question. Automatically logged as a high-priority misconception.</span>' +
+      '</div>';
+    } else if (outcomeType === 'CORRECT_UNCERTAIN') {
+      badgeBox.innerHTML = '<div class="metacognitive-badge correct-uncertain">' +
+        '<span>💡 Correct with Uncertainty (Confidence: ' + confidence + '/5)</span>' +
+        '<span style="font-weight:400;font-size:11px;color:var(--text-sub);">Correct, but low confidence indicates recall fragility. Scheduled for active recall review.</span>' +
+      '</div>';
+    } else if (outcomeType === 'CORRECT_CONFIDENT') {
+      badgeBox.innerHTML = '<div class="metacognitive-badge correct-confident">' +
+        '<span>🎯 Solid Mastery Verified (Confidence: ' + confidence + '/5)</span>' +
+        '<span style="font-weight:400;font-size:11px;color:var(--text-sub);">High accuracy aligned with high confidence. Interview readiness evidence updated.</span>' +
+      '</div>';
+    } else {
+      badgeBox.innerHTML = '<div class="metacognitive-badge wrong-uncertain">' +
+        '<span>📚 Concept Gap (Confidence: ' + confidence + '/5)</span>' +
+        '<span style="font-weight:400;font-size:11px;color:var(--text-sub);">Logged in Mistake Book. Review the detailed walkthrough to reinforce this pattern.</span>' +
+      '</div>';
+    }
+  }
+
   if (expBox) expBox.style.display = 'block';
 
-  if (selectedIdx === correctIdx) {
+  // Record mistake if incorrect
+  if (!isCorrect && window.MistakeBookModule && typeof MistakeBookModule.recordMistake === 'function') {
+    const mistakeCat = (outcomeType === 'WRONG_CONFIDENT') ? 'Misconception' : 'Wrong approach';
+    MistakeBookModule.recordMistake(
+      qData.question || 'Historical Question',
+      qData.category || 'Company Questions',
+      qData.company || 'Interview Prep',
+      selectedOptText,
+      correctOptText,
+      qData.explanation || 'Review question walkthrough',
+      mistakeCat
+    );
+  }
+
+  // Send practice attempt to backend
+  try {
+    await fetch('/api/practice/attempt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        questionId: qId,
+        subject: qData.category || 'Company Questions',
+        topic: qData.company || 'Interview Prep',
+        difficulty: qData.difficulty || 'Medium',
+        selectedOption: selectedOptText,
+        correctOption: correctOptText,
+        isCorrect: isCorrect,
+        confidenceLevel: confidence,
+        timeSpentSeconds: 50,
+        hintUsed: 0
+      })
+    });
+  } catch (e) {
+    console.warn('[QBank Attempt] Could not persist to server:', e);
+  }
+
+  if (isCorrect) {
     addXP(15, 'Solved Company Historical Question!');
   }
 }
@@ -8974,6 +9167,9 @@ window.resetPreparationJourney = async function () {
       if (window.PrepIntelligenceEngine) {
         PrepIntelligenceEngine.resetToZeroState();
       }
+      if (window.MistakeBookModule && typeof MistakeBookModule.resetToZeroState === 'function') {
+        MistakeBookModule.resetToZeroState();
+      }
       if (typeof showToast === 'function') {
         showToast('Preparation Journey reset to Day 0 zero-state', 'info');
       }
@@ -8985,6 +9181,9 @@ window.resetPreparationJourney = async function () {
     console.warn('[Reset] Reset journey fallback:', err);
     if (window.PrepIntelligenceEngine) {
       PrepIntelligenceEngine.resetToZeroState();
+    }
+    if (window.MistakeBookModule && typeof MistakeBookModule.resetToZeroState === 'function') {
+      MistakeBookModule.resetToZeroState();
     }
     location.reload();
   }

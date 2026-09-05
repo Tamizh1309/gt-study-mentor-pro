@@ -470,9 +470,15 @@
   // ──────────────────────────────────────────────────────────────────────────
   function collectLocalStudentContext() {
     let pendingMistakes = 0;
-    if (window.MistakeBookModule && typeof MistakeBookModule.getMistakes === 'function') {
-      const list = MistakeBookModule.getMistakes();
-      pendingMistakes = list.filter(m => !m.resolved).length;
+    let confidentMisconceptions = 0;
+    if (window.MistakeBookModule) {
+      if (typeof MistakeBookModule.getMistakes === 'function') {
+        const list = MistakeBookModule.getMistakes();
+        pendingMistakes = list.filter(m => !m.resolved).length;
+      }
+      if (typeof MistakeBookModule.getMisconceptionsCount === 'function') {
+        confidentMisconceptions = MistakeBookModule.getMisconceptionsCount();
+      }
     }
 
     const prepState = (window.PrepIntelligenceEngine && typeof PrepIntelligenceEngine.getState === 'function')
@@ -499,6 +505,7 @@
       status: prepState?.status || (day === 0 ? 'NOT_STARTED' : 'ACTIVE'),
       readiness,
       pendingMistakes,
+      confidentMisconceptions,
       weakTopics: (prepState && Array.isArray(prepState.weakTopics)) ? prepState.weakTopics : [],
       todayTasks: (prepState && Array.isArray(prepState.todayTasks)) ? prepState.todayTasks : [],
       activeTrack: '90-Day Career Preparation OS',

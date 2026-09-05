@@ -3581,6 +3581,62 @@ body.light-theme .predictor-result { background: rgba(255,255,255,0.8); }
   line-height: 1.4;
 }
 
+/* Practice Metacognitive & Confidence Badges */
+.conf-pill {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.conf-pill:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.conf-pill.active {
+  background: var(--accent-gradient, linear-gradient(135deg, #00d2ff, #3a7bd5));
+  border-color: transparent;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 210, 255, 0.3);
+}
+
+.metacognitive-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.metacognitive-badge.wrong-confident {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+.metacognitive-badge.correct-uncertain {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+}
+.metacognitive-badge.correct-confident {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+.metacognitive-badge.wrong-uncertain {
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #6366f1;
+}
+
 /* Company Preparation Guide Card */
 .guide-card {
   background: var(--surface2);

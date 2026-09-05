@@ -9,120 +9,48 @@ const MistakeBookModule = (function () {
   const SMART_REV_STORAGE_KEY = 'gt_mentor_smart_revision_v3';
 
   const MISTAKE_CATEGORIES = [
+    'Misconception',
     'Concept gap',
     'Calculation',
     'Careless',
     'Time pressure',
     'Misread',
-    'Wrong approach'
+    'Wrong approach',
+    'Logic error',
+    'Formula error'
   ];
 
-  let mistakes = [
-    {
-      id: 'mstk-1',
-      question: "In Banker's Algorithm, if Allocation = [1, 2, 2] and Max = [3, 3, 2], what is the Need vector?",
-      subject: 'Operating Systems',
-      topic: 'Deadlocks',
-      userWrongAnswer: 'Need = [4, 5, 4] (Added instead of subtracted)',
-      correctAnswer: 'Need = Max - Allocation = [2, 1, 0]',
-      concept: "Need matrix in Banker's Algorithm is strictly calculated as Max[i][j] - Allocation[i][j].",
-      mistakeType: 'Calculation',
-      stage: 'Smart Revision', // Wrong answer ? category ? correction ? Smart Revision ? reattempt ? mastered
-      dateAdded: '2026-08-28',
-      attempts: 2,
-      resolved: false
-    },
-    {
-      id: 'mstk-2',
-      question: 'What is the time complexity of building a heap from an unsorted array of N elements?',
-      subject: 'Data Structures & Algorithms',
-      topic: 'Heaps & Priority Queues',
-      userWrongAnswer: 'O(N log N) (Confused repeated insertion with bottom-up heapify)',
-      correctAnswer: 'O(N)',
-      concept: 'Bottom-up heapify (BuildHeap) sums heights of subtrees, resulting in a convergent geometric progression bounded by O(N).',
-      mistakeType: 'Concept gap',
-      stage: 'Reattempt',
-      dateAdded: '2026-08-29',
-      attempts: 1,
-      resolved: false
-    },
-    {
-      id: 'mstk-3',
-      question: 'A box contains 5 red and 3 green balls. Two balls are drawn at random without replacement. Find P(both red).',
-      subject: 'Quantitative Aptitude',
-      topic: 'Probability',
-      userWrongAnswer: '25/64 (Treated with replacement)',
-      correctAnswer: '(5/8) * (4/7) = 20/56 = 5/14',
-      concept: 'Without replacement alters the sample space on the second draw (7 remaining total, 4 red remaining).',
-      mistakeType: 'Misread',
-      stage: 'Mastered',
-      dateAdded: '2026-08-30',
-      attempts: 2,
-      resolved: true
-    },
-    {
-      id: 'mstk-4',
-      question: 'In Bellman-Ford algorithm, why is relaxing edges V-1 times sufficient for graphs without negative cycles?',
-      subject: 'Algorithms',
-      topic: 'Graph Shortest Paths',
-      userWrongAnswer: 'Relaxing V times guarantees finding negative cycles immediately.',
-      correctAnswer: 'A simple shortest path in a graph with V vertices can have at most V-1 edges. Each iteration guarantees the correct distance for paths with one more edge.',
-      concept: 'Relaxation propagates shortest path distances along path lengths. Any update on the V-th round proves existence of a reachable negative-weight cycle.',
-      mistakeType: 'Wrong approach',
-      stage: 'Smart Revision',
-      dateAdded: '2026-09-02',
-      attempts: 1,
-      resolved: false
-    }
-  ];
-
-  let smartRevisionCards = [
-    {
-      id: 'srev-1',
-      topic: 'Operating Systems ? Deadlocks',
-      question: 'What are the 4 Coffman conditions required simultaneously for Deadlock to hold?',
-      answer: '1. Mutual Exclusion\n2. Hold and Wait\n3. No Preemption\n4. Circular Wait',
-      stability: 3.2,
-      difficulty: 4.8,
-      dueDays: 0,
-      repetitions: 2,
-      lapses: 0,
-      status: 'Due Today'
-    },
-    {
-      id: 'srev-2',
-      topic: 'DSA ? Dynamic Programming',
-      question: 'What is the state transition formula for 0/1 Knapsack (item i with weight w[i], value v[i], capacity W)?',
-      answer: 'dp[i][W] = max(dp[i-1][W], dp[i-1][W - w[i]] + v[i]) if w[i] <= W else dp[i-1][W]',
-      stability: 2.1,
-      difficulty: 6.4,
-      dueDays: 0,
-      repetitions: 1,
-      lapses: 1,
-      status: 'Due Today'
-    },
-    {
-      id: 'srev-3',
-      topic: 'DBMS ? Transactions',
-      question: 'What are the four ACID properties in DBMS, and which subsystem guarantees Durability?',
-      answer: 'Atomicity, Consistency, Isolation, Durability.\nDurability is guaranteed by the Recovery Management / Write-Ahead Logging (WAL) subsystem.',
-      stability: 5.5,
-      difficulty: 3.5,
-      dueDays: 3,
-      repetitions: 4,
-      lapses: 0,
-      status: 'Mastered'
-    }
-  ];
+  let mistakes = [];
+  let smartRevisionCards = [];
 
   function load() {
     try {
       const savedM = localStorage.getItem(MISTAKES_STORAGE_KEY);
-      if (savedM) mistakes = JSON.parse(savedM);
+      if (savedM) {
+        const parsedM = JSON.parse(savedM);
+        // If old build with hardcoded mstk-1, reset to clean state
+        if (Array.isArray(parsedM) && parsedM.some(m => m.id === 'mstk-1' && m.dateAdded === '2026-08-28')) {
+          console.info('[MistakeBook] Migrating legacy sample mistakes to clean Day 0 state');
+          mistakes = [];
+          save();
+        } else {
+          mistakes = parsedM;
+        }
+      }
       const savedS = localStorage.getItem(SMART_REV_STORAGE_KEY);
-      if (savedS) smartRevisionCards = JSON.parse(savedS);
+      if (savedS) {
+        const parsedS = JSON.parse(savedS);
+        if (Array.isArray(parsedS) && parsedS.some(s => s.id === 'srev-1')) {
+          smartRevisionCards = [];
+          save();
+        } else {
+          smartRevisionCards = parsedS;
+        }
+      }
     } catch (e) {
       console.warn('Error loading mistake book from storage', e);
+      mistakes = [];
+      smartRevisionCards = [];
     }
   }
 
@@ -147,6 +75,10 @@ const MistakeBookModule = (function () {
 
     getUnresolvedMistakesCount: function () {
       return mistakes.filter(m => !m.resolved).length;
+    },
+
+    getMisconceptionsCount: function () {
+      return mistakes.filter(m => !m.resolved && m.mistakeType === 'Misconception').length;
     },
 
     // Step 1 & 2: Log Wrong Answer & Category
@@ -281,6 +213,14 @@ const MistakeBookModule = (function () {
 
     rateFSRSCard: function (cardId, rating) {
       return this.rateSmartRevisionCard(cardId, rating);
+    },
+
+    resetToZeroState: function () {
+      mistakes = [];
+      smartRevisionCards = [];
+      save();
+      localStorage.removeItem(MISTAKES_STORAGE_KEY);
+      localStorage.removeItem(SMART_REV_STORAGE_KEY);
     }
   };
 })();
