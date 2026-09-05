@@ -7879,7 +7879,8 @@ window.navigateToView = function (viewName, subtab) {
   const viewMap = {
     'home': 'view-home', 'prepare': 'view-prepare', 'practice': 'view-practice',
     'career': 'view-career', 'progress': 'view-progress', 'cselabs': 'view-cselabs',
-    'resources': 'view-resources', 'mentor': 'view-chat', 'chat': 'view-chat', 'settings': 'view-settings'
+    'resources': 'view-resources', 'mentor': 'view-chat', 'chat': 'view-chat', 'settings': 'view-settings',
+    'designs': 'view-designs'
   };
 
   document.querySelectorAll('.view-panel').forEach(p => { p.classList.remove('active'); });
@@ -7896,7 +7897,8 @@ window.navigateToView = function (viewName, subtab) {
     'practice': subtab === 'dsa' ? 'nav-dsa' : subtab === 'gate-pyq' ? 'nav-pyq' : subtab === 'aptitude' ? 'nav-aptitude' : subtab === 'cs-core' ? 'nav-cs-core' : subtab === 'mock' ? 'nav-mock' : 'nav-dsa',
     'career': subtab === 'applications' ? 'nav-applications' : subtab === 'interviews' ? 'nav-interviews' : subtab === 'companies' ? 'nav-companies' : 'nav-opportunities',
     'progress': subtab === 'mastery' ? 'nav-mastery' : subtab === 'mistakes' ? 'nav-mistakes' : subtab === 'analytics' ? 'nav-analytics' : 'nav-readiness',
-    'cselabs': 'nav-labs', 'resources': 'nav-resources', 'mentor': 'nav-mentor', 'chat': 'nav-mentor', 'settings': 'nav-settings'
+    'cselabs': 'nav-labs', 'resources': 'nav-resources', 'mentor': 'nav-mentor', 'chat': 'nav-mentor', 'settings': 'nav-settings',
+    'designs': 'nav-designs'
   };
   const activeBtnId = sidebarBtnMap[viewName];
   if (activeBtnId) {
@@ -7904,11 +7906,11 @@ window.navigateToView = function (viewName, subtab) {
     if (btn) { btn.classList.add('active'); btn.setAttribute('aria-current', 'page'); }
   }
 
-  const mobileMap = { 'home': 'mob-nav-home', 'prepare': 'mob-nav-prepare', 'practice': 'mob-nav-practice', 'progress': 'mob-nav-progress', 'mentor': 'mob-nav-mentor', 'chat': 'mob-nav-mentor' };
+  const mobileMap = { 'home': 'mob-nav-home', 'prepare': 'mob-nav-prepare', 'practice': 'mob-nav-practice', 'progress': 'mob-nav-progress', 'mentor': 'mob-nav-mentor', 'chat': 'mob-nav-mentor', 'designs': 'mob-nav-home' };
   const mobBtn = document.getElementById(mobileMap[viewName]);
   if (mobBtn) mobBtn.classList.add('active');
 
-  const titles = { 'home': 'Home', 'prepare': 'Preparation Hub', 'practice': 'Practice Arena', 'career': 'Career Pipeline', 'progress': 'Progress & Analytics', 'cselabs': 'CSE Labs', 'resources': 'Resources', 'mentor': 'GT AI Mentor', 'chat': 'GT AI Mentor', 'settings': 'Settings' };
+  const titles = { 'home': 'Home', 'prepare': 'Preparation Hub', 'practice': 'Practice Arena', 'career': 'Career Pipeline', 'progress': 'Progress & Analytics', 'cselabs': 'CSE Labs', 'resources': 'Resources', 'mentor': 'GT AI Mentor', 'chat': 'GT AI Mentor', 'settings': 'Settings', 'designs': '25 UI/UX Screens' };
   const headerTitle = document.getElementById('main-header-title');
   if (headerTitle) headerTitle.textContent = titles[viewName] || viewName;
 
@@ -7921,6 +7923,7 @@ window.navigateToView = function (viewName, subtab) {
     if (viewName === 'cselabs') renderCSELabs();
     if (viewName === 'resources') renderResourcesLibrary();
     if (viewName === 'settings') renderSettingsView();
+    if (viewName === 'designs' && window.UIUXStudio) window.UIUXStudio.init();
   } catch (e) { console.warn('[navigate] Renderer error:', viewName, e); }
 };
 
