@@ -143,6 +143,23 @@
 
   function updateAuthUI(user) {
     if (typeof document === 'undefined') return;
+
+    // 1. Update header auth-section buttons
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userName = document.getElementById('user-name');
+
+    if (user) {
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (logoutBtn) logoutBtn.style.display = 'block';
+      if (userName) userName.textContent = user.displayName || user.email || 'Student';
+    } else {
+      if (loginBtn) loginBtn.style.display = 'block';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+      if (userName) userName.textContent = 'Guest';
+    }
+
+    // 2. Update pill auth button if present
     const authBtn = document.getElementById('header-auth-btn');
     const authText = document.getElementById('header-auth-text');
     const authIcon = document.getElementById('header-auth-icon');
@@ -496,6 +513,28 @@
     seedQuestionBankToCloud,
     testConnection
   };
+
+  // ── 7. Global Direct Button Handlers (Available immediately on page load) ──
+  if (typeof window !== 'undefined') {
+    window.signInWithGoogle = async function () {
+      try {
+        if (typeof window.signInWithGoogleAuth === 'function') {
+          return await window.signInWithGoogleAuth();
+        }
+        return await loginWithGoogle();
+      } catch (err) {
+        console.warn('[Firebase] Sign-in notice:', err);
+      }
+    };
+
+    window.signOutUser = function () {
+      if (typeof window.signOutFirebaseUser === 'function') {
+        window.signOutFirebaseUser();
+      } else {
+        logout();
+      }
+    };
+  }
 
   if (typeof window !== 'undefined') {
     window.FirebaseService = FirebaseService;

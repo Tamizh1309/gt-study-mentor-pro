@@ -12822,7 +12822,41 @@ if (typeof document !== 'undefined') {
   } else {
     setTimeout(window.prewarmAllViews, 150);
   }
-  window.addEventListener('load', () => setTimeout(window.prewarmAllViews, 300));
+// ══════════════════════════════════════════════════
+//  FIREBASE AUTHENTICATION GLOBAL HANDLERS
+// ══════════════════════════════════════════════════
+if (typeof window !== 'undefined') {
+  if (!window.signInWithGoogle) {
+    window.signInWithGoogle = async function () {
+      try {
+        if (typeof window.signInWithGoogleAuth === 'function') {
+          return await window.signInWithGoogleAuth();
+        }
+        if (window.FirebaseService && typeof window.FirebaseService.loginWithGoogle === 'function') {
+          return await window.FirebaseService.loginWithGoogle();
+        }
+      } catch (error) {
+        console.error('❌ Sign-in error:', error);
+        alert('Sign-in failed! Check console.');
+      }
+    };
+  }
+
+  if (!window.signOutUser) {
+    window.signOutUser = function () {
+      if (typeof window.signOutFirebaseUser === 'function') {
+        window.signOutFirebaseUser();
+      } else if (window.FirebaseService && typeof window.FirebaseService.logout === 'function') {
+        window.FirebaseService.logout();
+      }
+      const loginBtn = document.getElementById('login-btn');
+      const logoutBtn = document.getElementById('logout-btn');
+      const userName = document.getElementById('user-name');
+      if (loginBtn) loginBtn.style.display = 'inline-flex';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+      if (userName) userName.textContent = 'Guest';
+    };
+  }
 }
 
 
