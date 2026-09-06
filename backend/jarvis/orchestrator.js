@@ -70,18 +70,33 @@ async function orchestrate({
   // 5. Append student input to memory
   appendMessage(sessionId, 'user', trimmed);
 
-  // 6. Generate provider-agnostic response
+  // 6. Generate provider-agnostic response with routing & verifier
   let replyText = '';
   let source = 'local-intelligence';
+  let routing = null;
+  let verified = true;
+  let verificationNotes = [];
 
   if (action && action.spokenConfirmation) {
     replyText = action.spokenConfirmation;
     source = 'action-engine';
+    routing = {
+      taskType: 'ACTION_EXECUTION',
+      provider: 'action-engine',
+      model: 'deterministic-whitelist',
+      reason: `Deterministic whitelist execution for ${action.action}`,
+      fallbacks: [],
+      attempts: []
+    };
+    verificationNotes = ['Action verified against strict safety whitelist'];
   } else {
-    // Generate evidence-based response with local fallback
+    // Generate evidence-based response with multi-model router & verifier
     const aiResult = await generateResponse(trimmed, context, mode);
     replyText = aiResult.text;
     source = aiResult.source;
+    routing = aiResult.routing;
+    verified = aiResult.verified;
+    verificationNotes = aiResult.verificationNotes || [];
   }
 
   // 7. Save assistant reply to memory
@@ -110,6 +125,9 @@ async function orchestrate({
     reply: replyText,
     spokenText,
     source,
+    routing,
+    verified,
+    verificationNotes,
     recommendations,
     speechConfig: getSpeechConfig()
   };

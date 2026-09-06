@@ -1,20 +1,25 @@
 /**
  * ============================================================================
- * GT JARVIS — AI Provider (Provider-Agnostic Engine)
+ * GT JARVIS — AI Provider & Multi-Model Execution Engine
  * File: backend/jarvis/aiProvider.js
  * ============================================================================
  * 
  * WHAT THIS FILE DOES:
- * This module is responsible for generating intelligent answers for the student.
- * It is "provider-agnostic", meaning you can connect it to Google Gemini,
- * OpenAI, or use the built-in Local CSE Intelligence.
+ * Implements the multi-model execution layer specified in the Blueprint:
+ * - FreeLLMAPI (Local gateway)
+ * - OmniRouter (Multi-model routing layer)
+ * - GLM (High-yield reasoning provider)
+ * - Kimi (Long-context document & resume provider)
+ * - DeepSeek (Algorithmic reasoning & coding provider)
+ * - Google Gemini (Cloud assistant fallback)
+ * - Local High-Yield CSE Intelligence (100% resilient offline fallback)
  * 
- * WHY IT EXISTS:
- * 1. Security: API keys stay safe on the backend (never exposed in the browser).
- * 2. Reliability: If the internet drops or no API key is set, the built-in
- *    Local CSE Intelligence takes over with ZERO downtime or crashes!
- * 3. Simplicity: Uses Node.js native `fetch`, so no complex external SDKs are needed.
+ * Observes provider health via circuit breaker and verifies technical output.
  */
+
+const { routeTask } = require('./modelRouter');
+const { isAvailable, recordSuccess, recordFailure } = require('./providerHealth');
+const { verifyResponse } = require('./verifier');
 
 // Local high-yield CSE intelligence database for instant offline answering
 const LOCAL_KNOWLEDGE_BASE = [
@@ -76,97 +81,49 @@ const LOCAL_KNOWLEDGE_BASE = [
 ];
 
 /**
- * Generates an answer based on user query and preparation context
- * @param {string} prompt - User's question or message
- * @param {object} context - Student's preparation context
- * @param {string} mode - Active JARVIS mode (study, gate, dsa, placement, etc.)
- * @returns {Promise<{ text: string, source: string }>}
+ * Builds standard system prompt for student context
  */
-async function generateResponse(prompt, context = {}, mode = 'study') {
-  const apiKey = process.env.JARVIS_API_KEY || process.env.GEMINI_API_KEY;
-  const provider = (process.env.JARVIS_PROVIDER || (apiKey ? 'gemini' : 'local')).toLowerCase();
+function buildSystemPrompt(context = {}, mode = 'study') {
+  const currentDay = context.day ?? 0;
+  return `You are GT JARVIS, the intelligent, calm, concise AI career preparation mentor inside GT Study Mentor Pro for a Computer Science student preparing for GATE 2027, Placements, SWE, and Internships.
+Current Mode: ${mode.toUpperCase()}
+Student State:
+- Day: Day ${currentDay} / 90
+- Readiness Scores: GATE ${context.readinessScores?.gate ?? 0}%, Placements ${context.readinessScores?.placement ?? 0}%, SWE ${context.readinessScores?.swe ?? 0}%, Internship ${context.readinessScores?.internship ?? 0}%
+- Pending Mistakes: ${context.pendingMistakes ?? 0}
+- Target Goal: ${context.targetRole || 'GATE 2027 + SWE'}
 
-  // 1. If FreeLLMAPI / OpenAI-compatible router is configured
-  if (provider === 'freellmapi' || process.env.JARVIS_API_URL) {
-    try {
-      const response = await callFreeLLMAPI(prompt, context, mode);
-      if (response && response.trim().length > 0) {
-        return { text: response.trim(), source: 'freellmapi-router' };
-      }
-    } catch (err) {
-      console.warn('[JARVIS AI Provider] FreeLLMAPI router failed. Falling back gracefully.', err.message);
-    }
-  }
-
-  // 2. If Gemini provider is configured
-  if (apiKey && provider === 'gemini') {
-    try {
-      const response = await callGeminiAPI(prompt, context, mode, apiKey);
-      if (response && response.trim().length > 0) {
-        return { text: response.trim(), source: 'gemini-cloud' };
-      }
-    } catch (err) {
-      console.warn('[JARVIS AI Provider] Gemini provider failed or rate-limited. Falling back gracefully.', err.message);
-    }
-  }
-
-  // 3. Fallback / Default: Fast, reliable, offline-ready Local CSE Intelligence
-  return {
-    text: generateLocalCSEAnswer(prompt, context, mode),
-    source: 'local-intelligence'
-  };
+Operational Rules:
+1. Speak professionally, calmly, and concisely (2-3 structured paragraphs max).
+2. Answer the student's actual question directly from first principles.
+3. If Day is 0, do not fabricate prior tests or metrics; guide them in orientation.
+4. If in DSA mode, offer Socratic conceptual hints before the full implementation.
+5. Never invent fake metrics or guaranteed admission claims.`;
 }
 
 /**
- * Calls FreeLLMAPI / OpenAI-compatible gateway with intelligent task-based model routing
+ * Executes a call to any OpenAI-compatible endpoint (DeepSeek, Kimi, GLM, OmniRouter, FreeLLMAPI)
  */
-async function callFreeLLMAPI(prompt, context, mode) {
-  const baseURL = process.env.JARVIS_API_URL || 'http://127.0.0.1:3001/v1/chat/completions';
-  const apiKey = process.env.JARVIS_API_KEY || 'freellmapi-local';
-
-  // Task-specific routing profile selection
-  let selectedModel = process.env.JARVIS_MODEL || 'auto:balanced';
-  if (mode === 'dsa' || /code|algorithm|python|java|c\+\+|implement/i.test(prompt)) {
-    selectedModel = process.env.JARVIS_CODING_MODEL || 'auto:coding';
-  } else if (/explain|deep|system design|architect|why/i.test(prompt)) {
-    selectedModel = process.env.JARVIS_SMART_MODEL || 'auto:smart';
-  } else if (/quick|time|define|what is/i.test(prompt)) {
-    selectedModel = process.env.JARVIS_FAST_MODEL || 'auto:fast';
-  }
-
-  const currentDay = context.day ?? 0;
-  const systemPrompt = `You are GT JARVIS, a highly capable, calm, concise AI career preparation mentor for a CS student preparing for GATE 2027, Placements, SWE, and Internships.
-Current Mode: ${mode.toUpperCase()}
-Student Context:
-- Day: Day ${currentDay} / 90
-- Readiness: GATE ${context.readinessScores?.gate ?? 0}%, Placement ${context.readinessScores?.placement ?? 0}%, SWE ${context.readinessScores?.swe ?? 0}%, Internship ${context.readinessScores?.internship ?? 0}%
-- Pending Mistakes: ${context.pendingMistakes ?? 0}
-- Target: ${context.targetRole || 'GATE + SWE'}
-
-Guidelines:
-1. Be structured, encouraging, and technically precise.
-2. If Day 0, do not fabricate prior performance; guide orientation.
-3. In DSA mode, offer Socratic hints before full code.
-4. Keep answers beginner-friendly and actionable.`;
-
+async function callOpenAICompatible(providerKey, endpointUrl, apiKey, modelName, prompt, context, mode) {
+  const startTime = Date.now();
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
   try {
-    const res = await fetch(baseURL, {
+    const res = await fetch(endpointUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey || 'bearer-token'}`
       },
       body: JSON.stringify({
-        model: selectedModel,
+        model: modelName,
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: buildSystemPrompt(context, mode) },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.5,
-        max_tokens: 650
+        temperature: 0.4,
+        max_tokens: 700
       }),
       signal: controller.signal
     });
@@ -174,59 +131,44 @@ Guidelines:
     clearTimeout(timeoutId);
 
     if (!res.ok) {
-      throw new Error(`FreeLLMAPI returned status ${res.status}`);
+      throw new Error(`Provider ${providerKey} returned status ${res.status}`);
     }
 
     const data = await res.json();
-    return data.choices?.[0]?.message?.content || null;
+    const reply = data.choices?.[0]?.message?.content;
+    if (!reply || !reply.trim()) {
+      throw new Error(`Empty response from ${providerKey}`);
+    }
+
+    recordSuccess(providerKey, Date.now() - startTime);
+    return reply.trim();
   } catch (err) {
     clearTimeout(timeoutId);
+    recordFailure(providerKey, err);
     throw err;
   }
 }
 
 /**
- * Calls Google Gemini REST API using native fetch
+ * Calls Google Gemini API if configured
  */
-async function callGeminiAPI(prompt, context, mode, apiKey) {
-  const model = process.env.JARVIS_MODEL || 'gemini-1.5-flash';
+async function callGemini(apiKey, modelName, prompt, context, mode) {
+  const startTime = Date.now();
+  const model = modelName || process.env.JARVIS_MODEL || 'gemini-1.5-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-  // Build a concise system prompt with student context
-  const currentDay = context.day ?? 0;
-  const systemInstruction = `You are JARVIS, an intelligent, calm, concise, and highly supportive personal study and career AI assistant inside GT Study Mentor Pro for a Computer Science student preparing for GATE 2027, Placements, SWE, and Internships.
-Current Mode: ${mode.toUpperCase()}
-Student Context:
-- Active Day: Day ${currentDay} / 90 (${context.phase || (currentDay === 0 ? 'Day 0: Setup & Orientation' : `Phase 1: Foundation (Day ${currentDay})`)})
-- Readiness Scores: GATE ${context.readinessScores?.gate ?? 0}%, Placements ${context.readinessScores?.placement ?? 0}%, SWE ${context.readinessScores?.swe ?? 0}%, Internship ${context.readinessScores?.internship ?? 0}%
-- Pending Mistakes in Mistake Book: ${context.pendingMistakes ?? 0}
-- Target: ${context.targetRole || 'Not configured yet'}
-
-Personality & Rules:
-1. Speak naturally, professionally, and concisely (2-4 paragraphs max).
-2. Answer the user's actual question directly from first principles.
-3. If Day is 0 or no study history exists, do NOT invent fake progress, weak topics, or past scores. State honestly that they are at Day 0 and guide them to begin.
-4. If in DSA mode and the user is solving a problem, offer Socratic hints before the full solution.
-5. If appropriate, recommend a safe next action inside the app (e.g. "Shall I start a 45-minute focus session?").
-6. Never invent fake metrics or selection probabilities.`;
 
   const body = {
     contents: [
       {
         role: 'user',
-        parts: [
-          { text: `${systemInstruction}\n\nStudent asks: "${prompt}"` }
-        ]
+        parts: [{ text: `${buildSystemPrompt(context, mode)}\n\nStudent asks: "${prompt}"` }]
       }
     ],
-    generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens: 600
-    }
+    generationConfig: { temperature: 0.4, maxOutputTokens: 600 }
   };
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 9000); // 9-second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 9000);
 
   try {
     const res = await fetch(url, {
@@ -235,20 +177,117 @@ Personality & Rules:
       body: JSON.stringify(body),
       signal: controller.signal
     });
-
     clearTimeout(timeoutId);
 
-    if (!res.ok) {
-      throw new Error(`Gemini API returned status ${res.status}`);
-    }
-
+    if (!res.ok) throw new Error(`Gemini API returned status ${res.status}`);
     const data = await res.json();
-    const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    return candidate || null;
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error('Empty candidate from Gemini');
+
+    recordSuccess('gemini', Date.now() - startTime);
+    return text.trim();
   } catch (err) {
     clearTimeout(timeoutId);
+    recordFailure('gemini', err);
     throw err;
   }
+}
+
+/**
+ * Master response generator with task-based routing, circuit breaking, and response verification
+ * @param {string} prompt - Student message
+ * @param {Object} context - Preparation context
+ * @param {string} mode - Active JARVIS mode
+ * @returns {Promise<{ text: string, source: string, routing: Object, verified: boolean }>}
+ */
+async function generateResponse(prompt, context = {}, mode = 'study') {
+  // 1. Get task-based routing decision
+  const routing = routeTask(prompt, context, mode);
+  const candidates = [routing.provider, ...routing.fallbacks];
+
+  let rawResultText = null;
+  let usedSource = 'local-intelligence';
+
+  // 2. Iterate through candidate chain based on availability & configuration
+  for (const provider of candidates) {
+    if (!isAvailable(provider)) continue;
+
+    try {
+      if (provider === 'deepseek' && (process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_API_URL)) {
+        const url = process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1/chat/completions';
+        rawResultText = await callOpenAICompatible('deepseek', url, process.env.DEEPSEEK_API_KEY, routing.model, prompt, context, mode);
+        usedSource = 'deepseek';
+        break;
+      }
+
+      if (provider === 'kimi' && (process.env.KIMI_API_KEY || process.env.KIMI_API_URL)) {
+        const url = process.env.KIMI_API_URL || 'https://api.moonshot.cn/v1/chat/completions';
+        rawResultText = await callOpenAICompatible('kimi', url, process.env.KIMI_API_KEY, routing.model, prompt, context, mode);
+        usedSource = 'kimi';
+        break;
+      }
+
+      if (provider === 'glm' && (process.env.GLM_API_KEY || process.env.GLM_API_URL)) {
+        const url = process.env.GLM_API_URL || 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+        rawResultText = await callOpenAICompatible('glm', url, process.env.GLM_API_KEY, routing.model, prompt, context, mode);
+        usedSource = 'glm';
+        break;
+      }
+
+      if (provider === 'omnirouter' && (process.env.OMNIROUTER_API_KEY || process.env.OMNIROUTER_BASE_URL)) {
+        const url = process.env.OMNIROUTER_BASE_URL || 'https://omnirouter.li/v1/chat/completions';
+        rawResultText = await callOpenAICompatible('omnirouter', url, process.env.OMNIROUTER_API_KEY, routing.model, prompt, context, mode);
+        usedSource = 'omnirouter';
+        break;
+      }
+
+      if (provider === 'freellmapi' && (process.env.JARVIS_API_URL || process.env.FREELLMAPI_URL)) {
+        const url = process.env.FREELLMAPI_URL || process.env.JARVIS_API_URL || 'http://127.0.0.1:3001/v1/chat/completions';
+        rawResultText = await callOpenAICompatible('freellmapi', url, process.env.JARVIS_API_KEY || 'local-key', routing.model, prompt, context, mode);
+        usedSource = 'freellmapi';
+        break;
+      }
+
+      if (provider === 'gemini' && (process.env.JARVIS_API_KEY || process.env.GEMINI_API_KEY)) {
+        const key = process.env.JARVIS_API_KEY || process.env.GEMINI_API_KEY;
+        rawResultText = await callGemini(key, routing.model, prompt, context, mode);
+        usedSource = 'gemini-cloud';
+        break;
+      }
+
+      if (provider === 'local') {
+        rawResultText = generateLocalCSEAnswer(prompt, context, mode);
+        usedSource = 'local-intelligence';
+        recordSuccess('local', 5);
+        break;
+      }
+    } catch (err) {
+      console.warn(`[JARVIS Router] Provider ${provider} failed, trying next fallback:`, err.message);
+    }
+  }
+
+  // 3. Absolute fallback to local intelligence if all else failed
+  if (!rawResultText) {
+    rawResultText = generateLocalCSEAnswer(prompt, context, mode);
+    usedSource = 'local-intelligence';
+    recordSuccess('local', 5);
+  }
+
+  // 4. Response Verification & Consensus Guard
+  const verification = verifyResponse(rawResultText, routing.taskType, context);
+
+  return {
+    text: verification.verifiedText || rawResultText,
+    source: usedSource,
+    routing: {
+      taskType: routing.taskType,
+      selectedProvider: usedSource,
+      intendedProvider: routing.provider,
+      reason: routing.reason
+    },
+    verified: verification.verified,
+    verificationNotes: verification.notes
+  };
 }
 
 /**

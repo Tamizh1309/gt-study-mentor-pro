@@ -25,6 +25,9 @@ const { getStudentContext } = require('./contextEngine');
 const { getProactiveRecommendations } = require('./recommendationEngine');
 const { getHistory } = require('./memoryService');
 const { getSpeechConfig } = require('./voiceService');
+const { getAllHealth, getProviderHealth } = require('./providerHealth');
+const { ROUTING_MATRIX } = require('./modelRouter');
+const { dispatchAutomationEvent, getRecentEvents } = require('./automationBridge');
 
 /**
  * POST /api/jarvis/orchestrate
@@ -127,17 +130,103 @@ router.post('/action', (req, res) => {
  * Health check & diagnostic endpoint
  */
 router.get('/status', (req, res) => {
-  const hasCloudKey = !!(process.env.JARVIS_API_KEY || process.env.GEMINI_API_KEY);
+  const provider = (process.env.JARVIS_PROVIDER || 'freellmapi').toLowerCase();
+  const deepseekConfigured = !!(process.env.DEEPSEEK_API_KEY || process.env.JARVIS_API_KEY);
+  const kimiConfigured = !!process.env.KIMI_API_KEY;
+  const glmConfigured = !!process.env.GLM_API_KEY;
+  const omniConfigured = !!process.env.OMNIROUTER_API_KEY;
+  const freeLlmConfigured = !!process.env.FREELLMAPI_URL;
+
+  const anyCloudConfigured = deepseekConfigured || kimiConfigured || glmConfigured || omniConfigured || freeLlmConfigured;
+
   res.json({
-    name: 'GT JARVIS Voice Assistant',
+    name: 'GT JARVIS Multi-Model Collaboration Brain',
     status: 'ONLINE',
-    version: '1.0.0',
-    mode: 'OS Preparation Engine',
-    aiProvider: hasCloudKey ? 'Cloud AI Active (Gemini)' : 'Local High-Yield CSE Intelligence Active (Offline Ready)',
-    cloudConfigured: hasCloudKey,
+    version: '2.0.0',
+    mode: 'Controlled Autonomous Preparation System',
+    activeProvider: provider,
+    cloudConfigured: anyCloudConfigured,
+    localFallbackReady: true,
+    providersConfigured: {
+      freellmapi: freeLlmConfigured,
+      omnirouter: omniConfigured,
+      deepseek: deepseekConfigured,
+      kimi: kimiConfigured,
+      glm: glmConfigured,
+      offline_cse: true
+    },
     speechSupport: 'Web Speech API (Chrome/Edge/Chromium)',
     uptime: process.uptime()
   });
+});
+
+/**
+ * GET /api/jarvis/health
+ * Returns instantaneous health states of all connected providers and gateways
+ */
+router.get('/health', (req, res) => {
+  const healthData = getAllHealth();
+  const isHealthy = Object.values(healthData).some(p => p.status === 'ONLINE' || p.status === 'DEGRADED');
+
+  res.json({
+    success: true,
+    healthy: isHealthy,
+    jarvis: 'ONLINE',
+    providers: healthData,
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
+ * GET /api/jarvis/diagnostics
+ * Detailed developer diagnostic endpoint (hidden under Settings -> Developer Diagnostics)
+ */
+router.get('/diagnostics', (req, res) => {
+  res.json({
+    success: true,
+    jarvis: {
+      identity: 'GT JARVIS',
+      architecture: 'Controlled Autonomous Multi-Model Gateway',
+      version: '2.0.0'
+    },
+    providers: getAllHealth(),
+    routingPolicy: ROUTING_MATRIX,
+    recentAutomationEvents: getRecentEvents(20),
+    timestamp: new Date().toISOString()
+  });
+});
+
+/**
+ * POST /api/jarvis/automation/event
+ * Safe OpenClaw automation dispatch gateway (Blueprint Section 7 & 23)
+ * Non-destructive events only: REVISION_DUE, TASK_REMINDER, FOCUS_COMPLETED, etc.
+ */
+router.post('/automation/event', async (req, res) => {
+  try {
+    const { event, topic, priority, metadata, channel } = req.body || {};
+    if (!event) {
+      return res.status(400).json({
+        success: false,
+        error: 'Automation event type is required.'
+      });
+    }
+
+    const dispatchResult = await dispatchAutomationEvent({
+      event,
+      topic,
+      priority,
+      metadata,
+      channel
+    });
+
+    res.json(dispatchResult);
+  } catch (err) {
+    console.error('[JARVIS Automation Dispatch Error]', err);
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Automation dispatch failed.'
+    });
+  }
 });
 
 /**
