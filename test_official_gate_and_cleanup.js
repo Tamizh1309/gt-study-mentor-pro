@@ -316,8 +316,53 @@ async function runSuite() {
   assert(appJs.includes('https://internshala.com'), 'app.js contains Internshala link');
   assert(appJs.includes('https://wellfound.com'), 'app.js contains Wellfound link');
 
+  // ── 5. Setup Wizard & Mobile 3D Optimization Verifications ──
+  console.log('\n5. Testing Setup Wizard & Mobile 3D Optimization...');
+  const iWizard = classifyIntent('JARVIS open setup wizard');
+  assert(iWizard.intent === 'OPEN_SETUP_WIZARD', 'Classifies "JARVIS open setup wizard" as OPEN_SETUP_WIZARD');
+
+  const actWizard = resolveAction('OPEN_SETUP_WIZARD');
+  assert(actWizard.type === 'open_setup_wizard', 'Action type is open_setup_wizard');
+  assert(actWizard.params.modal === 'day0-onboarding-modal', 'Target modal is day0-onboarding-modal');
+
+  const chatWizardRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'JARVIS open setup wizard',
+    mode: 'study'
+  });
+
+  assert(chatWizardRes.status === 200, 'POST /api/jarvis/chat for Setup Wizard returned 200');
+  assert(chatWizardRes.body.action.type === 'open_setup_wizard', 'Live action returns open_setup_wizard');
+
+  // DOM and Codebase checks
+  assert(indexHtml.includes('id="header-setup-wizard-btn"'), 'index.html contains #header-setup-wizard-btn');
+  assert(indexHtml.includes('id="nav-setup-wizard"'), 'index.html contains #nav-setup-wizard');
+  assert(indexHtml.includes('id="wizard-progress-dots"'), 'index.html contains #wizard-progress-dots');
+  assert(indexHtml.includes('id="wizard-step-1"'), 'index.html contains #wizard-step-1');
+  assert(indexHtml.includes('id="wizard-step-2"'), 'index.html contains #wizard-step-2');
+  assert(indexHtml.includes('id="wizard-step-3"'), 'index.html contains #wizard-step-3');
+  assert(indexHtml.includes('id="wizard-step-4"'), 'index.html contains #wizard-step-4');
+  assert(indexHtml.includes('id="vortex-mode-btn"'), 'index.html contains #vortex-mode-btn');
+
+  const project3DJs = fs.readFileSync(path.join(__dirname, 'project3D.js'), 'utf8');
+  assert(project3DJs.includes('displayMode'), 'project3D.js defines displayMode');
+  assert(project3DJs.includes('render2DEco'), 'project3D.js defines render2DEco');
+  assert(project3DJs.includes('toggleDisplayMode'), 'project3D.js defines toggleDisplayMode');
+
+  const learningUniverseJs = fs.readFileSync(path.join(__dirname, 'learningUniverse.js'), 'utf8');
+  assert(learningUniverseJs.includes('isScrolling'), 'learningUniverse.js includes mobile isScrolling handler');
+
+  assert(appJs.includes('window.openSetupWizard'), 'app.js defines window.openSetupWizard');
+  assert(appJs.includes('window.renderWizardStep'), 'app.js defines window.renderWizardStep');
+  assert(appJs.includes('window.applyCustomizedDashboard'), 'app.js defines window.applyCustomizedDashboard');
+
   console.log('\n======================================================');
-  console.log('✅ ALL ROADMAPS (SWE, GATE, PLACEMENT, INTERNSHIP) VERIFIED (100%)');
+  console.log('✅ ALL TESTS (ROADMAPS, SETUP WIZARD, MOBILE 3D) VERIFIED (100%)');
   console.log('======================================================\n');
 }
 

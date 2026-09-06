@@ -38,7 +38,8 @@ const ALLOWED_ACTIONS = {
   OPEN_APTITUDE_RESOURCE: 'open_aptitude_resource',
   OPEN_SWE_ROADMAP: 'open_swe_roadmap',
   OPEN_PLACEMENT_ROADMAP: 'open_placement_roadmap',
-  OPEN_INTERNSHIP_ROADMAP: 'open_internship_roadmap'
+  OPEN_INTERNSHIP_ROADMAP: 'open_internship_roadmap',
+  OPEN_SETUP_WIZARD: 'open_setup_wizard'
 };
 
 /**
@@ -249,6 +250,14 @@ function resolveAction(intent, params = {}) {
         type: ALLOWED_ACTIONS.OPEN_INTERNSHIP_ROADMAP,
         params: { view: 'prepare', tab: 'intern' },
         spokenConfirmation: "Opening the Internship Preparation Roadmap."
+      };
+    }
+
+    case 'OPEN_SETUP_WIZARD': {
+      return {
+        type: ALLOWED_ACTIONS.OPEN_SETUP_WIZARD,
+        params: { modal: 'day0-onboarding-modal' },
+        spokenConfirmation: "Opening the Setup Wizard. Let us calibrate your preparation goals and timeline."
       };
     }
 

@@ -56,6 +56,17 @@ const INTENT_RULES = [
     extractParams: () => ({ view: 'practice', tab: 'dsa' })
   },
   {
+    intent: 'OPEN_SETUP_WIZARD',
+    category: 'application_command',
+    patterns: [
+      /(open|launch|run|show|start)\s+(the\s+)?(setup\s+wizard|onboarding|day\s*0|profile\s+setup|calibration)/i,
+      /(change|calibrate|reconfigure|reset)\s+(my\s+)?(goals?|target|tracks?|preferences)/i,
+      /re-?run\s+(the\s+)?(setup(\s*wizard)?|onboarding)/i,
+      /setup\s+wizard/i
+    ],
+    extractParams: () => ({ modal: 'day0-onboarding-modal' })
+  },
+  {
     intent: 'OPEN_REVISION',
     category: 'application_command',
     patterns: [

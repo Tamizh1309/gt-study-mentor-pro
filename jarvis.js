@@ -539,6 +539,18 @@
           break;
         }
 
+        case 'open_setup_wizard': {
+          if (typeof window.openSetupWizard === 'function') {
+            window.openSetupWizard();
+          } else if (typeof window.openDay0Onboarding === 'function') {
+            window.openDay0Onboarding();
+          }
+          if (typeof showToast === 'function') {
+            showToast('🚀 Opened Setup Wizard & Mentor Calibration', 'info');
+          }
+          break;
+        }
+
         default:
           console.log('[GT JARVIS] Unhandled action type:', action.type);
       }

@@ -199,8 +199,10 @@
       <span class="sidebar-nav-icon" aria-hidden="true">&#x2699;&#xFE0F;</span>
       <span class="sidebar-nav-label">Settings</span>
     </button>
-
-    
+    <button class="sidebar-nav-item" id="nav-setup-wizard" onclick="window.openSetupWizard&&openSetupWizard()" style="border-left:2px solid var(--accent);background:rgba(56,189,248,0.06);">
+      <span class="sidebar-nav-icon" aria-hidden="true">🚀</span>
+      <span class="sidebar-nav-label" style="color:var(--accent);font-weight:700;">Setup Wizard</span>
+    </button>
   </nav>
   <div class="sidebar-user-area">
     <div class="sidebar-user-card" onclick="openModal('profile-modal')" role="button" tabindex="0" aria-label="Open profile" onkeydown="if(event.key==='Enter')openModal('profile-modal')">
@@ -226,6 +228,7 @@
           <span id="header-stopwatch-time" style="font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--text);" aria-live="off">00:00:00</span>
           <button id="header-stopwatch-btn" onclick="toggleHeaderStopwatch()" style="font-size:11px;padding:3px 10px;font-weight:800;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;">&#x25B6; Focus</button>
         </div>
+        <button onclick="window.openSetupWizard&&openSetupWizard()" id="header-setup-wizard-btn" style="display:flex;align-items:center;gap:6px;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light,#38BDF8);font-size:12px;cursor:pointer;font-weight:700;">⚙️ Setup Wizard</button>
         <button onclick="window.openJarvisBriefingModal&&openJarvisBriefingModal()" id="header-briefing-btn" style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--success);font-size:12px;cursor:pointer;font-weight:700;">📋 JARVIS Briefing</button>
         <button onclick="navigateToView('jarvis')" style="display:flex;align-items:center;gap:6px;background:rgba(109,99,255,0.15);border:1px solid rgba(109,99,255,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light);font-size:12px;cursor:pointer;font-weight:700;">🎙️ Ask JARVIS</button>
       </div>
@@ -779,71 +782,210 @@
   </div>
 </div>
 
-<!-- Day 0 Onboarding Modal -->
-<div class="modal-overlay" id="day0-onboarding-modal" role="dialog" aria-modal="true" aria-label="Welcome to Day 0 Setup">
-  <div class="modal" style="max-width:560px;">
+<!-- Day 0 Onboarding Modal / Setup Wizard -->
+<div class="modal-overlay" id="day0-onboarding-modal" role="dialog" aria-modal="true" aria-label="Setup Wizard & Mentor Calibration">
+  <div class="modal" style="max-width:620px; width:94%; max-height:90vh; overflow-y:auto;">
     <button class="modal-close" data-close="day0-onboarding-modal" aria-label="Close">&#x2715;</button>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-      <div style="font-size:28px;">🚀</div>
+    
+    <!-- Wizard Header & Progress Bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);flex-wrap:wrap;gap:8px;">
       <div>
-        <div class="modal-title" style="margin-bottom:2px;">Welcome to Your Day 0</div>
-        <div class="modal-subtitle">Your personalized 90-day career preparation starts here.</div>
+        <div class="modal-title" style="margin-bottom:2px;font-size:18px;display:flex;align-items:center;gap:8px;">
+          <span>🚀</span> <span>Setup Wizard &amp; Mentor Calibration</span>
+        </div>
+        <div class="modal-subtitle" style="font-size:12px;" id="wizard-step-subtitle">Step 1 of 4 &bull; Choose your primary preparation mission</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;" id="wizard-progress-dots">
+        <span class="wizard-dot active" id="wizard-dot-1" style="width:24px;height:6px;border-radius:3px;background:var(--primary);transition:all 0.3s;" title="Step 1: Goal"></span>
+        <span class="wizard-dot" id="wizard-dot-2" style="width:12px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);transition:all 0.3s;" title="Step 2: Timeline"></span>
+        <span class="wizard-dot" id="wizard-dot-3" style="width:12px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);transition:all 0.3s;" title="Step 3: Study Plan"></span>
+        <span class="wizard-dot" id="wizard-dot-4" style="width:12px;height:6px;border-radius:3px;background:rgba(255,255,255,0.2);transition:all 0.3s;" title="Step 4: Launch"></span>
       </div>
     </div>
 
-    <form onsubmit="window.submitDay0Onboarding&&submitDay0Onboarding(event)">
-      <div style="display:flex;flex-direction:column;gap:14px;margin-top:14px;">
-        <div>
-          <label for="d0-name" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">1. Your Preferred Name</label>
-          <input type="text" id="d0-name" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;" placeholder="e.g. Tamizharasan" required />
+    <!-- Hidden compatibility form inputs -->
+    <form id="setup-wizard-form" onsubmit="window.submitDay0Onboarding&&submitDay0Onboarding(event)">
+      <input type="hidden" id="d0-target" value="GATE + Placement" />
+      <input type="hidden" id="d0-horizon" value="9-18+ Months" />
+      <input type="hidden" id="d0-level" value="Beginner" />
+      <input type="hidden" id="d0-hours" value="2.0" />
+      <input type="hidden" id="d0-session" value="45" />
+
+      <!-- STEP 1: TARGET GOAL -->
+      <div id="wizard-step-1" class="wizard-step-content" style="display:block;">
+        <div style="margin-bottom:14px;">
+          <label for="d0-name" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Your Name / Preferred Call-sign</label>
+          <input type="text" id="d0-name" class="form-input" style="width:100%;padding:10px 14px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:14px;" placeholder="e.g. Tamizharasan" value="Student" required />
         </div>
 
-        <div>
-          <label for="d0-target" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">2. Primary Target Goals</label>
-          <select id="d0-target" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
-            <option value="GATE + Placement" selected>GATE CS 2027 + Campus Placements</option>
-            <option value="GATE 2027">GATE CS 2027 Exclusively (IISc / IITs / PSUs)</option>
-            <option value="Software Engineering">Software Engineering (Tier-1 Product SDE)</option>
-            <option value="Internship">Summer 2027 SDE Internships</option>
-            <option value="All Tracks">All 4 Tracks (Balanced Master Plan)</option>
-          </select>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div>
-            <label for="d0-level" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">3. Skill Level</label>
-            <select id="d0-level" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
-              <option value="Beginner" selected>Beginner (Foundations first)</option>
-              <option value="Intermediate">Intermediate (Revising core CS)</option>
-              <option value="Advanced">Advanced (Problem drills &amp; mocks)</option>
-            </select>
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Select Your Primary Target Mission</div>
+        <div style="display:grid;grid-template-columns:1fr;gap:8px;" id="wizard-track-cards">
+          <!-- Card 1: GATE 2027 -->
+          <div class="wizard-card" onclick="window.selectWizardTrack&&selectWizardTrack('GATE 2027')" data-track="GATE 2027" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--border-subtle);border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.2s;">
+            <div style="font-size:24px;line-height:1;">🎯</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;">
+                <span>GATE CS 2027 (IISc &bull; IITs &bull; PSUs)</span>
+                <span class="track-check" style="font-size:13px;opacity:0;">✓</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Target top All-India Rank. Curates IIT Madras 2027 syllabus, Discrete Math, CS core depth, and official PYQs.</div>
+            </div>
           </div>
+          <!-- Card 2: Campus Placements -->
+          <div class="wizard-card" onclick="window.selectWizardTrack&&selectWizardTrack('Campus Placements')" data-track="Campus Placements" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--border-subtle);border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.2s;">
+            <div style="font-size:24px;line-height:1;">💼</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;">
+                <span>Campus Placements &amp; SDE</span>
+                <span class="track-check" style="font-size:13px;opacity:0;">✓</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Target Tier-1 Tech &amp; Product companies. Focus on DSA patterns, Aptitude &amp; Reasoning, CS Core &amp; Resume projects.</div>
+            </div>
+          </div>
+          <!-- Card 3: Internship -->
+          <div class="wizard-card" onclick="window.selectWizardTrack&&selectWizardTrack('Internship')" data-track="Internship" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--border-subtle);border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.2s;">
+            <div style="font-size:24px;line-height:1;">⚡</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;">
+                <span>Summer 2027 SDE Internships</span>
+                <span class="track-check" style="font-size:13px;opacity:0;">✓</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">High-stipend summer internships &amp; PPO conversion. Domain specialization, portfolio websites, GitHub projects &amp; platforms.</div>
+            </div>
+          </div>
+          <!-- Card 4: Software Engineering -->
+          <div class="wizard-card" onclick="window.selectWizardTrack&&selectWizardTrack('Software Engineering')" data-track="Software Engineering" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--border-subtle);border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.2s;">
+            <div style="font-size:24px;line-height:1;">🌐</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;">
+                <span>Software Engineering Master Track</span>
+                <span class="track-check" style="font-size:13px;opacity:0;">✓</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">12-Step Full Stack &amp; Distributed Systems roadmap from fundamentals to clean production code and system architecture.</div>
+            </div>
+          </div>
+          <!-- Card 5: GATE + Placement (Hybrid) -->
+          <div class="wizard-card selected" onclick="window.selectWizardTrack&&selectWizardTrack('GATE + Placement')" data-track="GATE + Placement" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--primary);border-radius:8px;background:rgba(109,99,255,0.08);cursor:pointer;transition:all 0.2s;">
+            <div style="font-size:24px;line-height:1;">🚀</div>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:var(--primary-light);display:flex;align-items:center;justify-content:space-between;">
+                <span>GATE + Campus Placements (Balanced Master Plan)</span>
+                <span class="track-check" style="font-size:13px;opacity:1;color:var(--primary-light);">✓</span>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Dual-track synergy: CS core and math for GATE combined with coding and aptitude drills for job interviews.</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <div>
-            <label for="d0-hours" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">4. Daily Study Budget</label>
-            <select id="d0-hours" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
-              <option value="1.0">1 Hour / day (Steady pace)</option>
-              <option value="2.0" selected>2 Hours / day (Balanced)</option>
-              <option value="3.0">3 Hours / day (Accelerated)</option>
-              <option value="4.0">4+ Hours / day (Deep Sprint)</option>
-            </select>
+      <!-- STEP 2: TIME HORIZON -->
+      <div id="wizard-step-2" class="wizard-step-content" style="display:none;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">How much time do you have before your target exam/hiring drive?</div>
+        <div style="display:grid;grid-template-columns:1fr;gap:10px;" id="wizard-horizon-cards">
+          <!-- Horizon 1: 1-3 Months -->
+          <div class="wizard-horizon-card" onclick="window.selectWizardHorizon&&selectWizardHorizon('1-3 Months')" data-horizon="1-3 Months" style="padding:14px;border:1px solid var(--border-subtle);border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.2s;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:14px;font-weight:700;color:var(--warning);">⚡ Sprint Mode (1–3 Months / 60–90 Days)</span>
+              <span class="horizon-check" style="font-size:13px;opacity:0;">✓</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-sub);">Rapid high-yield question drills, formula vaults, and daily full-length mock tests. Prioritizes high-weightage topics first.</div>
+          </div>
+          <!-- Horizon 2: 4-8 Months -->
+          <div class="wizard-horizon-card" onclick="window.selectWizardHorizon&&selectWizardHorizon('4-8 Months')" data-horizon="4-8 Months" style="padding:14px;border:1px solid var(--border-subtle);border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer;transition:all 0.2s;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:14px;font-weight:700;color:var(--primary-light);">📅 Strategic Semester Plan (4–8 Months)</span>
+              <span class="horizon-check" style="font-size:13px;opacity:0;">✓</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-sub);">Balanced pacing: Complete 2 subjects per month alongside steady DSA practice and weekend mock tests.</div>
+          </div>
+          <!-- Horizon 3: 9-18+ Months -->
+          <div class="wizard-horizon-card selected" onclick="window.selectWizardHorizon&&selectWizardHorizon('9-18+ Months')" data-horizon="9-18+ Months" style="padding:14px;border:1px solid var(--primary);border-radius:8px;background:rgba(109,99,255,0.08);cursor:pointer;transition:all 0.2s;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:14px;font-weight:700;color:var(--success);">🏆 Comprehensive Mastery (9–18+ Months / 2027 Target)</span>
+              <span class="horizon-check" style="font-size:13px;opacity:1;color:var(--success);">✓</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-sub);">Full foundational ground-up mastery: Deep proofs, standard textbooks, multi-year PYQ sweeps, and advanced mock simulations.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: STUDY BUDGET & BASELINE -->
+      <div id="wizard-step-3" class="wizard-step-content" style="display:none;">
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Daily Study Bandwidth</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;" id="wizard-hours-btns">
+            <button type="button" onclick="window.selectWizardHours&&selectWizardHours(1.0)" data-hours="1.0" class="wizard-choice-btn" style="padding:10px;border-radius:6px;border:1px solid var(--border-subtle);background:var(--depth-3);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">☕ 1 Hr / day<br><span style="font-size:10px;font-weight:400;color:var(--text-muted);">Steady pace</span></button>
+            <button type="button" onclick="window.selectWizardHours&&selectWizardHours(2.0)" data-hours="2.0" class="wizard-choice-btn selected" style="padding:10px;border-radius:6px;border:1px solid var(--primary);background:rgba(109,99,255,0.12);color:var(--primary-light);font-size:12px;font-weight:700;cursor:pointer;">⚡ 2–3 Hrs / day<br><span style="font-size:10px;font-weight:400;color:var(--text-muted);">Recommended</span></button>
+            <button type="button" onclick="window.selectWizardHours&&selectWizardHours(4.0)" data-hours="4.0" class="wizard-choice-btn" style="padding:10px;border-radius:6px;border:1px solid var(--border-subtle);background:var(--depth-3);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">🔥 4+ Hrs / day<br><span style="font-size:10px;font-weight:400;color:var(--text-muted);">Deep Sprint</span></button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Current Technical Baseline</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;" id="wizard-skill-btns">
+            <button type="button" onclick="window.selectWizardSkill&&selectWizardSkill('Beginner')" data-skill="Beginner" class="wizard-choice-btn selected" style="padding:10px;border-radius:6px;border:1px solid var(--primary);background:rgba(109,99,255,0.12);color:var(--primary-light);font-size:12px;font-weight:700;cursor:pointer;">🌱 Beginner<br><span style="font-size:10px;font-weight:400;color:var(--text-muted);">Foundations first</span></button>
+            <button type="button" onclick="window.selectWizardSkill&&selectWizardSkill('Intermediate')" data-skill="Intermediate" class="wizard-choice-btn" style="padding:10px;border-radius:6px;border:1px solid var(--border-subtle);background:var(--depth-3);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">⚖️ Intermediate<br><span style="font-size:10px;font-weight:400;color:var(--text-muted);">Revising core CS</span></button>
+            <button type="button" onclick="window.selectWizardSkill&&selectWizardSkill('Advanced')" data-skill="Advanced" class="wizard-choice-btn" style="padding:10px;border-radius:6px;border:1px solid var(--border-subtle);background:var(--depth-3);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">🏆 Advanced<br><span style="font-size:10px;font-weight:400;color:var(--text-muted);">Problem drills</span></button>
           </div>
         </div>
 
         <div>
-          <label for="d0-session" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">5. Preferred Focus Session Length</label>
-          <select id="d0-session" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
+          <label for="wizard-session-select" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Preferred Focus Session Duration</label>
+          <select id="wizard-session-select" onchange="document.getElementById('d0-session').value=this.value" class="form-input" style="width:100%;padding:10px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;">
             <option value="25">25 min (Pomodoro Classic)</option>
-            <option value="45" selected>45 min (Recommended Deep Work)</option>
-            <option value="60">60 min (Full Block)</option>
-            <option value="90">90 min (Extended Focus)</option>
+            <option value="45" selected>45 min (Recommended Deep Work Block)</option>
+            <option value="60">60 min (Full Subject Module)</option>
+            <option value="90">90 min (Extended Focus Block)</option>
           </select>
         </div>
       </div>
 
-      <div style="margin-top:20px;display:flex;gap:10px;justify-content:flex-end;">
-        <button type="button" class="modal-close" data-close="day0-onboarding-modal" style="padding:10px 18px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-muted);font-size:13px;cursor:pointer;">Cancel</button>
-        <button type="submit" class="submit-btn" style="padding:10px 24px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:13px;cursor:pointer;">Launch Day 1 Plan 🚀</button>
+      <!-- STEP 4: LAUNCH & BLUEPRINT PREVIEW -->
+      <div id="wizard-step-4" class="wizard-step-content" style="display:none;">
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.25);border-radius:8px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+            <span>✨</span> <span>Your Calibrated Preparation Blueprint</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-sub);line-height:1.45;">
+            GT JARVIS has configured your dashboard, customized your daily study quota, and pinned your core preparation roadmap.
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div style="background:var(--depth-3);padding:12px;border-radius:6px;border:1px solid var(--border-subtle);">
+            <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Target Track</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px;" id="preview-target-badge">GATE + Placement</div>
+          </div>
+          <div style="background:var(--depth-3);padding:12px;border-radius:6px;border:1px solid var(--border-subtle);">
+            <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Timeline Horizon</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px;" id="preview-horizon-badge">9–18+ Months</div>
+          </div>
+          <div style="background:var(--depth-3);padding:12px;border-radius:6px;border:1px solid var(--border-subtle);">
+            <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Daily Study Target</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-top:2px;" id="preview-hours-badge">2.0 Hours / Day</div>
+          </div>
+          <div style="background:var(--depth-3);padding:12px;border-radius:6px;border:1px solid var(--border-subtle);">
+            <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Active Pinned Roadmap</div>
+            <div style="font-size:13px;font-weight:700;color:var(--accent);margin-top:2px;" id="preview-roadmap-badge">GATE CS 2027 + Placements</div>
+          </div>
+        </div>
+
+        <div style="padding:10px 14px;background:rgba(255,255,255,0.03);border-left:3px solid var(--accent);border-radius:6px;font-size:12px;color:var(--text-sub);">
+          <span style="color:var(--text);font-weight:700;">Day 1 Action:</span> <span id="preview-action-text">Explore Phase 1 Foundations and complete your first 5 diagnostic questions.</span>
+        </div>
+      </div>
+
+      <!-- Navigation & Action Buttons -->
+      <div style="margin-top:18px;display:flex;gap:10px;justify-content:space-between;align-items:center;border-top:1px solid var(--border-subtle);padding-top:14px;">
+        <button type="button" class="modal-close" data-close="day0-onboarding-modal" style="padding:9px 16px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-muted);font-size:12px;cursor:pointer;">Cancel</button>
+        
+        <div style="display:flex;gap:8px;">
+          <button type="button" id="wizard-prev-btn" onclick="window.prevWizardStep&&prevWizardStep()" style="display:none;padding:9px 16px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">&larr; Back</button>
+          
+          <button type="button" id="wizard-next-btn" onclick="window.nextWizardStep&&nextWizardStep()" style="padding:9px 20px;background:var(--primary);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:700;font-size:12px;cursor:pointer;">Continue &rarr;</button>
+          
+          <button type="submit" id="wizard-submit-btn" style="display:none;padding:9px 22px;background:var(--success);color:#050814;border:none;border-radius:var(--radius-sm);font-weight:800;font-size:13px;cursor:pointer;">Launch Day 1 Plan 🚀</button>
+        </div>
       </div>
     </form>
   </div>
@@ -3824,8 +3966,9 @@ function solve(arr) {
         <div style="position:absolute; bottom:8px; left:12px; font-size:10px; color:rgba(255,255,255,0.45); pointer-events:none;">
           &#x1F504; Drag to Orbit in 3D &bull; Scroll to Zoom &bull; Real-time 60 FPS Canvas Projection
         </div>
-        <!-- Live HUD Overlay -->
-        <div style="position:absolute; top:10px; right:12px; display:flex; gap:8px; pointer-events:none;">
+        <!-- Live HUD Overlay & Performance Switcher -->
+        <div style="position:absolute; top:10px; right:12px; display:flex; gap:8px; align-items:center;">
+          <button type="button" onclick="Vortex3D&&Vortex3D.toggleDisplayMode()" id="vortex-mode-btn" style="padding:3px 10px; border-radius:4px; background:rgba(0,0,0,0.75); border:1px solid rgba(56,189,248,0.4); font-size:11px; font-weight:700; color:var(--accent); cursor:pointer;" title="Toggle between 3D Spatial and 2D Eco Mode">⚡ 3D Mode</button>
           <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:var(--text);" id="vortex-hud-term">Term 1</span>
           <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:#F59E0B;" id="vortex-hud-leader">Leader: Node-1</span>
           <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:var(--success);" id="vortex-hud-quorum">Full Quorum (5/5)</span>

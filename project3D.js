@@ -28,6 +28,9 @@ const Vortex3D = (function () {
   let isPartitioned = false;
   let simulationSpeed = 1.0;
 
+  // Display Mode: '3d' spatial vs '2d' eco low-power mode (auto-selected on mobile)
+  let displayMode = (typeof window !== 'undefined' && window.innerWidth < 768) ? '2d' : '3d';
+
   let nodes = [
     { id: 'Node-1', role: 'LEADER', x: 0, y: 0, z: 0, angle: 0, term: 1, logs: 5, heartbeatTimer: 0, color: '#F59E0B', status: 'Active' },
     { id: 'Node-2', role: 'FOLLOWER', x: 0, y: 0, z: 0, angle: (2 * Math.PI / 5) * 1, term: 1, logs: 5, heartbeatTimer: 30, color: '#38BDF8', status: 'Active' },
@@ -135,8 +138,134 @@ const Vortex3D = (function () {
     zoom += (targetZoom - zoom) * 0.1;
   }
 
+  function render2DEco() {
+    if (!ctx || !canvas) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const radius = Math.min(cx, cy) - (canvas.width < 500 ? 55 : 65);
+
+    // Subtle background radar rings
+    ctx.save();
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 0.5, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Center 2D Status Hub
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 38, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.stroke();
+
+    ctx.fillStyle = '#38BDF8';
+    ctx.font = '700 11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('RAFT CLUSTER', cx, cy - 8);
+    ctx.fillStyle = isPartitioned ? '#F59E0B' : '#10B981';
+    ctx.font = '600 10px Inter, sans-serif';
+    ctx.fillText(isPartitioned ? '⚡ Split Partition' : '✓ Full Quorum', cx, cy + 8);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '500 9px monospace';
+    ctx.fillText('2D ECO MODE', cx, cy + 20);
+    ctx.restore();
+
+    // Node 2D Positions in circular ring
+    const node2DPos = nodes.map((n, i) => {
+      const angle = (2 * Math.PI / nodes.length) * i - Math.PI / 2;
+      return {
+        node: n,
+        x: cx + Math.cos(angle) * radius,
+        y: cy + Math.sin(angle) * radius
+      };
+    });
+
+    // Draw connection lines
+    for (let i = 0; i < node2DPos.length; i++) {
+      for (let j = i + 1; j < node2DPos.length; j++) {
+        const p1 = node2DPos[i];
+        const p2 = node2DPos[j];
+        const isBroken = isPartitioned && 
+          (((p1.node.id === 'Node-4' || p1.node.id === 'Node-5') && (p2.node.id !== 'Node-4' && p2.node.id !== 'Node-5')) ||
+          ((p2.node.id === 'Node-4' || p2.node.id === 'Node-5') && (p1.node.id !== 'Node-4' && p1.node.id !== 'Node-5')));
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = isBroken ? 'rgba(239, 68, 68, 0.25)' : 'rgba(56, 189, 248, 0.2)';
+        ctx.lineWidth = isBroken ? 1.5 : 1;
+        if (isBroken) ctx.setLineDash([4, 4]);
+        else ctx.setLineDash([]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    // Draw packets
+    packets.forEach(p => {
+      const fromPos = node2DPos.find(np => np.node.id === p.from.id);
+      const toPos = node2DPos.find(np => np.node.id === p.to.id);
+      if (!fromPos || !toPos) return;
+
+      const px = fromPos.x + (toPos.x - fromPos.x) * p.progress;
+      const py = fromPos.y + (toPos.y - fromPos.y) * p.progress;
+
+      ctx.beginPath();
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.fillStyle = p.color || '#38BDF8';
+      ctx.fill();
+    });
+
+    // Draw 2D Node Circles
+    node2DPos.forEach(({ node, x, y }) => {
+      const r = 20;
+
+      // Glow halo
+      ctx.beginPath();
+      ctx.arc(x, y, r + 5, 0, Math.PI * 2);
+      ctx.fillStyle = node.role === 'LEADER' ? 'rgba(245, 158, 11, 0.25)' : 'rgba(56, 189, 248, 0.15)';
+      ctx.fill();
+
+      // Node Body
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = node.status !== 'Active' ? '#1E293B' : (node.role === 'LEADER' ? '#D97706' : '#0284C7');
+      ctx.fill();
+      ctx.strokeStyle = node.role === 'LEADER' ? '#F59E0B' : '#38BDF8';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Node Name
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(node.id, x, y - r - 6);
+
+      // Role Badge
+      ctx.font = 'bold 10px monospace';
+      ctx.fillStyle = node.role === 'LEADER' ? '#FBBF24' : '#7DD3FC';
+      ctx.fillText(node.role === 'LEADER' ? '👑 LEADER' : node.role, x, y + 4);
+
+      // Log Count
+      ctx.font = '500 9px monospace';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.fillText(`L:${node.logs}`, x, y + r + 14);
+    });
+  }
+
   function render() {
     if (!ctx) return;
+    if (displayMode === '2d') {
+      render2DEco();
+      return;
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw background 3D grid plane
@@ -444,6 +573,25 @@ const Vortex3D = (function () {
       if (partBtn) {
         partBtn.textContent = isPartitioned ? '🔄 Heal Partition' : '⚡ Split Partition';
       }
+
+      const modeBtn = document.getElementById('vortex-mode-btn');
+      if (modeBtn) {
+        modeBtn.textContent = displayMode === '3d' ? '⚡ 3D Mode' : '🔋 2D Eco';
+        modeBtn.style.color = displayMode === '3d' ? 'var(--accent)' : 'var(--success)';
+        modeBtn.style.borderColor = displayMode === '3d' ? 'rgba(56,189,248,0.5)' : 'rgba(16,185,129,0.5)';
+      }
+    },
+
+    toggleDisplayMode: function () {
+      displayMode = displayMode === '3d' ? '2d' : '3d';
+      this.updateHUD();
+      if (typeof showToast === 'function') {
+        showToast(displayMode === '3d' ? '⚡ Switched to 3D Spatial Visualizer' : '🔋 Switched to 2D Eco Mode (Battery Saver)', 'info');
+      }
+    },
+
+    getDisplayMode: function () {
+      return displayMode;
     }
   };
 })();

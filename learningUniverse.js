@@ -60,6 +60,17 @@
       });
     }
 
+    // Pause canvas animation during touch scrolling on mobile to prevent GPU strain
+    let isScrolling = false;
+    let scrollTimeout = null;
+    if (isMobile) {
+      window.addEventListener('scroll', () => {
+        isScrolling = true;
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => { isScrolling = false; }, 200);
+      }, { passive: true });
+    }
+
     // Initialize knowledge nodes
     nodes.length = 0;
     for (let i = 0; i < nodeCount; i++) {
@@ -111,6 +122,10 @@
   }
 
   function render(time) {
+    if (isMobile && isScrolling) {
+      animId = requestAnimationFrame(render);
+      return;
+    }
     const dt = Math.min((time - lastTime) / 1000, 0.1);
     lastTime = time;
 

@@ -11123,8 +11123,46 @@ window.openJarvisModal = function () {
   }
 };
 
-// Global Day 0 Onboarding & Journey Reset Handlers
-window.openDay0Onboarding = function () {
+// ══════════════════════════════════════════════════════════════
+// Global Setup Wizard & Mentor Calibration Controllers
+// ══════════════════════════════════════════════════════════════
+
+window._wizardState = {
+  step: 1,
+  target: 'GATE + Placement',
+  timeHorizon: '9-18+ Months',
+  dailyHours: 2.0,
+  skillLevel: 'Beginner',
+  focusInterval: 45,
+  name: 'Student'
+};
+
+window.openSetupWizard = function () {
+  window._wizardState.step = 1;
+  const savedProfile = localStorage.getItem('gt_user_profile');
+  if (savedProfile) {
+    try {
+      const p = JSON.parse(savedProfile);
+      if (p.name) window._wizardState.name = p.name;
+      if (p.target) window._wizardState.target = p.target;
+      if (p.timeHorizon) window._wizardState.timeHorizon = p.timeHorizon;
+      if (p.dailyHours) window._wizardState.dailyHours = p.dailyHours;
+      if (p.skillLevel) window._wizardState.skillLevel = p.skillLevel;
+      if (p.focusInterval) window._wizardState.focusInterval = p.focusInterval;
+    } catch (e) {}
+  }
+
+  // Populate inputs & card highlights
+  const nameInput = document.getElementById('d0-name');
+  if (nameInput) nameInput.value = window._wizardState.name || 'Student';
+
+  window.selectWizardTrack(window._wizardState.target);
+  window.selectWizardHorizon(window._wizardState.timeHorizon);
+  window.selectWizardHours(window._wizardState.dailyHours);
+  window.selectWizardSkill(window._wizardState.skillLevel);
+
+  window.renderWizardStep(1);
+
   if (typeof openModal === 'function') {
     openModal('day0-onboarding-modal');
   } else {
@@ -11133,21 +11171,186 @@ window.openDay0Onboarding = function () {
   }
 };
 
+window.openDay0Onboarding = function () {
+  window.openSetupWizard();
+};
+
+window.renderWizardStep = function (step) {
+  window._wizardState.step = step;
+
+  // Update step views
+  for (let i = 1; i <= 4; i++) {
+    const stepEl = document.getElementById(`wizard-step-${i}`);
+    if (stepEl) stepEl.style.display = i === step ? 'block' : 'none';
+
+    const dot = document.getElementById(`wizard-dot-${i}`);
+    if (dot) {
+      if (i === step) {
+        dot.style.background = 'var(--primary)';
+        dot.style.width = '24px';
+      } else if (i < step) {
+        dot.style.background = 'var(--success)';
+        dot.style.width = '12px';
+      } else {
+        dot.style.background = 'rgba(255,255,255,0.2)';
+        dot.style.width = '12px';
+      }
+    }
+  }
+
+  // Subtitle
+  const subEl = document.getElementById('wizard-step-subtitle');
+  if (subEl) {
+    if (step === 1) subEl.textContent = 'Step 1 of 4 • Choose your primary preparation mission';
+    else if (step === 2) subEl.textContent = 'Step 2 of 4 • Choose your time horizon and target date';
+    else if (step === 3) subEl.textContent = 'Step 3 of 4 • Daily study bandwidth and technical baseline';
+    else if (step === 4) subEl.textContent = 'Step 4 of 4 • Review your calibrated preparation blueprint';
+  }
+
+  // Navigation buttons
+  const prevBtn = document.getElementById('wizard-prev-btn');
+  const nextBtn = document.getElementById('wizard-next-btn');
+  const submitBtn = document.getElementById('wizard-submit-btn');
+
+  if (prevBtn) prevBtn.style.display = step > 1 ? 'block' : 'none';
+  if (nextBtn) nextBtn.style.display = step < 4 ? 'block' : 'none';
+  if (submitBtn) submitBtn.style.display = step === 4 ? 'block' : 'none';
+
+  if (step === 4) {
+    window.updateWizardPreview();
+  }
+};
+
+window.nextWizardStep = function () {
+  const cur = window._wizardState.step || 1;
+  if (cur < 4) {
+    window.renderWizardStep(cur + 1);
+  }
+};
+
+window.prevWizardStep = function () {
+  const cur = window._wizardState.step || 1;
+  if (cur > 1) {
+    window.renderWizardStep(cur - 1);
+  }
+};
+
+window.selectWizardTrack = function (track) {
+  window._wizardState.target = track;
+  const targetInput = document.getElementById('d0-target');
+  if (targetInput) targetInput.value = track;
+
+  document.querySelectorAll('#wizard-track-cards .wizard-card').forEach(card => {
+    const match = card.getAttribute('data-track') === track;
+    card.classList.toggle('selected', match);
+    card.style.borderColor = match ? 'var(--primary)' : 'var(--border-subtle)';
+    card.style.background = match ? 'rgba(109,99,255,0.08)' : 'rgba(255,255,255,0.02)';
+    const check = card.querySelector('.track-check');
+    if (check) {
+      check.style.opacity = match ? '1' : '0';
+      check.style.color = match ? 'var(--primary-light)' : 'inherit';
+    }
+  });
+};
+
+window.selectWizardHorizon = function (horizon) {
+  window._wizardState.timeHorizon = horizon;
+  const input = document.getElementById('d0-horizon');
+  if (input) input.value = horizon;
+
+  document.querySelectorAll('#wizard-horizon-cards .wizard-horizon-card').forEach(card => {
+    const match = card.getAttribute('data-horizon') === horizon;
+    card.classList.toggle('selected', match);
+    card.style.borderColor = match ? 'var(--primary)' : 'var(--border-subtle)';
+    card.style.background = match ? 'rgba(109,99,255,0.08)' : 'rgba(255,255,255,0.02)';
+    const check = card.querySelector('.horizon-check');
+    if (check) {
+      check.style.opacity = match ? '1' : '0';
+      check.style.color = match ? 'var(--success)' : 'inherit';
+    }
+  });
+};
+
+window.selectWizardHours = function (hours) {
+  window._wizardState.dailyHours = parseFloat(hours);
+  const input = document.getElementById('d0-hours');
+  if (input) input.value = hours;
+
+  document.querySelectorAll('#wizard-hours-btns .wizard-choice-btn').forEach(btn => {
+    const match = parseFloat(btn.getAttribute('data-hours')) === parseFloat(hours);
+    btn.classList.toggle('selected', match);
+    btn.style.borderColor = match ? 'var(--primary)' : 'var(--border-subtle)';
+    btn.style.background = match ? 'rgba(109,99,255,0.12)' : 'var(--depth-3)';
+    btn.style.color = match ? 'var(--primary-light)' : 'var(--text)';
+  });
+};
+
+window.selectWizardSkill = function (skill) {
+  window._wizardState.skillLevel = skill;
+  const input = document.getElementById('d0-level');
+  if (input) input.value = skill;
+
+  document.querySelectorAll('#wizard-skill-btns .wizard-choice-btn').forEach(btn => {
+    const match = btn.getAttribute('data-skill') === skill;
+    btn.classList.toggle('selected', match);
+    btn.style.borderColor = match ? 'var(--primary)' : 'var(--border-subtle)';
+    btn.style.background = match ? 'rgba(109,99,255,0.12)' : 'var(--depth-3)';
+    btn.style.color = match ? 'var(--primary-light)' : 'var(--text)';
+  });
+};
+
+window.updateWizardPreview = function () {
+  const targetBadge = document.getElementById('preview-target-badge');
+  const horizonBadge = document.getElementById('preview-horizon-badge');
+  const hoursBadge = document.getElementById('preview-hours-badge');
+  const roadmapBadge = document.getElementById('preview-roadmap-badge');
+  const actionText = document.getElementById('preview-action-text');
+
+  const target = window._wizardState.target || 'GATE + Placement';
+  const horizon = window._wizardState.timeHorizon || '9-18+ Months';
+  const hours = window._wizardState.dailyHours || 2.0;
+
+  if (targetBadge) targetBadge.textContent = target;
+  if (horizonBadge) horizonBadge.textContent = horizon;
+  if (hoursBadge) hoursBadge.textContent = `${hours} Hours / Day`;
+
+  if (target.includes('GATE 2027')) {
+    if (roadmapBadge) roadmapBadge.textContent = 'GATE CS 2027 Comprehensive Roadmap';
+    if (actionText) actionText.textContent = 'Discrete Mathematics & IIT Madras official syllabus deep-dive with PYQ question banks.';
+  } else if (target.includes('Placement')) {
+    if (roadmapBadge) roadmapBadge.textContent = 'Placement Preparation Roadmap (8 Areas)';
+    if (actionText) actionText.textContent = 'Area 1 Problem Solving (DSA) + Quantitative Aptitude & Reasoning practice.';
+  } else if (target.includes('Internship')) {
+    if (roadmapBadge) roadmapBadge.textContent = 'Internship Preparation Roadmap (5 Phases)';
+    if (actionText) actionText.textContent = 'Domain selection (Web/Cloud/AI) and GitHub portfolio repository setup.';
+  } else if (target.includes('Software Engineering')) {
+    if (roadmapBadge) roadmapBadge.textContent = '12-Step Software Engineer Roadmap';
+    if (actionText) actionText.textContent = 'Step 1 & 2: Computer Science fundamentals, clean code, and OOP design.';
+  } else {
+    if (roadmapBadge) roadmapBadge.textContent = 'Dual Master Roadmap (GATE + Placement)';
+    if (actionText) actionText.textContent = 'Phase 1 Foundations: Core CS subjects combined with daily DSA drills.';
+  }
+};
+
 window.submitDay0Onboarding = async function (e) {
   if (e && e.preventDefault) e.preventDefault();
   const nameInput = document.getElementById('d0-name');
-  const targetSelect = document.getElementById('d0-target');
-  const levelSelect = document.getElementById('d0-level');
-  const hoursSelect = document.getElementById('d0-hours');
-  const sessionSelect = document.getElementById('d0-session');
+  const sessionSelect = document.getElementById('wizard-session-select');
 
   const payload = {
-    name: nameInput?.value?.trim() || 'Student',
-    target: targetSelect?.value || 'GATE + Placement',
-    skillLevel: levelSelect?.value || 'Beginner',
-    dailyHours: parseFloat(hoursSelect?.value || '2.0'),
-    focusInterval: parseInt(sessionSelect?.value || '45')
+    name: nameInput?.value?.trim() || window._wizardState.name || 'Student',
+    target: window._wizardState.target || 'GATE + Placement',
+    timeHorizon: window._wizardState.timeHorizon || '9-18+ Months',
+    skillLevel: window._wizardState.skillLevel || 'Beginner',
+    dailyHours: parseFloat(window._wizardState.dailyHours || 2.0),
+    focusInterval: parseInt(sessionSelect?.value || window._wizardState.focusInterval || 45, 10),
+    completedAt: new Date().toISOString()
   };
+
+  // Save to localStorage
+  localStorage.setItem('gt_onboarding_completed', 'true');
+  localStorage.setItem('gt_target_track', payload.target);
+  localStorage.setItem('gt_user_profile', JSON.stringify(payload));
 
   try {
     const res = await fetch('/api/preparation/onboarding', {
@@ -11161,22 +11364,71 @@ window.submitDay0Onboarding = async function (e) {
         await PrepIntelligenceEngine.syncWithServer();
       }
       if (typeof showToast === 'function') {
-        showToast(`Welcome ${payload.name}! Day 1 Plan initialized 🚀`, 'success');
+        showToast(`Welcome ${payload.name}! Calibrated for ${payload.target} 🚀`, 'success');
       }
-      window.renderHomeView();
+      window.applyCustomizedDashboard(payload);
     } else {
       throw new Error('Onboarding failed on server');
     }
   } catch (err) {
     console.warn('[Onboarding] Error submitting:', err);
     if (typeof closeModal === 'function') closeModal('day0-onboarding-modal');
-    if (typeof showToast === 'function') showToast('Started Day 1 in offline mode!', 'info');
+    if (typeof showToast === 'function') showToast(`Mentor calibrated for ${payload.target}!`, 'info');
     if (window.PrepIntelligenceEngine) {
       const st = PrepIntelligenceEngine.getState();
       st.currentDay = 1;
       st.status = 'ACTIVE';
-      window.renderHomeView();
+      st.target = payload.target;
     }
+    window.applyCustomizedDashboard(payload);
+  }
+};
+
+window.applyCustomizedDashboard = function (profile) {
+  const nameEl = document.querySelector('.sidebar-user-name');
+  if (nameEl) nameEl.textContent = profile.name || 'Student';
+
+  const statusEl = document.querySelector('.sidebar-user-status');
+  if (statusEl) statusEl.textContent = `● Day 1 • ${profile.target || 'Active'}`;
+
+  const dayLabel = document.getElementById('home-day-label');
+  if (dayLabel) dayLabel.textContent = `Day 1 / 90 • ${profile.target || 'Active'}`;
+
+  const greetingEl = document.getElementById('home-greeting-full');
+  if (greetingEl) {
+    greetingEl.textContent = `JARVIS calibrated your curriculum for ${profile.target} (${profile.dailyHours}h daily budget).`;
+  }
+
+  // Personalize Next Best Action (NBA)
+  const nbaTrackBadge = document.getElementById('nba-track-text');
+  const nbaTitle = document.getElementById('nba-title');
+  const nbaWhy = document.getElementById('nba-why');
+  const nbaBenefit = document.getElementById('nba-benefit-text');
+
+  if (profile.target.includes('GATE 2027')) {
+    if (nbaTrackBadge) nbaTrackBadge.textContent = 'GATE CS 2027';
+    if (nbaTitle) nbaTitle.textContent = 'Phase 1: Discrete Mathematics & IIT Madras Syllabus Deep Dive';
+    if (nbaWhy) nbaWhy.textContent = 'GATE CS 2027 scoring weightage prioritizes Discrete Math and Data Structures early for top percentiles.';
+    if (nbaBenefit) nbaBenefit.textContent = 'Master core concept foundation with official IIT question patterns';
+  } else if (profile.target.includes('Placement')) {
+    if (nbaTrackBadge) nbaTrackBadge.textContent = 'CAMPUS PLACEMENTS';
+    if (nbaTitle) nbaTitle.textContent = 'Area 1: Problem Solving (DSA) & Top Interview Patterns';
+    if (nbaWhy) nbaWhy.textContent = 'Technical coding rounds require mastery of Arrays, Hashing, and Strings.';
+    if (nbaBenefit) nbaBenefit.textContent = 'High pass-rate on online screening rounds (LeetCode / Codeforces)';
+  } else if (profile.target.includes('Internship')) {
+    if (nbaTrackBadge) nbaTrackBadge.textContent = 'SUMMER INTERNSHIP';
+    if (nbaTitle) nbaTitle.textContent = 'Phase 1: Domain Selection & GitHub Project Portfolio';
+    if (nbaWhy) nbaWhy.textContent = 'Recruiters evaluate clean repositories and deployed web/cloud projects first.';
+    if (nbaBenefit) nbaBenefit.textContent = 'Direct interview calls via Internshala, LinkedIn, and Wellfound';
+  } else if (profile.target.includes('Software Engineering')) {
+    if (nbaTrackBadge) nbaTrackBadge.textContent = 'SWE MASTER TRACK';
+    if (nbaTitle) nbaTitle.textContent = 'Step 1 & 2: CS Foundations & Clean System Architecture';
+    if (nbaWhy) nbaWhy.textContent = 'Tier-1 product engineering rounds evaluate OOP design and scalable architecture.';
+    if (nbaBenefit) nbaBenefit.textContent = 'Readiness for SDE-1 / SDE-2 product engineering roles';
+  }
+
+  if (typeof window.renderHomeView === 'function') {
+    window.renderHomeView();
   }
 };
 
@@ -11218,14 +11470,26 @@ window.toggleHomeTimelineTask = function (id) {
   if (typeof renderHomeView === 'function') renderHomeView();
 };
 
-// ── AUTOMATIC STARTUP ROUTE VALIDATION (Blueprint Section 21) ──
+// ── AUTOMATIC STARTUP ROUTE VALIDATION & SETUP WIZARD CHECK ──
 if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof window.validateRoutes === 'function') window.validateRoutes();
-    });
-  } else {
+  const onReady = () => {
     if (typeof window.validateRoutes === 'function') window.validateRoutes();
+    // Auto-prompt Setup Wizard on first visit if onboarding was not completed
+    setTimeout(() => {
+      if (!localStorage.getItem('gt_onboarding_completed')) {
+        const modal = document.getElementById('day0-onboarding-modal');
+        if (modal && !modal.classList.contains('active')) {
+          if (typeof window.openSetupWizard === 'function') {
+            window.openSetupWizard();
+          }
+        }
+      }
+    }, 800);
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onReady);
+  } else {
+    onReady();
   }
 }
 
