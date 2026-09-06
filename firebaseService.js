@@ -593,6 +593,20 @@
         logout();
       }
     };
+
+    window.updateDateTime = function () {
+      const now = new Date();
+      const dateTimeEl = document.getElementById('date-time');
+      if (dateTimeEl) {
+        dateTimeEl.textContent = now.toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          dateStyle: 'full',
+          timeStyle: 'medium'
+        });
+      }
+    };
+    window.updateDateTime();
+    setInterval(window.updateDateTime, 1000);
   }
 
   if (typeof window !== 'undefined') {

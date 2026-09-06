@@ -11481,7 +11481,6 @@ window.submitDay0Onboarding = async function (e) {
       st.target = payload.target;
     }
     window.applyCustomizedDashboard(payload);
-  }
 };
 
 window.applyCustomizedDashboard = function (profile) {
@@ -12813,6 +12812,65 @@ window.prewarmAllViews = function () {
   }
 };
 
+// ══════════════════════════════════════════════════
+//  REAL-TIME DATE & TIME DISPLAY ENGINE
+// ══════════════════════════════════════════════════
+window.updateDateTime = function () {
+  const now = new Date();
+  const dateTimeEl = document.getElementById('date-time');
+  if (dateTimeEl) {
+    dateTimeEl.textContent = now.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      dateStyle: 'full',
+      timeStyle: 'medium'
+    });
+  }
+};
+
+window.updateSystemDateTime = function () {
+  const now = new Date();
+
+  // 1. Calendar Date (e.g. "Sun, Sep 7, 2026")
+  const dateOptions = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+  const dateStr = now.toLocaleDateString('en-US', dateOptions);
+
+  // 2. Second-precision Time (e.g. "12:34:56 AM")
+  const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+  const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+
+  // Update Header Badges
+  const headerDate = document.getElementById('header-live-date');
+  if (headerDate) headerDate.textContent = dateStr;
+  const headerTime = document.getElementById('header-live-time');
+  if (headerTime) headerTime.textContent = timeStr;
+
+  // Update Hero Brand Bar
+  const heroDate = document.getElementById('hero-live-date');
+  if (heroDate) heroDate.textContent = dateStr;
+  const heroTime = document.getElementById('hero-live-time');
+  if (heroTime) heroTime.textContent = timeStr;
+
+  // Update 3D Vortex HUD
+  const vortexTime = document.getElementById('vortex-hud-time');
+  if (vortexTime) vortexTime.textContent = timeStr;
+
+  // Sync to #date-time element
+  if (typeof window.updateDateTime === 'function') {
+    window.updateDateTime();
+  }
+};
+
+window.initLiveDateTimeEngine = function () {
+  window.updateSystemDateTime();
+  if (window._dateTimeInterval) clearInterval(window._dateTimeInterval);
+  window._dateTimeInterval = setInterval(window.updateSystemDateTime, 1000);
+};
+
+// Start Date/Time engine immediately
+if (typeof window !== 'undefined') {
+  window.initLiveDateTimeEngine();
+}
+
 // Run prewarm on DOMContentLoaded and Window Load
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
@@ -12820,6 +12878,9 @@ if (typeof document !== 'undefined') {
   } else {
     setTimeout(window.prewarmAllViews, 150);
   }
+  window.addEventListener('load', () => setTimeout(window.prewarmAllViews, 300));
+}
+
 // ══════════════════════════════════════════════════
 //  FIREBASE AUTHENTICATION GLOBAL HANDLERS
 // ══════════════════════════════════════════════════
