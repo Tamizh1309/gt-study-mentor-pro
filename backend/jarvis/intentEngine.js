@@ -173,13 +173,19 @@ const INTENT_RULES = [
     category: 'application_command',
     patterns: [
       /(indiabix|india\s*bix)/i,
+      /(geeks\s*for\s*geeks|gfg)/i,
       /aptitude\s+(questions?\s*(and|&)?\s*answers?|material|drills?|preparation)/i,
-      /(open|show|practice|launch)\s+aptitude\s+(preparation|questions?|practice|indiabix)/i
+      /(open|show|practice|launch)\s+(geeksforgeeks|gfg|indiabix|aptitude)/i
     ],
-    extractParams: () => ({
-      resource: 'indiabix',
-      url: 'https://www.indiabix.com/aptitude/questions-and-answers/'
-    })
+    extractParams: (text) => {
+      const isGfg = /(geeks\s*for\s*geeks|gfg)/i.test(text);
+      return {
+        resource: isGfg ? 'geeksforgeeks' : 'indiabix',
+        url: isGfg
+          ? 'https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/'
+          : 'https://www.indiabix.com/aptitude/questions-and-answers/'
+      };
+    }
   },
   {
     intent: 'START_QUIZ',

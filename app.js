@@ -8055,21 +8055,26 @@ function renderGATEPYQPracticeArena(container) {
 
 function renderAptitudePracticeArena(container) {
   container.innerHTML = `
-    <!-- IndiaBIX Resource Banner -->
+    <!-- Curated Aptitude Resource Vault Banner -->
     <div class="nd-card" style="padding:18px 20px; margin-bottom:18px; border:1px solid rgba(99,216,255,0.35); background:radial-gradient(circle at top right, rgba(99,216,255,0.08), transparent 60%), var(--depth-2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
       <div style="display:flex; align-items:center; gap:12px;">
         <span style="font-size:28px;">🧮</span>
         <div>
           <div style="display:flex; align-items:center; gap:8px;">
             <span style="font-size:11px; font-weight:800; color:var(--primary-light); background:rgba(99,216,255,0.15); padding:2px 6px; border-radius:4px; text-transform:uppercase;">Curated Practice</span>
-            <strong style="font-size:14px; color:var(--text);">IndiaBIX Quantitative Aptitude Questions &amp; Answers</strong>
+            <strong style="font-size:14px; color:var(--text);">Quantitative Aptitude Questions &amp; Answers Vault</strong>
           </div>
-          <p style="font-size:12px; color:var(--text-sub); margin:4px 0 0;">Comprehensive topic-wise aptitude questions, step-by-step explanations, shortcuts, and formulas for placement exams.</p>
+          <p style="font-size:12px; color:var(--text-sub); margin:4px 0 0;">Comprehensive topic-wise aptitude questions, step-by-step explanations, shortcuts, and formulas from IndiaBIX &amp; GeeksforGeeks.</p>
         </div>
       </div>
-      <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="cta-pill-primary" style="font-size:12px; padding:10px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-        <span>🌐</span> <span>Open IndiaBIX Aptitude ↗</span>
-      </a>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="cta-pill-primary" style="font-size:12px; padding:9px 16px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+          <span>🌐</span> <span>IndiaBIX Aptitude ↗</span>
+        </a>
+        <a href="https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/" target="_blank" rel="noopener noreferrer" class="cta-pill-primary" style="font-size:12px; padding:9px 16px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, #15803d, #22c55e); border-color:#22c55e;">
+          <span>🌿</span> <span>GeeksforGeeks Aptitude ↗</span>
+        </a>
+      </div>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
@@ -8078,7 +8083,8 @@ function renderAptitudePracticeArena(container) {
         <p style="font-size:12px;color:var(--text-sub);line-height:1.5;">Time-Speed-Distance, Work & Pipes, Probability, Mixtures, P&C, Compound Interest.</p>
         <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
           <button class="action-btn" onclick="openModal('puzzle-lab-modal')">Start Speed Drills →</button>
-          <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(99,216,255,0.1); border-color:rgba(99,216,255,0.3); color:var(--primary-light);">🌐 IndiaBIX Questions ↗</a>
+          <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(99,216,255,0.1); border-color:rgba(99,216,255,0.3); color:var(--primary-light);">🌐 IndiaBIX ↗</a>
+          <a href="https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.1); border-color:rgba(34,197,94,0.3); color:var(--success);">🌿 GeeksforGeeks ↗</a>
         </div>
       </div>
       <div class="track-card" style="padding:16px;">
@@ -8291,14 +8297,20 @@ function renderPlacementPrepare(container) {
     <div class="track-card">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
         <h3 style="color:#fff; margin:0;">📊 Quantitative Aptitude (12 Core Topics)</h3>
-        <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="badge-pill" style="font-size:11px; text-decoration:none; background:rgba(99,216,255,0.12); color:var(--primary-light); border:1px solid rgba(99,216,255,0.3); display:inline-flex; align-items:center; gap:4px;">
-          <span>🌐</span> IndiaBIX Questions &amp; Answers ↗
-        </a>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="badge-pill" style="font-size:11px; text-decoration:none; background:rgba(99,216,255,0.12); color:var(--primary-light); border:1px solid rgba(99,216,255,0.3); display:inline-flex; align-items:center; gap:4px;">
+            <span>🌐</span> IndiaBIX ↗
+          </a>
+          <a href="https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/" target="_blank" rel="noopener noreferrer" class="badge-pill" style="font-size:11px; text-decoration:none; background:rgba(34,197,94,0.12); color:var(--success); border:1px solid rgba(34,197,94,0.3); display:inline-flex; align-items:center; gap:4px;">
+            <span>🌿</span> GeeksforGeeks ↗
+          </a>
+        </div>
       </div>
       <p style="font-size:12px; color:var(--text-muted);">Number Systems, Percentages, Profit &amp; Loss, Ratio &amp; Proportion, Time &amp; Work, Time-Speed-Distance, Permutation &amp; Combination, Probability, Geometry, Mixtures, Simple/Compound Interest, Data Interpretation.</p>
       <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
         <button class="action-btn" onclick="navigateToView('practice', 'aptitude')">Practice Aptitude Drills →</button>
-        <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(99,216,255,0.1); border-color:rgba(99,216,255,0.3); color:var(--primary-light);">🌐 Open IndiaBIX Aptitude ↗</a>
+        <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(99,216,255,0.1); border-color:rgba(99,216,255,0.3); color:var(--primary-light);">🌐 IndiaBIX Questions ↗</a>
+        <a href="https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.1); border-color:rgba(34,197,94,0.3); color:var(--success);">🌿 GeeksforGeeks Aptitude ↗</a>
       </div>
     </div>
     <div class="track-card">

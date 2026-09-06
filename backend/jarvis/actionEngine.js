@@ -194,15 +194,20 @@ function resolveAction(intent, params = {}) {
     }
 
     case 'OPEN_APTITUDE_RESOURCE': {
-      const url = params.url || 'https://www.indiabix.com/aptitude/questions-and-answers/';
+      const isGfg = params.resource === 'geeksforgeeks' || (params.url && params.url.includes('geeksforgeeks'));
+      const url = isGfg
+        ? 'https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/'
+        : (params.url || 'https://www.indiabix.com/aptitude/questions-and-answers/');
+      const label = isGfg ? 'GeeksforGeeks Aptitude Questions & Answers' : 'IndiaBIX Aptitude Questions & Answers';
+      const source = isGfg ? 'GeeksforGeeks' : 'IndiaBIX';
       return {
         type: ALLOWED_ACTIONS.OPEN_APTITUDE_RESOURCE,
         params: {
           url,
-          label: 'IndiaBIX Aptitude Questions & Answers',
-          source: 'IndiaBIX'
+          label,
+          source
         },
-        spokenConfirmation: "Opening IndiaBIX Quantitative Aptitude Questions & Answers."
+        spokenConfirmation: `Opening ${source} Quantitative Aptitude Questions & Answers.`
       };
     }
 

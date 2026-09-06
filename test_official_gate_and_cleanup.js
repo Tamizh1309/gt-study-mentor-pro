@@ -147,6 +147,28 @@ async function runSuite() {
   assert(chatBixRes.status === 200, 'POST /api/jarvis/chat for IndiaBIX returned 200');
   assert(chatBixRes.body.action.params.url === 'https://www.indiabix.com/aptitude/questions-and-answers/', 'Live action returns IndiaBIX URL');
 
+  // Test GeeksforGeeks Aptitude query
+  const iGfg = classifyIntent('JARVIS open GeeksforGeeks aptitude questions and answers');
+  assert(iGfg.intent === 'OPEN_APTITUDE_RESOURCE', 'Classifies GeeksforGeeks query as OPEN_APTITUDE_RESOURCE');
+  assert(iGfg.parameters.resource === 'geeksforgeeks', 'Extracts resource as "geeksforgeeks"');
+
+  const actGfg = resolveAction('OPEN_APTITUDE_RESOURCE', { resource: 'geeksforgeeks' });
+  assert(actGfg.params.url === 'https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/', 'Action returns GeeksforGeeks Aptitude URL');
+
+  const chatGfgRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'JARVIS open GeeksforGeeks aptitude',
+    mode: 'study'
+  });
+
+  assert(chatGfgRes.status === 200, 'POST /api/jarvis/chat for GeeksforGeeks returned 200');
+  assert(chatGfgRes.body.action.params.url === 'https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/', 'Live action returns GeeksforGeeks URL');
+
   // ── 4. Codebase Cleanup & Resource Links Verification ──
   console.log('\n4. Testing Codebase Cleanliness & External Resource Links...');
   const appJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
@@ -154,6 +176,7 @@ async function runSuite() {
   assert(appJs.includes('API_BASE_URL'), 'app.js defines and uses API_BASE_URL');
   assert(appJs.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'app.js contains Google Drive question papers link');
   assert(appJs.includes('https://www.indiabix.com/aptitude/questions-and-answers/'), 'app.js contains IndiaBIX Aptitude link');
+  assert(appJs.includes('https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/'), 'app.js contains GeeksforGeeks Aptitude link');
 
   const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   assert(indexHtml.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'index.html contains Google Drive question papers link');
