@@ -480,12 +480,12 @@ async function runSuite() {
   console.log('✅ ALL TESTS (OPTIONS 1, 2, 3 & DATE/TIME ENGINE) VERIFIED (100% PASS)');
   console.log('======================================================\n');
 
-  // ── 9. Testing Firebase Cloud Database & Authentication Integration (linguastream-lzxdj) ──
+  // ── 9. Testing Firebase Cloud Database & Authentication Integration (gt-study-mentor-pro) ──
   console.log('9. Testing Firebase Cloud Database Service, Google Auth & Firestore Sync...');
   const firebaseService = require('./firebaseService');
   assert(firebaseService !== undefined, 'firebaseService exports FirebaseService module');
-  assert(firebaseService.config.projectId === 'linguastream-lzxdj', 'Firebase configured with project ID linguastream-lzxdj');
-  assert(firebaseService.config.apiKey === 'AIzaSyD1iAczyFw9fZDxS2wPSIKwoC18lzReFHg', 'Firebase configured with user API key');
+  assert(firebaseService.config.projectId === 'gt-study-mentor-pro', 'Firebase configured with project ID gt-study-mentor-pro');
+  assert(firebaseService.config.apiKey === 'AIzaSyB937BvY64PUlDGCvXFwkbWRONVx2qxqjk', 'Firebase configured with user API key');
   assert(typeof firebaseService.saveUserOnboarding === 'function', 'firebaseService defines saveUserOnboarding');
   assert(typeof firebaseService.syncMistakeToCloud === 'function', 'firebaseService defines syncMistakeToCloud');
   assert(typeof firebaseService.saveMockExamResult === 'function', 'firebaseService defines saveMockExamResult');
@@ -516,7 +516,7 @@ async function runSuite() {
 
   // Modular Firebase files verification
   const firebaseConfigJs = fs.readFileSync(path.join(__dirname, 'firebase-config.js'), 'utf8');
-  assert(firebaseConfigJs.includes('linguastream-lzxdj'), 'firebase-config.js configured with project ID');
+  assert(firebaseConfigJs.includes('gt-study-mentor-pro'), 'firebase-config.js configured with project ID');
   assert(firebaseConfigJs.includes('export { db, auth, provider'), 'firebase-config.js exports db, auth, provider');
 
   const firebaseAuthAppJs = fs.readFileSync(path.join(__dirname, 'firebase-auth-app.js'), 'utf8');

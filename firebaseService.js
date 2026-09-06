@@ -1,7 +1,7 @@
 /**
  * firebaseService.js
  * Firebase Database & Cloud Sync Service for GT Study Mentor Pro
- * Connects directly to project: linguastream-lzxdj
+ * Connects directly to project: gt-study-mentor-pro
  * 
  * Provides Firestore cloud persistence & Google Authentication for:
  * - Google OAuth & Email/Password Authentication
@@ -16,12 +16,13 @@
 
   // ── 1. User-Provided Firebase Configuration ──
   const firebaseConfig = {
-    apiKey: "AIzaSyD1iAczyFw9fZDxS2wPSIKwoC18lzReFHg",
-    authDomain: "linguastream-lzxdj.firebaseapp.com",
-    projectId: "linguastream-lzxdj",
-    storageBucket: "linguastream-lzxdj.firebasestorage.app",
-    messagingSenderId: "277774555956",
-    appId: "1:277774555956:web:14c48c26d7906efdf8e361"
+    apiKey: "AIzaSyB937BvY64PUlDGCvXFwkbWRONVx2qxqjk",
+    authDomain: "gt-study-mentor-pro.firebaseapp.com",
+    projectId: "gt-study-mentor-pro",
+    storageBucket: "gt-study-mentor-pro.firebasestorage.app",
+    messagingSenderId: "1088683345601",
+    appId: "1:1088683345601:web:7f7493d624c8b4a32c7640",
+    measurementId: "G-DPD1ZH2NL6"
   };
 
   let app = null;
@@ -81,7 +82,7 @@
 
         isInitialized = true;
         isOnline = true;
-        console.info('[Firebase] Connected to Firestore project: linguastream-lzxdj');
+        console.info('[Firebase] Connected to Firestore project: gt-study-mentor-pro');
         updateStatusBadge('connected');
         return true;
       }
@@ -123,7 +124,7 @@
       badge.style.borderColor = 'rgba(16,185,129,0.4)';
       badge.style.background = 'rgba(16,185,129,0.1)';
       badge.style.color = 'var(--success, #10B981)';
-      badge.title = 'Firebase Firestore Cloud Database Connected (Project: linguastream-lzxdj)';
+      badge.title = 'Firebase Firestore Cloud Database Connected (Project: gt-study-mentor-pro)';
       if (textEl) textEl.textContent = 'Cloud DB Active';
     } else if (status === 'connecting') {
       badge.style.borderColor = 'rgba(245,158,11,0.4)';
@@ -201,7 +202,7 @@
         const guest = {
           uid: 'demo_user_google_fb',
           displayName: 'GATE Student (Authenticated)',
-          email: 'student@linguastream-lzxdj.firebaseapp.com',
+          email: 'student@gt-study-mentor-pro.firebaseapp.com',
           photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=GATE'
         };
         currentUser = guest;

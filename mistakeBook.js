@@ -156,7 +156,7 @@ const MistakeBookModule = (function () {
 
       save();
 
-      // Cloud sync to Firebase Firestore (linguastream-lzxdj)
+      // Cloud sync to Firebase Firestore (gt-study-mentor-pro)
       if (typeof window !== 'undefined' && window.FirebaseService && typeof window.FirebaseService.syncMistakeToCloud === 'function') {
         window.FirebaseService.syncMistakeToCloud(newMistake);
       }

@@ -12375,7 +12375,7 @@ window.submitGateMockExam = function (force = false) {
   const finalScore = Math.max(0, Math.min(100, Math.round(totalScore * 100) / 100));
   const rankData = window.GATEQuestionBank.calculateRankAndPercentile(finalScore);
 
-  // Sync exam result to Firebase Firestore cloud database (Project: linguastream-lzxdj)
+  // Sync exam result to Firebase Firestore cloud database (Project: gt-study-mentor-pro)
   if (typeof window !== 'undefined' && window.FirebaseService && typeof window.FirebaseService.saveMockExamResult === 'function') {
     window.FirebaseService.saveMockExamResult({
       finalScore,

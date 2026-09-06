@@ -3,14 +3,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 🔥 Firebase configuration for project: linguastream-lzxdj
+// 🔥 Firebase configuration for official project: gt-study-mentor-pro
 const firebaseConfig = {
-  apiKey: "AIzaSyD1iAczyFw9fZDxS2wPSIKwoC18lzReFHg",
-  authDomain: "linguastream-lzxdj.firebaseapp.com",
-  projectId: "linguastream-lzxdj",
-  storageBucket: "linguastream-lzxdj.firebasestorage.app",
-  messagingSenderId: "277774555956",
-  appId: "1:277774555956:web:14c48c26d7906efdf8e361"
+  apiKey: "AIzaSyB937BvY64PUlDGCvXFwkbWRONVx2qxqjk",
+  authDomain: "gt-study-mentor-pro.firebaseapp.com",
+  projectId: "gt-study-mentor-pro",
+  storageBucket: "gt-study-mentor-pro.firebasestorage.app",
+  messagingSenderId: "1088683345601",
+  appId: "1:1088683345601:web:7f7493d624c8b4a32c7640",
+  measurementId: "G-DPD1ZH2NL6"
 };
 
 const app = initializeApp(firebaseConfig);
