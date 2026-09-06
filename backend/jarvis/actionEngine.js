@@ -159,7 +159,10 @@ function resolveAction(intent, params = {}) {
         syllabus: 'https://gate2027.iitm.ac.in/exam_papers_and_syllabus',
         pattern: 'https://gate2027.iitm.ac.in/question_paper_pattern',
         downloads: 'https://gate2027.iitm.ac.in/download',
-        papers_drive: 'https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'
+        papers_drive: 'https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud',
+        knowledgegate_pyq: 'https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/pyq-questions?q=68ecac7295474565f43ef40d',
+        knowledgegate_practice: 'https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/practice-questions?q=6a1d2962cc6fe47e57ce7427',
+        gate_videos: 'https://youtube.com/playlist?list=PLmXKhU9FNesTaKDC-MKWt-rFuB8OwqrCY&si=z2TEtNMoBzPKHuls'
       };
       const url = urls[target] || urls.portal;
       const targetLabels = {
@@ -168,9 +171,22 @@ function resolveAction(intent, params = {}) {
         syllabus: 'Official Papers & Syllabus',
         pattern: 'Question Paper Pattern',
         downloads: 'Official Downloads',
-        papers_drive: 'Question Papers Drive Vault'
+        papers_drive: 'Question Papers Drive Vault',
+        knowledgegate_pyq: 'Knowledge Gate PYQ Questions',
+        knowledgegate_practice: 'Knowledge Gate Practice Questions',
+        gate_videos: 'GATE Preparation Video Lectures'
       };
-      const source = target === 'papers_drive' ? 'GATE Question Papers Vault' : 'GATE 2027 — IIT Madras';
+      let source = 'GATE 2027 — IIT Madras';
+      if (target === 'papers_drive') source = 'GATE Question Papers Vault';
+      else if (target === 'knowledgegate_pyq' || target === 'knowledgegate_practice') source = 'Knowledge Gate by Sanchit Sir';
+      else if (target === 'gate_videos') source = 'GATE Preparation Video Series';
+
+      let spokenConfirmation = `Opening the official GATE 2027 ${targetLabels[target] || 'Portal'} from IIT Madras.`;
+      if (target === 'papers_drive') spokenConfirmation = "Opening the GATE Previous Years Question Papers Drive Vault.";
+      else if (target === 'knowledgegate_pyq') spokenConfirmation = "Opening Knowledge Gate GATE PYQ Question Paper by Sanchit Sir.";
+      else if (target === 'knowledgegate_practice') spokenConfirmation = "Opening Knowledge Gate GATE Practice Question Paper by Sanchit Sir.";
+      else if (target === 'gate_videos') spokenConfirmation = "Opening the GATE Preparation Video Lectures playlist on YouTube.";
+
       return {
         type: ALLOWED_ACTIONS.OPEN_GATE_OFFICIAL,
         params: {
@@ -179,9 +195,7 @@ function resolveAction(intent, params = {}) {
           label: targetLabels[target] || 'Official Portal',
           source
         },
-        spokenConfirmation: target === 'papers_drive'
-          ? "Opening the GATE Previous Years Question Papers Drive Vault."
-          : `Opening the official GATE 2027 ${targetLabels[target] || 'Portal'} from IIT Madras.`
+        spokenConfirmation
       };
     }
 

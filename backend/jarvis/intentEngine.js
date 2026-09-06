@@ -145,17 +145,29 @@ const INTENT_RULES = [
       /(gate\s+)?(previous\s+years?\s+)?question\s+papers?/i,
       /pyq\s+(papers?|drive|folder|vault)/i,
       /gate\s+papers?\s+(drive|folder|vault|link)/i,
+      /(knowledge\s*gate|sanchit\s*sir)/i,
+      /(gate\s+)?practice\s+(questions?|papers?)/i,
+      /(gate\s+)?(video\s+lectures?|preparation\s+videos?|video\s+playlist|youtube\s+lectures?)/i,
       /(open|show|launch|go to)\s+(the\s+)?(official\s+)?gate(\s+2027)?\s*(portal|website|iit madras)?/i,
       /gate\s+portal/i
     ],
     extractParams: (text) => {
       let target = 'portal';
-      if (/question\s+paper(?!.*pattern)|pyq\s+(papers?|drive|folder|vault)|paper\s+(drive|folder|vault|link)/i.test(text)) target = 'papers_drive';
+      if (/video|lecture|playlist|youtube/i.test(text)) target = 'gate_videos';
+      else if (/knowledge\s*gate.*practice|practice\s+question/i.test(text)) target = 'knowledgegate_practice';
+      else if (/knowledge\s*gate|sanchit/i.test(text)) target = 'knowledgegate_pyq';
+      else if (/question\s+paper(?!.*pattern)|pyq\s+(papers?|drive|folder|vault)|paper\s+(drive|folder|vault|link)/i.test(text)) target = 'papers_drive';
       else if (/date/i.test(text)) target = 'dates';
       else if (/pattern|marking/i.test(text)) target = 'pattern';
       else if (/syllabus/i.test(text)) target = 'syllabus';
       else if (/download|document|brochure/i.test(text)) target = 'downloads';
-      return { target, source: target === 'papers_drive' ? 'GATE Question Papers Vault' : 'IIT Madras' };
+
+      let source = 'IIT Madras';
+      if (target === 'papers_drive') source = 'GATE Question Papers Vault';
+      else if (target === 'knowledgegate_pyq' || target === 'knowledgegate_practice') source = 'Knowledge Gate by Sanchit Sir';
+      else if (target === 'gate_videos') source = 'GATE Preparation Video Series';
+
+      return { target, source };
     }
   },
   {

@@ -169,6 +169,40 @@ async function runSuite() {
   assert(chatGfgRes.status === 200, 'POST /api/jarvis/chat for GeeksforGeeks returned 200');
   assert(chatGfgRes.body.action.params.url === 'https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/', 'Live action returns GeeksforGeeks URL');
 
+  // Test Knowledge Gate & Video Playlist queries
+  const iKgPyq = classifyIntent('JARVIS open Knowledge Gate PYQ questions');
+  assert(iKgPyq.intent === 'OPEN_GATE_OFFICIAL', 'Classifies Knowledge Gate PYQ query');
+  assert(iKgPyq.parameters.target === 'knowledgegate_pyq', 'Target is knowledgegate_pyq');
+
+  const actKgPyq = resolveAction('OPEN_GATE_OFFICIAL', { target: 'knowledgegate_pyq' });
+  assert(actKgPyq.params.url === 'https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/pyq-questions?q=68ecac7295474565f43ef40d', 'Returns Knowledge Gate PYQ URL');
+
+  const iKgPractice = classifyIntent('JARVIS open Knowledge Gate practice questions');
+  assert(iKgPractice.parameters.target === 'knowledgegate_practice', 'Target is knowledgegate_practice');
+
+  const actKgPractice = resolveAction('OPEN_GATE_OFFICIAL', { target: 'knowledgegate_practice' });
+  assert(actKgPractice.params.url === 'https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/practice-questions?q=6a1d2962cc6fe47e57ce7427', 'Returns Knowledge Gate Practice URL');
+
+  const iGateVideos = classifyIntent('JARVIS open GATE preparation video playlist');
+  assert(iGateVideos.parameters.target === 'gate_videos', 'Target is gate_videos');
+
+  const actGateVideos = resolveAction('OPEN_GATE_OFFICIAL', { target: 'gate_videos' });
+  assert(actGateVideos.params.url === 'https://youtube.com/playlist?list=PLmXKhU9FNesTaKDC-MKWt-rFuB8OwqrCY&si=z2TEtNMoBzPKHuls', 'Returns YouTube Video Playlist URL');
+
+  const chatVideoRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'JARVIS open GATE preparation videos',
+    mode: 'study'
+  });
+
+  assert(chatVideoRes.status === 200, 'POST /api/jarvis/chat for GATE videos returned 200');
+  assert(chatVideoRes.body.action.params.url === 'https://youtube.com/playlist?list=PLmXKhU9FNesTaKDC-MKWt-rFuB8OwqrCY&si=z2TEtNMoBzPKHuls', 'Live action returns YouTube playlist URL');
+
   // ── 4. Codebase Cleanup & Resource Links Verification ──
   console.log('\n4. Testing Codebase Cleanliness & External Resource Links...');
   const appJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
@@ -177,6 +211,9 @@ async function runSuite() {
   assert(appJs.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'app.js contains Google Drive question papers link');
   assert(appJs.includes('https://www.indiabix.com/aptitude/questions-and-answers/'), 'app.js contains IndiaBIX Aptitude link');
   assert(appJs.includes('https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/'), 'app.js contains GeeksforGeeks Aptitude link');
+  assert(appJs.includes('https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/pyq-questions?q=68ecac7295474565f43ef40d'), 'app.js contains Knowledge Gate PYQ link');
+  assert(appJs.includes('https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/practice-questions?q=6a1d2962cc6fe47e57ce7427'), 'app.js contains Knowledge Gate Practice link');
+  assert(appJs.includes('https://youtube.com/playlist?list=PLmXKhU9FNesTaKDC-MKWt-rFuB8OwqrCY&si=z2TEtNMoBzPKHuls'), 'app.js contains YouTube GATE playlist link');
 
   const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   assert(indexHtml.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'index.html contains Google Drive question papers link');

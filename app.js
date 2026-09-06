@@ -8038,6 +8038,28 @@ function renderGATEPYQPracticeArena(container) {
       </a>
     </div>
 
+    <!-- Sanchit Sir / Knowledge Gate Practice & Video Lectures Banner -->
+    <div class="nd-card" style="padding:14px 18px; margin-bottom:18px; border:1px solid rgba(147,51,234,0.3); background:rgba(147,51,234,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:24px;">🎓</span>
+        <div>
+          <strong style="font-size:13px; color:var(--text);">Sanchit Sir's Knowledge Gate Practice &amp; Video Lectures</strong>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Online interactive PYQ drills, practice sets, and full GATE CS preparation video playlist.</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a href="https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/pyq-questions?q=68ecac7295474565f43ef40d" target="_blank" rel="noopener noreferrer" class="action-btn" style="font-size:11px; padding:6px 12px; text-decoration:none; color:#c084fc; border-color:rgba(147,51,234,0.4); background:rgba(147,51,234,0.1); font-weight:700;">
+          📝 Knowledge Gate PYQs ↗
+        </a>
+        <a href="https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/practice-questions?q=6a1d2962cc6fe47e57ce7427" target="_blank" rel="noopener noreferrer" class="action-btn" style="font-size:11px; padding:6px 12px; text-decoration:none; color:var(--primary-light); border-color:rgba(99,216,255,0.4); background:rgba(99,216,255,0.1); font-weight:700;">
+          🎯 Practice Questions ↗
+        </a>
+        <a href="https://youtube.com/playlist?list=PLmXKhU9FNesTaKDC-MKWt-rFuB8OwqrCY&si=z2TEtNMoBzPKHuls" target="_blank" rel="noopener noreferrer" class="action-btn" style="font-size:11px; padding:6px 12px; text-decoration:none; color:#ef4444; border-color:rgba(239,68,68,0.4); background:rgba(239,68,68,0.1); font-weight:700;">
+          📺 Preparation Videos ↗
+        </a>
+      </div>
+    </div>
+
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
       ${gateSubjects.map(g => `
         <div class="track-card" style="padding:16px;">
@@ -8249,6 +8271,64 @@ function renderGATEPrepare(container) {
           <strong style="color:var(--text);">Marking Scheme:</strong> MCQ (-1/3, -2/3) &bull; MSQ &amp; NAT (No negative marking)
         </div>
         <button onclick="window.openJarvisModal?openJarvisModal():(window.toggleJarvisVoice&&toggleJarvisVoice())" class="action-btn" style="font-size:10px; padding:3px 10px;">🎙️ Ask JARVIS about GATE</button>
+      </div>
+    </div>
+
+    <!-- CURATED GATE CS PREPARATION & VIDEO LECTURES (Knowledge Gate by Sanchit Sir) -->
+    <div class="nd-card" style="padding:20px; margin-bottom:24px; border:1px solid rgba(147,51,234,0.35); background:radial-gradient(circle at top right, rgba(147,51,234,0.08), transparent 60%), var(--depth-2); position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:800; color:#c084fc; letter-spacing:0.8px; text-transform:uppercase; background:rgba(147,51,234,0.15); padding:3px 8px; border-radius:4px; border:1px solid rgba(147,51,234,0.3);">🎓 SANCHIT SIR • KNOWLEDGE GATE</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">Curated Learning &amp; Question Papers</span>
+          </div>
+          <h3 style="font-size:1.25rem; font-weight:800; color:var(--text); margin:4px 0;">GATE CS Guided Preparation &amp; Video Lectures</h3>
+          <p style="font-size:12px; color:var(--text-sub); margin:0;">Complete topic-wise PYQs, practice problems, and comprehensive YouTube lecture series curated by Sanchit Sir.</p>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
+        <!-- Card 1: PYQs -->
+        <div style="background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <span style="font-size:18px;">📝</span>
+              <strong style="font-size:13px; color:var(--text);">GATE PYQ Question Paper</strong>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); line-height:1.4; margin:0 0 10px;">Subject-wise GATE previous year questions with verified solutions and video guidance.</p>
+          </div>
+          <a href="https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/pyq-questions?q=68ecac7295474565f43ef40d" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:11px; font-weight:700; color:#c084fc; border-color:rgba(147,51,234,0.4); background:rgba(147,51,234,0.1);">
+            <span>Open PYQ Questions ↗</span>
+          </a>
+        </div>
+
+        <!-- Card 2: Practice Questions -->
+        <div style="background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <span style="font-size:18px;">🎯</span>
+              <strong style="font-size:13px; color:var(--text);">GATE Practice Question Paper</strong>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); line-height:1.4; margin:0 0 10px;">Targeted conceptual practice questions curated by Sanchit Sir for deep mastery.</p>
+          </div>
+          <a href="https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/practice-questions?q=6a1d2962cc6fe47e57ce7427" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:11px; font-weight:700; color:var(--primary-light); border-color:rgba(99,216,255,0.4); background:rgba(99,216,255,0.1);">
+            <span>Open Practice Questions ↗</span>
+          </a>
+        </div>
+
+        <!-- Card 3: Video Playlist -->
+        <div style="background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+              <span style="font-size:18px;">📺</span>
+              <strong style="font-size:13px; color:var(--text);">GATE Preparation Video Lectures</strong>
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); line-height:1.4; margin:0 0 10px;">Full YouTube preparation video series covering CS fundamentals, problem solving &amp; strategies.</p>
+          </div>
+          <a href="https://youtube.com/playlist?list=PLmXKhU9FNesTaKDC-MKWt-rFuB8OwqrCY&si=z2TEtNMoBzPKHuls" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:11px; font-weight:700; color:#ef4444; border-color:rgba(239,68,68,0.4); background:rgba(239,68,68,0.1);">
+            <span>Watch Video Playlist ↗</span>
+          </a>
+        </div>
       </div>
     </div>
 
