@@ -24,7 +24,16 @@
   <script src="prepIntelligence.js"></script>
   <script src="mistakeBook.js"></script>
   <script src="gateQuestionBankService.js"></script>
-  <!-- Firebase Cloud Database (Project: linguastream-lzxdj) -->
+  <!-- Firebase Cloud Database & Auth (Project: linguastream-lzxdj) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"
+      }
+    }
+  </script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -247,10 +256,15 @@
           <span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span>
           <span id="firebase-status-text">Cloud DB Active</span>
         </button>
-        <button type="button" onclick="window.openAuthModal&&openAuthModal()" id="header-auth-btn" style="display:flex;align-items:center;gap:6px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light,#818CF8);font-size:12px;cursor:pointer;font-weight:700;" title="Login with Google or Email">
-          <span id="header-auth-icon">🔑</span>
-          <span id="header-auth-text">Sign In</span>
-        </button>
+        <div id="auth-section" style="display:flex;gap:8px;align-items:center;padding:3px 10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:var(--radius-full);">
+          <button id="login-btn" onclick="signInWithGoogle()" style="padding:5px 12px;background:#4285F4;color:white;border:none;border-radius:var(--radius-full);cursor:pointer;font-weight:700;font-size:11px;display:flex;align-items:center;gap:6px;">
+            🔑 Sign in with Google
+          </button>
+          <button id="logout-btn" onclick="signOutUser()" style="display:none;padding:5px 12px;background:#dc3545;color:white;border:none;border-radius:var(--radius-full);cursor:pointer;font-weight:700;font-size:11px;">
+            🚪 Sign Out
+          </button>
+          <span id="user-name" style="font-weight:700;font-size:12px;color:var(--text);">Guest</span>
+        </div>
         <button onclick="window.openJarvisBriefingModal&&openJarvisBriefingModal()" id="header-briefing-btn" style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--success);font-size:12px;cursor:pointer;font-weight:700;">📋 JARVIS Briefing</button>
         <button onclick="navigateToView('jarvis')" style="display:flex;align-items:center;gap:6px;background:rgba(109,99,255,0.15);border:1px solid rgba(109,99,255,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light);font-size:12px;cursor:pointer;font-weight:700;">🎙️ Ask JARVIS</button>
       </div>
@@ -508,6 +522,7 @@
             <div id="weak-topics-list">
               <!-- Rendered by renderWeakTopics() in app.js -->
             </div>
+            <div id="weak-areas" style="margin-top:6px;"></div>
           </div>
         </div>
 
@@ -4517,6 +4532,7 @@ function solve(arr) {
 <script src="focusSession.js"></script>
 <script src="learningUniverse.js"></script>
 <script src="jarvis.js"></script>
+<script type="module" src="firebase-auth-app.js"></script>
 
 </body>
 </html>

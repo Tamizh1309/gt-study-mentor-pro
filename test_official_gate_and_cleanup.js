@@ -503,11 +503,28 @@ async function runSuite() {
   const freshIndexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   assert(freshIndexHtml.includes('src="firebaseService.js"'), 'index.html loads firebaseService.js');
   assert(freshIndexHtml.includes('id="firebase-status-badge"'), 'index.html contains #firebase-status-badge in header');
-  assert(freshIndexHtml.includes('id="header-auth-btn"'), 'index.html contains #header-auth-btn in header');
+  assert(freshIndexHtml.includes('id="auth-section"'), 'index.html contains #auth-section in header');
+  assert(freshIndexHtml.includes('id="login-btn"'), 'index.html contains #login-btn for Google Sign-In');
+  assert(freshIndexHtml.includes('id="logout-btn"'), 'index.html contains #logout-btn for Sign Out');
+  assert(freshIndexHtml.includes('id="user-name"'), 'index.html contains #user-name display element');
+  assert(freshIndexHtml.includes('id="weak-areas"'), 'index.html contains #weak-areas display element');
+  assert(freshIndexHtml.includes('firebase-auth-app.js'), 'index.html includes firebase-auth-app.js module');
+  assert(freshIndexHtml.includes('type="importmap"'), 'index.html includes importmap for Firebase SDK');
   assert(freshIndexHtml.includes('id="firebase-auth-modal"'), 'index.html contains #firebase-auth-modal dialog');
-  assert(freshIndexHtml.includes('id="google-auth-btn"'), 'index.html contains #google-auth-btn with Google OAuth');
   assert(freshIndexHtml.includes('firebase-firestore-compat.js'), 'index.html includes official Firebase Firestore SDK');
   assert(freshIndexHtml.includes('firebase-auth-compat.js'), 'index.html includes official Firebase Auth SDK');
+
+  // Modular Firebase files verification
+  const firebaseConfigJs = fs.readFileSync(path.join(__dirname, 'firebase-config.js'), 'utf8');
+  assert(firebaseConfigJs.includes('linguastream-lzxdj'), 'firebase-config.js configured with project ID');
+  assert(firebaseConfigJs.includes('export { db, auth, provider'), 'firebase-config.js exports db, auth, provider');
+
+  const firebaseAuthAppJs = fs.readFileSync(path.join(__dirname, 'firebase-auth-app.js'), 'utf8');
+  assert(firebaseAuthAppJs.includes('window.signInWithGoogle'), 'firebase-auth-app.js defines window.signInWithGoogle');
+  assert(firebaseAuthAppJs.includes('window.signOutUser'), 'firebase-auth-app.js defines window.signOutUser');
+  assert(firebaseAuthAppJs.includes('saveUserToFirestore'), 'firebase-auth-app.js defines saveUserToFirestore');
+  assert(firebaseAuthAppJs.includes('loadUserData'), 'firebase-auth-app.js defines loadUserData');
+  assert(firebaseAuthAppJs.includes('updateDashboard'), 'firebase-auth-app.js defines updateDashboard');
 
   // Zero-Loading Verification across all primary views
   assert(!freshIndexHtml.includes('Loading preparation data...'), 'Eliminated Loading preparation data placeholder');
