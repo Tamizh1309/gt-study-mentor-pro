@@ -34,7 +34,8 @@ const ALLOWED_ACTIONS = {
   REVIEW_MISTAKES: 'review_mistakes',
   RESET_JOURNEY: 'reset_journey',
   OPEN_GATE_OFFICIAL: 'open_gate_official',
-  OPEN_GATE_PREPARE: 'open_gate_prepare'
+  OPEN_GATE_PREPARE: 'open_gate_prepare',
+  OPEN_APTITUDE_RESOURCE: 'open_aptitude_resource'
 };
 
 /**
@@ -189,6 +190,19 @@ function resolveAction(intent, params = {}) {
         type: ALLOWED_ACTIONS.OPEN_GATE_PREPARE,
         params: { view: 'prepare', tab: 'gate' },
         spokenConfirmation: "Opening your GATE 2027 preparation dashboard with official IIT Madras resources."
+      };
+    }
+
+    case 'OPEN_APTITUDE_RESOURCE': {
+      const url = params.url || 'https://www.indiabix.com/aptitude/questions-and-answers/';
+      return {
+        type: ALLOWED_ACTIONS.OPEN_APTITUDE_RESOURCE,
+        params: {
+          url,
+          label: 'IndiaBIX Aptitude Questions & Answers',
+          source: 'IndiaBIX'
+        },
+        spokenConfirmation: "Opening IndiaBIX Quantitative Aptitude Questions & Answers."
       };
     }
 

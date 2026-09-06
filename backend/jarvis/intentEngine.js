@@ -169,6 +169,19 @@ const INTENT_RULES = [
     extractParams: () => ({ view: 'prepare', tab: 'gate' })
   },
   {
+    intent: 'OPEN_APTITUDE_RESOURCE',
+    category: 'application_command',
+    patterns: [
+      /(indiabix|india\s*bix)/i,
+      /aptitude\s+(questions?\s*(and|&)?\s*answers?|material|drills?|preparation)/i,
+      /(open|show|practice|launch)\s+aptitude\s+(preparation|questions?|practice|indiabix)/i
+    ],
+    extractParams: () => ({
+      resource: 'indiabix',
+      url: 'https://www.indiabix.com/aptitude/questions-and-answers/'
+    })
+  },
+  {
     intent: 'START_QUIZ',
     category: 'application_command',
     patterns: [

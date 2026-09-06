@@ -495,6 +495,20 @@
           break;
         }
 
+        case 'open_aptitude_resource': {
+          const url = action.params?.url || 'https://www.indiabix.com/aptitude/questions-and-answers/';
+          const label = action.params?.label || 'IndiaBIX Aptitude';
+          try {
+            window.open(url, '_blank', 'noopener,noreferrer');
+            if (typeof showToast === 'function') {
+              showToast(`🔗 Opened ${label}`, 'success');
+            }
+          } catch(e) {
+            console.warn('[JARVIS] Error opening aptitude resource link:', e);
+          }
+          break;
+        }
+
         default:
           console.log('[GT JARVIS] Unhandled action type:', action.type);
       }

@@ -126,18 +126,40 @@ async function runSuite() {
   assert(chatDriveRes.status === 200, 'POST /api/jarvis/chat for question papers returned 200');
   assert(chatDriveRes.body.action.params.url === 'https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud', 'Live action returns Google Drive folder URL');
 
-  // ── 4. Codebase Cleanup & Drive Link Verification ──
-  console.log('\n4. Testing Codebase Cleanliness & Question Paper Link...');
+  // Test IndiaBIX Aptitude query
+  const iBix = classifyIntent('JARVIS open IndiaBIX aptitude questions and answers');
+  assert(iBix.intent === 'OPEN_APTITUDE_RESOURCE', 'Classifies IndiaBIX query as OPEN_APTITUDE_RESOURCE');
+  
+  const actBix = resolveAction('OPEN_APTITUDE_RESOURCE');
+  assert(actBix.params.url === 'https://www.indiabix.com/aptitude/questions-and-answers/', 'Action returns IndiaBIX Aptitude URL');
+
+  const chatBixRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'JARVIS open IndiaBIX aptitude questions',
+    mode: 'study'
+  });
+
+  assert(chatBixRes.status === 200, 'POST /api/jarvis/chat for IndiaBIX returned 200');
+  assert(chatBixRes.body.action.params.url === 'https://www.indiabix.com/aptitude/questions-and-answers/', 'Live action returns IndiaBIX URL');
+
+  // ── 4. Codebase Cleanup & Resource Links Verification ──
+  console.log('\n4. Testing Codebase Cleanliness & External Resource Links...');
   const appJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
   assert(!appJs.includes('http://localhost:3000'), 'app.js has zero occurrences of http://localhost:3000');
   assert(appJs.includes('API_BASE_URL'), 'app.js defines and uses API_BASE_URL');
   assert(appJs.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'app.js contains Google Drive question papers link');
+  assert(appJs.includes('https://www.indiabix.com/aptitude/questions-and-answers/'), 'app.js contains IndiaBIX Aptitude link');
 
   const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   assert(indexHtml.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'index.html contains Google Drive question papers link');
 
   console.log('\n======================================================');
-  console.log('✅ ALL OFFICIAL GATE & CLEANUP TESTS PASSED (100%)');
+  console.log('✅ ALL RESOURCE & CLEANUP TESTS PASSED (100%)');
   console.log('======================================================\n');
 }
 
