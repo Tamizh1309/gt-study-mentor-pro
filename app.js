@@ -13,6 +13,8 @@ import { db, auth, provider, signInWithPopup, onAuthStateChanged, signOut, doc, 
 
 // Configurable production API endpoint (Blueprint Section 44)
 const API_BASE_URL = window.GT_API_BASE_URL || '';
+window.GT_BUILD_TIMESTAMP = '2026-09-06T20:40:00+05:30';
+window.GT_BUILD_DATE = 'September 6, 2026, 08:40 PM IST';
 
 // ══════════════════════════════════════════
 //  CONSTANTS — SCHEDULE
