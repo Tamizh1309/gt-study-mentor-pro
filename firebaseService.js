@@ -514,8 +514,67 @@
     testConnection
   };
 
-  // ── 7. Global Direct Button Handlers (Available immediately on page load) ──
+  // ── 7. Global Direct Button Handlers & UI Data Display ──
+  function updateDashboard(data) {
+    if (!data) return;
+
+    // 1. Weak Areas Update
+    const weakEl = document.getElementById('weak-areas');
+    if (weakEl) {
+      if (data.weakTopics && data.weakTopics.length > 0) {
+        weakEl.innerHTML = data.weakTopics.map(t => `<span class="weak-topic-badge" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--danger);padding:3px 8px;border-radius:4px;font-size:12px;display:inline-block;margin:2px;">⚠️ ${t}</span>`).join(' ');
+      } else {
+        weakEl.innerHTML = '<span style="color:var(--success);font-weight:600;font-size:12px;">✅ No weak areas yet! Keep practicing.</span>';
+      }
+    }
+
+    // 2. Readiness Scores Update
+    if (data.readinessScores) {
+      const scores = data.readinessScores;
+      const orbsContainer = document.getElementById('readiness-orbs-container');
+      if (orbsContainer) {
+        const subjects = [
+          { key: 'dsa', name: 'DSA & Algorithms', score: scores.dsa ?? 65, icon: '⚡', color: '#6366F1' },
+          { key: 'dbms', name: 'DBMS & SQL', score: scores.dbms ?? 72, icon: '🗄️', color: '#10B981' },
+          { key: 'os', name: 'Operating Systems', score: scores.os ?? 60, icon: '💻', color: '#F59E0B' },
+          { key: 'networks', name: 'Computer Networks', score: scores.networks ?? scores.cn ?? 58, icon: '🌐', color: '#38BDF8' },
+          { key: 'systemDesign', name: 'System Design', score: scores.systemDesign ?? 50, icon: '🏗️', color: '#EC4899' }
+        ];
+        orbsContainer.innerHTML = subjects.map(s => `
+          <div class="readiness-orb-card" style="background:var(--depth-2);border:1px solid var(--border-subtle);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">
+                <span>${s.icon}</span> <span>${s.name}</span>
+              </span>
+              <span class="skill-score" data-topic="${s.key}" style="font-size:14px;font-weight:800;color:${s.color};font-family:var(--font-mono);">${s.score}%</span>
+            </div>
+            <div style="background:var(--depth-4);border-radius:var(--radius-full);height:6px;overflow:hidden;">
+              <div id="${s.key}-readiness-bar" style="height:100%;background:${s.color};border-radius:var(--radius-full);width:${s.score}%;transition:width 0.8s ease;"></div>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between;">
+              <span>Firestore Sync</span>
+              <span style="color:var(--success);font-weight:600;">Active</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.querySelectorAll('.skill-score').forEach(el => {
+        const topic = el.dataset.topic;
+        if (topic && data.readinessScores[topic] !== undefined) {
+          el.textContent = data.readinessScores[topic] + '%';
+        }
+      });
+    }
+
+    if (data.studyStreak !== undefined) {
+      const streakBadges = document.querySelectorAll('.streak-count, #user-streak-display');
+      streakBadges.forEach(el => el.textContent = data.studyStreak + ' Days');
+    }
+  }
+
   if (typeof window !== 'undefined') {
+    window.updateDashboard = updateDashboard;
     window.signInWithGoogle = async function () {
       try {
         if (typeof window.signInWithGoogleAuth === 'function') {
