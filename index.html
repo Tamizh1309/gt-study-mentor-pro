@@ -224,6 +224,14 @@
         <div class="main-header-breadcrumb" id="main-header-breadcrumb">GT Study Mentor Pro &bull; 90-Day OS</div>
       </div>
       <div class="main-header-actions">
+        <!-- Live System Date & Time Display Badge (User Requested) -->
+        <div id="header-datetime-wrap" style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-subtle);padding:5px 14px;border-radius:var(--radius-full);font-size:12px;" title="Current System Date &amp; Time">
+          <span style="font-size:13px;color:var(--accent);">📅</span>
+          <span id="header-live-date" style="color:var(--text-sub);font-weight:600;">--</span>
+          <span style="color:var(--border-subtle);">&bull;</span>
+          <span style="font-size:13px;color:var(--primary-light);">⏱️</span>
+          <span id="header-live-time" style="font-family:var(--font-mono);font-weight:700;color:var(--accent);">--:--:--</span>
+        </div>
         <div id="header-stopwatch-wrap" style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border-subtle);padding:4px 12px;border-radius:var(--radius-full);">
           <span class="stopwatch-dot" id="stopwatch-dot" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted);transition:all 0.3s;" aria-hidden="true"></span>
           <span id="header-stopwatch-time" style="font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--text);" aria-live="off">00:00:00</span>
@@ -245,6 +253,12 @@
             <span class="editorial-brand-title">GT STUDY MENTOR PRO</span>
             <span class="editorial-brand-separator">&bull;</span>
             <span class="editorial-brand-day" id="home-day-label">Day 0 / 90 &bull; Orientation Zero-State</span>
+            <span class="editorial-brand-separator">&bull;</span>
+            <span id="hero-live-datetime" style="font-size:11px; font-weight:600; color:var(--text-sub); display:inline-flex; align-items:center; gap:5px;">
+              <span>🗓️</span> <span id="hero-live-date">--</span>
+              <span>&bull;</span>
+              <span id="hero-live-time" style="font-family:var(--font-mono); color:var(--accent);">--:--:--</span>
+            </span>
           </div>
           <div class="editorial-brand-right" id="hero-jarvis-indicator" onclick="window.openJarvisModal?openJarvisModal():(window.toggleJarvisVoice&&toggleJarvisVoice())" role="button" tabindex="0" title="Click to interact with JARVIS">
             <span class="pulse-dot-jarvis" id="hero-jarvis-dot"></span>
@@ -3973,6 +3987,7 @@ function solve(arr) {
         <!-- Live HUD Overlay & Performance Switcher -->
         <div style="position:absolute; top:10px; right:12px; display:flex; gap:8px; align-items:center;">
           <button type="button" onclick="Vortex3D&&Vortex3D.toggleDisplayMode()" id="vortex-mode-btn" style="padding:3px 10px; border-radius:4px; background:rgba(0,0,0,0.75); border:1px solid rgba(56,189,248,0.4); font-size:11px; font-weight:700; color:var(--accent); cursor:pointer;" title="Toggle between 3D Spatial and 2D Eco Mode">⚡ 3D Mode</button>
+          <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:var(--primary-light);" id="vortex-hud-time">--:--:--</span>
           <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:var(--text);" id="vortex-hud-term">Term 1</span>
           <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:#F59E0B;" id="vortex-hud-leader">Leader: Node-1</span>
           <span style="padding:3px 8px; border-radius:4px; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.1); font-size:11px; font-family:var(--font-mono); color:var(--success);" id="vortex-hud-quorum">Full Quorum (5/5)</span>

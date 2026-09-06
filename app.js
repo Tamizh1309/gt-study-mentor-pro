@@ -12577,4 +12577,75 @@ window.vcalcEvaluate = function () {
   }
 };
 
+// ══════════════════════════════════════════════════════════════════════
+// 6. LIVE SYSTEM DATE & TIME ENGINE (Real-Time Synchronized Clock)
+// ══════════════════════════════════════════════════════════════════════
+window.updateSystemDateTime = function () {
+  const now = new Date();
+
+  // Formatted date options: "Sun, 6 Sep 2026"
+  const dateShort = now.toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+
+  // Long date options: "Sunday, September 6, 2026"
+  const dateLong = now.toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  // Formatted time: "06:14:22 PM"
+  const timeStr = now.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+
+  // 1. Header live date & time
+  const headerDateEl = document.getElementById('header-live-date');
+  const headerTimeEl = document.getElementById('header-live-time');
+  if (headerDateEl) headerDateEl.textContent = dateShort;
+  if (headerTimeEl) headerTimeEl.textContent = timeStr;
+
+  // 2. Editorial brand bar live date & time
+  const heroDateEl = document.getElementById('hero-live-date');
+  const heroTimeEl = document.getElementById('hero-live-time');
+  if (heroDateEl) heroDateEl.textContent = dateShort;
+  if (heroTimeEl) heroTimeEl.textContent = timeStr;
+
+  // 3. JARVIS Briefing subtitle dynamic date/time
+  const briefingDateEl = document.getElementById('briefing-subtitle-date');
+  if (briefingDateEl) {
+    briefingDateEl.textContent = `${dateLong} • ${timeStr} • Context-Aware Intelligence`;
+  }
+
+  // 4. Vortex HUD time (if open)
+  const vortexTimeEl = document.getElementById('vortex-hud-time');
+  if (vortexTimeEl) {
+    vortexTimeEl.textContent = `⏱️ ${timeStr}`;
+  }
+};
+
+window.initLiveDateTimeEngine = function () {
+  window.updateSystemDateTime();
+  if (window._liveDateTimeInterval) clearInterval(window._liveDateTimeInterval);
+  window._liveDateTimeInterval = setInterval(window.updateSystemDateTime, 1000);
+};
+
+// Initialize immediately and on DOM load
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.initLiveDateTimeEngine);
+  } else {
+    window.initLiveDateTimeEngine();
+  }
+}
+
+
 

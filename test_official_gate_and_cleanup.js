@@ -460,8 +460,24 @@ async function runSuite() {
   assert(appJs.includes('window.filterGATEPYQCards'), 'app.js defines window.filterGATEPYQCards');
   assert(appJs.includes('Sunday Mistake Bank Repetition Ritual'), 'app.js includes Sunday Mistake Bank Repetition Ritual logic');
 
+  // ── 8. Testing Real-Time Date & Time Display Engine ──
+  console.log('\n8. Testing Real-Time Date & Time Display Engine across Header, Brand Bar & 3D HUD...');
+  assert(indexHtml.includes('id="header-datetime-wrap"'), 'index.html contains #header-datetime-wrap in main header');
+  assert(indexHtml.includes('id="header-live-date"'), 'index.html contains #header-live-date for live calendar date');
+  assert(indexHtml.includes('id="header-live-time"'), 'index.html contains #header-live-time for live second-precision clock');
+  assert(indexHtml.includes('id="hero-live-datetime"'), 'index.html contains #hero-live-datetime in editorial brand bar');
+  assert(indexHtml.includes('id="vortex-hud-time"'), 'index.html contains #vortex-hud-time in 3D simulator HUD');
+  
+  const updatedProject3D = fs.readFileSync(path.join(__dirname, 'project3D.js'), 'utf8');
+  assert(updatedProject3D.includes('vortex-hud-time'), 'project3D.js updates vortex-hud-time in live HUD');
+  assert(updatedProject3D.includes('toLocaleDateString'), 'project3D.js formats real audit log timestamps with date and time');
+
+  const updatedAppJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  assert(updatedAppJs.includes('window.updateSystemDateTime'), 'app.js defines window.updateSystemDateTime');
+  assert(updatedAppJs.includes('window.initLiveDateTimeEngine'), 'app.js defines window.initLiveDateTimeEngine');
+
   console.log('\n======================================================');
-  console.log('✅ ALL TESTS (OPTIONS 1, 2, AND 3) VERIFIED (100% PASS)');
+  console.log('✅ ALL TESTS (OPTIONS 1, 2, 3 & DATE/TIME ENGINE) VERIFIED (100% PASS)');
   console.log('======================================================\n');
 }
 

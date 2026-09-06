@@ -78,8 +78,11 @@ const Vortex3D = (function () {
   }
 
   function addLog(msg) {
-    const time = new Date().toTimeString().split(' ')[0];
-    logHistory.unshift({ time, text: msg });
+    const now = new Date();
+    const datePart = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+    const timePart = now.toTimeString().split(' ')[0];
+    const fullTime = `${datePart} ${timePart}`;
+    logHistory.unshift({ time: fullTime, text: msg });
     if (logHistory.length > 20) logHistory.pop();
 
     const list = document.getElementById('vortex-log-list');
@@ -553,6 +556,14 @@ const Vortex3D = (function () {
     },
 
     updateHUD: function () {
+      const timeEl = document.getElementById('vortex-hud-time');
+      if (timeEl) {
+        const now = new Date();
+        const dStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+        const tStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+        timeEl.textContent = `⏱️ ${dStr} • ${tStr}`;
+      }
+
       const termEl = document.getElementById('vortex-hud-term');
       if (termEl) termEl.textContent = 'Term ' + currentTerm;
 
