@@ -894,8 +894,6 @@ function registerSW() {
 }
 
 // PWA Install Prompt (Android/Desktop)
-let deferredInstallPrompt;
-
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;

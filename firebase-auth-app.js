@@ -111,9 +111,38 @@ function updateDashboard(data) {
     }
   }
 
-  // 2. Readiness Scores
+  // 2. Readiness Scores & Orbs Grid
   console.log("📈 Scores:", data.readinessScores);
   if (data.readinessScores) {
+    const scores = data.readinessScores;
+    const orbsContainer = document.getElementById('readiness-orbs-container');
+    if (orbsContainer) {
+      const subjects = [
+        { key: 'dsa', name: 'DSA & Algorithms', score: scores.dsa ?? 65, icon: '⚡', color: '#6366F1' },
+        { key: 'dbms', name: 'DBMS & SQL', score: scores.dbms ?? 72, icon: '🗄️', color: '#10B981' },
+        { key: 'os', name: 'Operating Systems', score: scores.os ?? 60, icon: '💻', color: '#F59E0B' },
+        { key: 'networks', name: 'Computer Networks', score: scores.networks ?? scores.cn ?? 58, icon: '🌐', color: '#38BDF8' },
+        { key: 'systemDesign', name: 'System Design', score: scores.systemDesign ?? 50, icon: '🏗️', color: '#EC4899' }
+      ];
+      orbsContainer.innerHTML = subjects.map(s => `
+        <div class="readiness-orb-card" style="background:var(--depth-2);border:1px solid var(--border-subtle);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;">
+              <span>${s.icon}</span> <span>${s.name}</span>
+            </span>
+            <span class="skill-score" data-topic="${s.key}" style="font-size:14px;font-weight:800;color:${s.color};font-family:var(--font-mono);">${s.score}%</span>
+          </div>
+          <div style="background:var(--depth-4);border-radius:var(--radius-full);height:6px;overflow:hidden;">
+            <div id="${s.key}-readiness-bar" style="height:100%;background:${s.color};border-radius:var(--radius-full);width:${s.score}%;transition:width 0.8s ease;"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between;">
+            <span>Firestore Sync</span>
+            <span style="color:var(--success);font-weight:600;">Active</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
     // Update .skill-score elements with data-topic
     document.querySelectorAll('.skill-score').forEach(el => {
       const topic = el.dataset.topic;
