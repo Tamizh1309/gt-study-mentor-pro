@@ -24,61 +24,281 @@ const { verifyResponse } = require('./verifier');
 // Local high-yield CSE intelligence database for instant offline answering
 const LOCAL_KNOWLEDGE_BASE = [
   {
+    keywords: ['normalization', 'normal form', 'bcnf', '3nf', '2nf', '1nf'],
+    title: 'DBMS — Normalization & Normal Forms',
+    notes: `• Normalization organizes relations to eliminate insertion, update, and deletion anomalies while minimizing redundant data.
+• 1NF: All attribute values must be atomic (no multi-valued attributes or nested records).
+• 2NF: In 1NF + Every non-prime attribute is fully functionally dependent on the candidate key (No partial dependencies).
+• 3NF: In 2NF + No non-prime attribute depends transitively on the candidate key (For X → Y, either X is a superkey or Y is a prime attribute).
+• BCNF (Boyce-Codd): For every non-trivial functional dependency X → Y, X must be a superkey. Guarantees zero redundancy but may not preserve dependencies.`,
+    video: {
+      title: 'Gate Smashers — Normalization in DBMS (1NF, 2NF, 3NF, BCNF)',
+      channel: 'Gate Smashers',
+      url: 'https://www.youtube.com/watch?v=5ds-_a_51W4'
+    },
+    practiceQuestions: [
+      {
+        q: 'If relation R(A, B, C, D) has functional dependencies AB → C, C → D, and D → A, what are the candidate keys and what is the highest normal form of R?',
+        hint: 'Closures: (AB)+ = {A,B,C,D}, (BC)+ = {A,B,C,D}, (BD)+ = {A,B,C,D}. C → D has non-superkey LHS but D is prime. Hence 3NF.'
+      },
+      {
+        q: 'Can a binary relation R(A, B) with only two attributes ever violate BCNF?',
+        hint: 'No. Any non-trivial FD must be A → B or B → A, making the LHS a superkey.'
+      },
+      {
+        q: 'Which normal form strictly eliminates all transitive dependencies on candidate keys?',
+        hint: '3NF (Third Normal Form).'
+      }
+    ]
+  },
+  {
     keywords: ['deadlock', 'dead lock', 'banker'],
-    title: 'Operating Systems — Deadlock',
-    answer: "A deadlock occurs when a set of processes are blocked because each process is holding a resource and waiting for another resource held by some other process. The four necessary Coffman conditions are:\n1. Mutual Exclusion (non-shareable resources)\n2. Hold and Wait (holding one resource while waiting for another)\n3. No Preemption (resources cannot be forcibly taken)\n4. Circular Wait (a circular chain of waiting exists).\n\nTo prevent deadlocks, we break at least one of these conditions, or use Banker's Algorithm for avoidance."
+    title: 'Operating Systems — Deadlocks & Banker\'s Algorithm',
+    notes: `• Deadlock is a permanent stalled state where a set of processes are blocked because each is holding a resource and waiting for another.
+• 4 Necessary Coffman Conditions: Mutual Exclusion, Hold & Wait, No Preemption, Circular Wait.
+• Handling Strategies:
+  1. Prevention: Invalidate at least one Coffman condition (e.g. acquire all resources upfront).
+  2. Avoidance: Dynamic validation using Banker\'s Algorithm (Safe State vs Unsafe State).
+  3. Detection & Recovery: Wait-For-Graph cycle check + abort victim processes.
+  4. Ostrich Algorithm: Ignore the problem if occurrence is rare (standard in general-purpose OS).`,
+    video: {
+      title: 'Gate Smashers — Deadlock in Operating System & Banker\'s Algorithm',
+      channel: 'Gate Smashers',
+      url: 'https://www.youtube.com/watch?v=UbhvPshcaQk'
+    },
+    practiceQuestions: [
+      {
+        q: 'If 3 processes each request 2 units of resource R, what is the minimum units of R to guarantee deadlock freedom?',
+        hint: 'Formula: Total >= sum(Max_i - 1) + 1 = (2-1) + (2-1) + (2-1) + 1 = 4 units.'
+      },
+      {
+        q: 'Is an unsafe state in Banker\'s Algorithm necessarily a deadlocked state?',
+        hint: 'No. An unsafe state is not a deadlock, but it may lead to one if processes request their maximum claims.'
+      },
+      {
+        q: 'Which condition is broken if resources are ordered numerically and requested in strictly increasing order?',
+        hint: 'Circular Wait.'
+      }
+    ]
   },
   {
     keywords: ['binary search', 'search in sorted', 'divide and conquer search'],
     title: 'Data Structures & Algorithms — Binary Search',
-    answer: "Binary Search is a divide-and-conquer searching algorithm for sorted arrays. Instead of scanning linearly (O(N)), it compares the target with the middle element (mid = low + (high - low) / 2):\n• If target === arr[mid], return mid.\n• If target < arr[mid], narrow search to left half (high = mid - 1).\n• If target > arr[mid], narrow search to right half (low = mid + 1).\n\nTime Complexity: O(log N) — eliminates half the remaining elements each step.\nSpace Complexity: O(1) iterative, O(log N) recursive."
+    notes: `• Binary Search is a divide-and-conquer searching algorithm on monotonic/sorted sequences.
+• Formula: mid = low + ((high - low) >> 1) to prevent 32-bit integer overflow.
+• Comparison logic:
+  - target === arr[mid]: Found at mid.
+  - target < arr[mid]: search left half (high = mid - 1).
+  - target > arr[mid]: search right half (low = mid + 1).
+• Time Complexity: O(log N) — eliminates half the search space per iteration.
+• Space Complexity: O(1) iterative, O(log N) recursive.`,
+    video: {
+      title: 'Abdul Bari — Binary Search Algorithm & Recurrence Relations',
+      channel: 'Abdul Bari',
+      url: 'https://www.youtube.com/watch?v=C2apEw9pgtw'
+    },
+    practiceQuestions: [
+      {
+        q: 'How many maximum comparisons does binary search take in a sorted array of 1,000,000 elements?',
+        hint: 'ceil(log2(1,000,000)) = 20 comparisons.'
+      },
+      {
+        q: 'How do you adapt binary search to find the lower bound (first index where arr[i] >= target)?',
+        hint: 'When arr[mid] >= target, record ans = mid and move high = mid - 1.'
+      }
+    ]
   },
   {
     keywords: ['tcp', 'udp', 'transport layer'],
     title: 'Computer Networks — TCP vs UDP',
-    answer: "TCP (Transmission Control Protocol) and UDP (User Datagram Protocol) are transport layer protocols:\n• TCP is connection-oriented, reliable, guarantees in-order delivery using 3-way handshakes, sequence numbers, and ACKs. It handles flow control and congestion control. (Used for HTTP/HTTPS, SSH, File transfers).\n• UDP is connectionless, lightweight, and does not guarantee packet delivery or order. There are no ACKs or retransmissions, resulting in ultra-low latency. (Used for DNS, live video streaming, multiplayer gaming, VoIP)."
+    notes: `• TCP (Transmission Control Protocol): Connection-oriented, reliable, byte-stream, 3-way handshake (SYN, SYN-ACK, ACK), sliding-window flow control, Reno/Cubic congestion control. Used for HTTP, SSH, FTP.
+• UDP (User Datagram Protocol): Connectionless, unreliable datagrams, zero handshake, minimal 8-byte header, no flow/congestion control, ultra-low latency. Used for DNS, VoIP, gaming, live streaming.`,
+    video: {
+      title: 'Gate Smashers — TCP vs UDP Protocol Differences',
+      channel: 'Gate Smashers',
+      url: 'https://www.youtube.com/watch?v=uwoD5P0c1x0'
+    },
+    practiceQuestions: [
+      {
+        q: 'What is the header size of UDP vs minimum header size of TCP?',
+        hint: 'UDP header is 8 bytes. TCP minimum header is 20 bytes (up to 60 bytes with options).'
+      },
+      {
+        q: 'Why does DNS primarily use UDP over port 53 for standard lookups?',
+        hint: 'A single query and response fits in one packet, avoiding the latency overhead of a 3-way handshake.'
+      }
+    ]
   },
   {
     keywords: ['polymorphism', 'oops', 'object oriented'],
     title: 'Software Engineering — Polymorphism',
-    answer: "Polymorphism (meaning 'many forms') allows an entity (like a function or object) to take on multiple forms in Object-Oriented Programming:\n1. Compile-Time (Static) Polymorphism: Achieved via Method Overloading or Operator Overloading. Resolved at compile time.\n2. Run-Time (Dynamic) Polymorphism: Achieved via Method Overriding using inheritance and virtual functions/interfaces. The method called is determined at runtime based on the actual object instance."
+    notes: `• Polymorphism allows a single interface or method identifier to execute different behaviors depending on data types or object instances.
+• Compile-Time (Static): Function Overloading & Operator Overloading resolved by compiler signature matching.
+• Run-Time (Dynamic): Method Overriding resolved via Virtual Method Tables (vtable) and dynamic dispatch.`,
+    video: {
+      title: 'Apna College — Object Oriented Programming & Polymorphism in C++/Java',
+      channel: 'Apna College',
+      url: 'https://www.youtube.com/watch?v=bSrm9RXwBaI'
+    },
+    practiceQuestions: [
+      {
+        q: 'In C++, what keyword is required in the base class to enable dynamic runtime polymorphism?',
+        hint: 'The "virtual" keyword on member functions.'
+      },
+      {
+        q: 'Can a private method in a Java base class be overridden in a subclass?',
+        hint: 'No. Private methods are not visible to subclasses and cannot be overridden.'
+      }
+    ]
   },
   {
     keywords: ['operating system', 'os', 'kernel'],
     title: 'Operating Systems — Core Fundamentals',
-    answer: "An Operating System (OS) is system software that acts as an intermediary between computer hardware and user applications. Its primary responsibilities include:\n1. Process Management (scheduling, CPU allocation, context switching)\n2. Memory Management (virtual memory, paging, segmentation)\n3. Storage & File Management (file systems, disk scheduling)\n4. I/O Device Management (device drivers, buffering, interrupts)\n5. Protection & Security (user modes vs kernel mode)."
+    notes: `• An Operating System coordinates computer hardware and provides abstractions for user applications.
+• Core pillars:
+  1. Process & Thread Scheduling (Context switching, CFS, Round Robin).
+  2. Memory Management (Virtual memory, demand paging, TLB, page replacement).
+  3. Storage Architecture (Ext4, NTFS, inode structures, disk scheduling).
+  4. Concurrency & Synchronization (Semaphores, mutexes, condition variables, spinlocks).`,
+    video: {
+      title: 'Gate Smashers — Introduction to Operating Systems',
+      channel: 'Gate Smashers',
+      url: 'https://www.youtube.com/watch?v=bkSWJJZNgf8'
+    },
+    practiceQuestions: [
+      {
+        q: 'What is the difference between a process and a thread?',
+        hint: 'A process has its own address space; threads share the process heap, code, and global memory but have private call stacks.'
+      },
+      {
+        q: 'What hardware mechanism allows the CPU to switch from User Mode to Kernel Mode?',
+        hint: 'Interrupts, system calls (traps), and hardware exceptions.'
+      }
+    ]
   },
   {
     keywords: ['raft', 'consensus', 'distributed system', 'vortex'],
     title: 'Distributed Systems — Raft Consensus Protocol',
-    answer: "Raft is a distributed consensus algorithm designed to be easily understood and implemented. It manages a replicated log across a cluster of nodes:\n• Leader Election: Nodes start as Followers. If they don't receive heartbeats within a randomized election timeout, they become Candidates and request votes. A Candidate with a majority of votes becomes Leader.\n• Log Replication: The Leader receives client writes, writes to its log, and broadcasts AppendEntries to followers.\n• Quorum: A write is committed only after a majority (⌊N/2⌋ + 1) of nodes acknowledge it, guaranteeing consistency even during network partitions."
+    notes: `• Raft decomposes distributed consensus into three independent sub-problems:
+  1. Leader Election: Heartbeat timeouts trigger Candidate state; candidate with majority votes wins term.
+  2. Log Replication: Leader appends client commands to local log and sends AppendEntries RPCs to followers.
+  3. Safety: Leader completeness guarantee ensures any committed entry exists in all future leaders.
+• Quorum requirement: Any write requires acknowledgment from ⌊N/2⌋ + 1 nodes.`,
+    video: {
+      title: 'MIT 6.824: Distributed Systems — Raft Consensus',
+      channel: 'MIT OpenCourseWare',
+      url: 'https://www.youtube.com/watch?v=R2-9bsKmEbo'
+    },
+    practiceQuestions: [
+      {
+        q: 'In a 5-node Raft cluster, how many nodes can fail while still committing new client writes?',
+        hint: 'Majority of 5 is 3. Therefore, at most 2 nodes can fail (5 - 3 = 2).'
+      },
+      {
+        q: 'How does Raft prevent split votes when multiple nodes start election simultaneously?',
+        hint: 'Randomized election timeouts (typically 150ms–300ms).'
+      }
+    ]
   },
   {
     keywords: ['time complexity', 'big o', 'space complexity'],
-    title: 'DSA — Asymptotic Notation & Big-O',
-    answer: "Big-O notation describes the upper bound of an algorithm's execution time or memory consumption as the input size N grows toward infinity:\n• O(1): Constant time (hash map lookup, array index access)\n• O(log N): Logarithmic (binary search, balanced BST operations)\n• O(N): Linear (single loop, array traversal)\n• O(N log N): Linearithmic (Merge Sort, Heap Sort, efficient Quick Sort)\n• O(N²): Quadratic (nested loops, Bubble/Insertion sort)\n• O(2ⁿ): Exponential (naive recursive Fibonacci, subsets generation)"
+    title: 'DSA — Asymptotic Complexity & Big-O Notation',
+    notes: `• Big-O notation describes the asymptotic worst-case upper bound of runtime or auxiliary space:
+  - O(1): Constant (hash map lookup, push/pop on stack).
+  - O(log N): Logarithmic (binary search, divide-and-conquer).
+  - O(N): Linear (array traversal, linear search).
+  - O(N log N): Linearithmic (Merge Sort, Heap Sort, Quick Sort average).
+  - O(N²): Quadratic (nested loops, Bubble Sort).
+  - O(2ⁿ): Exponential (subsets, tower of Hanoi).`,
+    video: {
+      title: 'Abdul Bari — Analysis of Algorithms & Asymptotic Notations',
+      channel: 'Abdul Bari',
+      url: 'https://www.youtube.com/watch?v=9TlHvipP5yA'
+    },
+    practiceQuestions: [
+      {
+        q: 'What is the tightest Big-O time complexity of solving T(N) = 2T(N/2) + O(N) using Master Theorem?',
+        hint: 'Case 2 of Master Theorem: a = 2, b = 2, f(N) = O(N^1). Since N^(log_2 2) = N^1, T(N) = O(N log N).'
+      }
+    ]
   },
   {
     keywords: ['recursion', 'recursive', 'base case'],
     title: 'DSA — Recursion & Stack Frames',
-    answer: "Recursion occurs when a function calls itself to solve a smaller instance of the same problem. Every recursive solution requires:\n1. Base Case: The condition that terminates recursion to prevent stack overflow.\n2. Recursive Step: Dividing the problem and calling itself with a smaller input toward the base case.\n\nUnder the hood, each recursive call pushes a new stack frame onto the Call Stack storing local variables and return addresses. Space complexity is proportional to the maximum recursion tree depth: O(Depth)."
-  },
-  {
-    keywords: ['normalization', 'normal form', 'bcnf', '3nf', '2nf', '1nf'],
-    title: 'DBMS — Normalization & Functional Dependencies',
-    answer: "Normalization organizes database tables to minimize redundancy and prevent insertion, update, and deletion anomalies:\n• 1NF: Atomic column values (no multi-valued attributes or repeating groups).\n• 2NF: In 1NF + No partial dependency (every non-key attribute fully functionally dependent on primary key).\n• 3NF: In 2NF + No transitive dependency (non-prime attributes depend only on candidate keys).\n• BCNF: Stricter 3NF where for every functional dependency X → Y, X must be a super key."
+    notes: `• Recursion solves a problem by having a function invoke itself on smaller inputs.
+• Two non-negotiable components:
+  1. Base Case: Terminates recursive expansion to prevent call stack overflow.
+  2. Recursive Transition: Progresses toward the base case while combining sub-solutions.
+• Stack frame overhead: Auxiliary space equals maximum depth of the recursive call tree: O(Depth).`,
+    video: {
+      title: 'Striver — Recursion & Backtracking Masterclass',
+      channel: 'take U forward',
+      url: 'https://www.youtube.com/watch?v=yVdKa8dnKiE'
+    },
+    practiceQuestions: [
+      {
+        q: 'What is tail-call optimization and how does it optimize recursive space complexity?',
+        hint: 'When the recursive call is the final operation in the function, compilers can reuse the existing stack frame, reducing space from O(N) to O(1).'
+      }
+    ]
   },
   {
     keywords: ['pointer', 'pointers', 'memory address', 'dereference'],
-    title: 'Programming — Pointers & Memory Management',
-    answer: "A pointer is a variable that stores the memory address of another variable rather than storing a direct value:\n• Address-of operator (&x): Retrieves the physical memory address of variable x.\n• Dereference operator (*p): Accesses or modifies the value stored at the memory address pointed to by p.\n• Pointers enable dynamic memory allocation (heap via malloc/new), efficient pass-by-reference without cloning large structs, and linked data structure implementations (linked lists, trees, graphs)."
+    title: 'Programming — Pointers & Dynamic Memory',
+    notes: `• A pointer variable stores the virtual memory address of another variable.
+• Address-of operator (&): Obtains memory address.
+• Dereference operator (*): Accesses or mutates value at the referenced address.
+• Enables manual heap allocation (malloc/free, new/delete), references, and linked data structures.`,
+    video: {
+      title: 'freeCodeCamp — Pointers in C / C++ Full Course',
+      channel: 'freeCodeCamp',
+      url: 'https://www.youtube.com/watch?v=zuegQmMdy8M'
+    },
+    practiceQuestions: [
+      {
+        q: 'What is a dangling pointer and how is it created?',
+        hint: 'A pointer pointing to a memory location that has already been deallocated/freed.'
+      }
+    ]
   },
   {
     keywords: ['rest', 'rest api', 'http methods', 'restful'],
     title: 'Software Engineering — RESTful Architecture',
-    answer: "REST (Representational State Transfer) is an architectural style for networked distributed systems adhering to 6 core constraints:\n1. Stateless: Every request contains all information needed to process it; server stores no client session context.\n2. Client-Server Separation: UI concerns separated from data storage.\n3. Uniform Interface: Standardized HTTP verbs (GET: read, POST: create, PUT/PATCH: update, DELETE: remove) and URI resources.\n4. Cacheable: Responses explicitly define whether they can be cached.\n5. Layered System: Client cannot tell whether it is connected directly to end server or proxy/load balancer."
+    notes: `• REST (Representational State Transfer) constraints:
+  1. Stateless: Server stores no client session context across requests.
+  2. Client-Server Separation: Frontend concerns isolated from persistent data storage.
+  3. Standardized HTTP Verbs: GET (Read), POST (Create), PUT/PATCH (Update), DELETE (Remove).
+  4. Cacheable responses with standard status codes (200 OK, 201 Created, 400 Bad Request, 404 Not Found, 500 Server Error).`,
+    video: {
+      title: 'Hussein Nasser — REST API Design Best Practices',
+      channel: 'Hussein Nasser',
+      url: 'https://www.youtube.com/watch?v=qbLc5a9jdXo'
+    },
+    practiceQuestions: [
+      {
+        q: 'What is the idempotency requirement of HTTP PUT vs HTTP POST?',
+        hint: 'PUT is idempotent (repeating the same request yields identical state); POST is non-idempotent.'
+      }
+    ]
   }
 ];
+
+function formatCuratedMentorResponse(item) {
+  let out = `### 📝 Concept Notes: ${item.title}\n\n`;
+  out += (item.notes || item.answer) + '\n\n';
+  if (item.video) {
+    out += `---\n\n### 📺 Curated Video Lesson\n`;
+    out += `▶ **[${item.video.title}](${item.video.url})** *(${item.video.channel})*\n\n`;
+  }
+  if (item.practiceQuestions && item.practiceQuestions.length > 0) {
+    out += `---\n\n### 🎯 Practice Questions to Test Understanding\n`;
+    item.practiceQuestions.forEach((pq, idx) => {
+      out += `**${idx + 1}. ${pq.q}**\n*💡 Hint:* ${pq.hint}\n\n`;
+    });
+    out += `*Reply with your answers or ask me for a step-by-step hint!*`;
+  }
+  return out;
+}
 
 /**
  * Builds standard system prompt for student context
@@ -299,14 +519,14 @@ function generateLocalCSEAnswer(prompt, context = {}, mode = 'study') {
   // 1. Check curated CSE knowledge base
   for (const item of LOCAL_KNOWLEDGE_BASE) {
     if (item.keywords.some(k => lower.includes(k))) {
-      return `**${item.title}**\n\n${item.answer}\n\n*Would you like me to start a focused practice session or explore a practice question on this topic?*`;
+      return formatCuratedMentorResponse(item);
     }
   }
 
   // 2. Weak area query check (Rule: Never invent fake weak areas)
   if (lower.includes('weak')) {
     if (!context.day || context.day === 0 || !context.weakTopics || context.weakTopics.length === 0) {
-      return "I don't have enough tracked data yet to identify a weak area. As you practice DSA, attempt quizzes, and complete focus sessions, any recurring errors will be tracked in your Mistake Book!";
+      return "No data yet. Complete 10 questions to identify weak spots. As you practice questions in the Practice Arena, recurring mistakes will be categorized into Red (<40%), Yellow (40–70%), and Green (>70%) proficiency levels!";
     }
     return `Based on your tracked activity, your current areas requiring reinforcement are: ${context.weakTopics.join(', ')}. Would you like to start a focused practice session on one of them?`;
   }
@@ -343,5 +563,6 @@ function generateLocalCSEAnswer(prompt, context = {}, mode = 'study') {
 
 module.exports = {
   generateResponse,
-  LOCAL_KNOWLEDGE_BASE
+  LOCAL_KNOWLEDGE_BASE,
+  formatCuratedMentorResponse
 };

@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="style.css" />
   <script src="prepIntelligence.js"></script>
   <script src="mistakeBook.js"></script>
+  <script src="gateQuestionBankService.js"></script>
 </head>
 <body>
 
@@ -490,6 +491,9 @@
             <!-- Populated dynamically by renderCareerSyncMatrix() in app.js -->
           </div>
         </div>
+
+        <!-- Sunday Mistake Bank Repetition Banner (Option 3) -->
+        <div id="sunday-mistake-banner" style="grid-column: 1 / -1; margin-top: 14px; display:none;"></div>
       </div>
     </section>
 
@@ -4165,6 +4169,185 @@ function solve(arr) {
     <div style="padding:24px;" id="adaptive-modal-body">
       <!-- Populated dynamically -->
     </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- SIGNATURE MODAL 4: GATE 65-Question Mock Exam & AIR Predictor (Option 3) -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="gate-mock-modal" role="dialog" aria-modal="true" aria-labelledby="gate-mock-modal-title" style="display:none; z-index:9999;">
+  <div class="modal" style="max-width:1200px; width:98%; height:94vh; background:var(--depth-1); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); box-shadow:0 24px 70px rgba(0,0,0,0.9); overflow:hidden; display:flex; flex-direction:column; padding:0; position:relative;">
+    
+    <!-- Top Exam Navigation Header -->
+    <div style="background:var(--depth-2); border-bottom:1px solid var(--border-subtle); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:20px;">⚡</span>
+        <div>
+          <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--primary-light);">Official GATE CS Simulation Engine</div>
+          <h3 id="gate-mock-modal-title" style="font-size:14px; font-weight:800; margin:0; color:var(--text);">GATE CSE 2027 Full 65-Question Mock Test (100 Marks)</h3>
+        </div>
+      </div>
+
+      <!-- Center Countdown Timer -->
+      <div id="gate-mock-timer-box" style="display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.4); border:1px solid var(--border-subtle); padding:6px 16px; border-radius:20px; font-family:var(--font-mono); font-weight:800; font-size:15px; color:var(--accent);">
+        <span>⏱️</span>
+        <span id="gate-mock-timer">03:00:00</span>
+      </div>
+
+      <!-- Header Tools & Submit -->
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button type="button" onclick="toggleVirtualCalc()" id="gate-calc-toggle-btn" class="action-btn" style="font-size:11px; padding:6px 12px; display:flex; align-items:center; gap:6px; background:rgba(99,216,255,0.08); border-color:rgba(99,216,255,0.3); color:var(--primary-light);">
+          <span>🧮</span> <span>Virtual Calculator</span>
+        </button>
+        <button type="button" onclick="submitGateMockExam()" class="submit-btn" style="font-size:11px; padding:6px 16px; background:linear-gradient(135deg, #10B981, #059669); color:#fff; border:none;">
+          <span>✓</span> <span>Submit Exam</span>
+        </button>
+        <button type="button" onclick="closeGateMockModal()" style="background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer; line-height:1; padding:0 6px;" title="Exit Exam">&times;</button>
+      </div>
+    </div>
+
+    <!-- EXAM BODY CONTAINER (Live Exam Mode) -->
+    <div id="gate-exam-screen" style="flex:1; display:flex; overflow:hidden; position:relative;">
+      
+      <!-- Left Column: Question Area (72% width) -->
+      <div style="flex:1; display:flex; flex-direction:column; border-right:1px solid var(--border-subtle); background:var(--depth-1); overflow:hidden;">
+        <!-- Question Meta Subheader -->
+        <div style="background:var(--depth-3); border-bottom:1px solid var(--border-subtle); padding:10px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span id="mock-q-number" style="font-size:13px; font-weight:800; color:var(--text);">Question 1 of 65</span>
+            <span id="mock-q-type-badge" class="badge-pill" style="font-size:10px; background:rgba(56,189,248,0.15); color:var(--accent);">MCQ</span>
+            <span id="mock-q-marks-badge" class="badge-pill" style="font-size:10px; background:rgba(16,185,129,0.15); color:var(--success);">+1 / -0.33</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span id="mock-q-subject-badge" style="font-size:11px; color:var(--text-muted); font-weight:600;">Computer Networks</span>
+            <span style="font-size:10px; color:var(--border-subtle);">&bull;</span>
+            <span id="mock-q-topic-badge" style="font-size:11px; color:var(--text-sub);">Subnetting &amp; CIDR</span>
+          </div>
+        </div>
+
+        <!-- Question Viewport Scrollable -->
+        <div id="mock-question-viewport" style="flex:1; padding:24px; overflow-y:auto; font-size:14px; line-height:1.6; color:var(--text);">
+          <!-- Dynamically populated question text, code blocks, and options -->
+        </div>
+
+        <!-- Question Footer Controls -->
+        <div style="background:var(--depth-2); border-top:1px solid var(--border-subtle); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div style="display:flex; gap:8px;">
+            <button type="button" onclick="markMockForReview()" class="action-btn" style="font-size:12px; color:#c084fc; border-color:rgba(192,132,252,0.3); background:rgba(192,132,252,0.08);">
+              🟣 Mark for Review &amp; Next
+            </button>
+            <button type="button" onclick="clearMockResponse()" class="action-btn" style="font-size:12px; color:var(--text-muted);">
+              Clear Response
+            </button>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" id="mock-prev-btn" onclick="prevMockQuestion()" class="action-btn" style="font-size:12px;">
+              &larr; Previous
+            </button>
+            <button type="button" id="mock-save-next-btn" onclick="saveAndNextMockQuestion()" class="submit-btn" style="font-size:12px; padding:8px 20px;">
+              Save &amp; Next &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Question Palette & Status (28% width, min-width 280px) -->
+      <div style="width:300px; background:var(--depth-2); display:flex; flex-direction:column; overflow:hidden;">
+        <!-- Status Legend -->
+        <div style="padding:14px; border-bottom:1px solid var(--border-subtle); font-size:11px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:12px; height:12px; border-radius:3px; background:#10B981; display:inline-block;"></span>
+              <span style="color:var(--text-sub);">Answered (<b id="mock-stat-answered" style="color:var(--text);">0</b>)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:12px; height:12px; border-radius:3px; background:#EF4444; display:inline-block;"></span>
+              <span style="color:var(--text-sub);">Not Ans (<b id="mock-stat-not-answered" style="color:var(--text);">0</b>)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:12px; height:12px; border-radius:3px; background:#4B5563; display:inline-block;"></span>
+              <span style="color:var(--text-sub);">Not Visited (<b id="mock-stat-not-visited" style="color:var(--text);">65</b>)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:12px; height:12px; border-radius:3px; background:#9333EA; display:inline-block;"></span>
+              <span style="color:var(--text-sub);">Review (<b id="mock-stat-review" style="color:var(--text);">0</b>)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 65-Question Palette Grid -->
+        <div style="padding:10px 14px 6px; font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-muted);">
+          Questions Navigation
+        </div>
+        <div id="mock-palette-grid" style="flex:1; padding:10px 14px; overflow-y:auto; display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; align-content:start;">
+          <!-- 65 Question Badges (1 to 65) injected dynamically -->
+        </div>
+
+        <!-- Bottom Quick Summary -->
+        <div style="padding:12px 14px; background:var(--depth-3); border-top:1px solid var(--border-subtle); font-size:11px; display:flex; justify-content:space-between;">
+          <span style="color:var(--text-sub);">Total Marks: <b style="color:var(--text);">100</b></span>
+          <span style="color:var(--text-sub);">Cutoff Target: <b style="color:var(--success);">~28.5</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST-EXAM RESULTS & RANK PREDICTOR SCREEN -->
+    <div id="gate-results-screen" style="display:none; flex:1; padding:28px; overflow-y:auto; background:var(--depth-1);">
+      <!-- Dynamic Results injected here -->
+    </div>
+
+    <!-- POPUP VIRTUAL SCIENTIFIC CALCULATOR (Movable / Floating) -->
+    <div id="gate-calc-dialog" style="display:none; position:absolute; top:54px; right:310px; width:340px; background:var(--depth-3); border:1px solid var(--accent); border-radius:var(--radius-md); box-shadow:0 16px 40px rgba(0,0,0,0.85); z-index:10001; overflow:hidden;">
+      <div style="background:var(--depth-4); padding:8px 12px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:12px; font-weight:800; color:var(--accent);">🧮 GATE Virtual Scientific Calculator</span>
+        <button type="button" onclick="toggleVirtualCalc()" style="background:none; border:none; color:var(--text-muted); font-size:16px; cursor:pointer;">&times;</button>
+      </div>
+      <div style="padding:12px;">
+        <input type="text" id="vcalc-display" readonly style="width:100%; height:42px; background:#050814; border:1px solid var(--border-subtle); border-radius:4px; color:#38BDF8; font-family:var(--font-mono); font-size:18px; text-align:right; padding:6px 12px; margin-bottom:10px;" value="0" />
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:4px;">
+          <button type="button" onclick="vcalcInput('(')" class="action-btn" style="padding:7px 0; font-size:11px;">(</button>
+          <button type="button" onclick="vcalcInput(')')" class="action-btn" style="padding:7px 0; font-size:11px;">)</button>
+          <button type="button" onclick="vcalcInput('pi')" class="action-btn" style="padding:7px 0; font-size:11px;">π</button>
+          <button type="button" onclick="vcalcClear()" class="action-btn" style="padding:7px 0; font-size:11px; color:var(--danger);">C</button>
+          <button type="button" onclick="vcalcBackspace()" class="action-btn" style="padding:7px 0; font-size:11px;">⌫</button>
+
+          <button type="button" onclick="vcalcSci('sin')" class="action-btn" style="padding:7px 0; font-size:11px;">sin</button>
+          <button type="button" onclick="vcalcSci('cos')" class="action-btn" style="padding:7px 0; font-size:11px;">cos</button>
+          <button type="button" onclick="vcalcSci('tan')" class="action-btn" style="padding:7px 0; font-size:11px;">tan</button>
+          <button type="button" onclick="vcalcSci('log')" class="action-btn" style="padding:7px 0; font-size:11px;">log</button>
+          <button type="button" onclick="vcalcSci('ln')" class="action-btn" style="padding:7px 0; font-size:11px;">ln</button>
+
+          <button type="button" onclick="vcalcSci('sqrt')" class="action-btn" style="padding:7px 0; font-size:11px;">√</button>
+          <button type="button" onclick="vcalcSci('sq')" class="action-btn" style="padding:7px 0; font-size:11px;">x²</button>
+          <button type="button" onclick="vcalcInput('^')" class="action-btn" style="padding:7px 0; font-size:11px;">x^y</button>
+          <button type="button" onclick="vcalcSci('inv')" class="action-btn" style="padding:7px 0; font-size:11px;">1/x</button>
+          <button type="button" onclick="vcalcInput('/')" class="action-btn" style="padding:7px 0; font-size:11px; color:var(--accent);">÷</button>
+
+          <button type="button" onclick="vcalcInput('7')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">7</button>
+          <button type="button" onclick="vcalcInput('8')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">8</button>
+          <button type="button" onclick="vcalcInput('9')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">9</button>
+          <button type="button" onclick="vcalcInput('*')" class="action-btn" style="padding:7px 0; font-size:11px; color:var(--accent);">×</button>
+          <button type="button" onclick="vcalcInput('%')" class="action-btn" style="padding:7px 0; font-size:11px;">%</button>
+
+          <button type="button" onclick="vcalcInput('4')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">4</button>
+          <button type="button" onclick="vcalcInput('5')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">5</button>
+          <button type="button" onclick="vcalcInput('6')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">6</button>
+          <button type="button" onclick="vcalcInput('-')" class="action-btn" style="padding:7px 0; font-size:12px; color:var(--accent);">-</button>
+          <button type="button" onclick="vcalcSci('exp')" class="action-btn" style="padding:7px 0; font-size:11px;">e</button>
+
+          <button type="button" onclick="vcalcInput('1')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">1</button>
+          <button type="button" onclick="vcalcInput('2')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">2</button>
+          <button type="button" onclick="vcalcInput('3')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">3</button>
+          <button type="button" onclick="vcalcInput('+')" class="action-btn" style="padding:7px 0; font-size:12px; color:var(--accent);">+</button>
+          <button type="button" onclick="vcalcEvaluate()" class="submit-btn" style="padding:7px 0; font-size:13px; font-weight:800; grid-row:span 2; background:var(--accent); color:#050814;">=</button>
+
+          <button type="button" onclick="vcalcInput('0')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700; grid-column:span 2;">0</button>
+          <button type="button" onclick="vcalcInput('.')" class="action-btn" style="padding:7px 0; font-size:12px; font-weight:700;">.</button>
+          <button type="button" onclick="vcalcNegate()" class="action-btn" style="padding:7px 0; font-size:11px;">±</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 

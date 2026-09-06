@@ -8020,7 +8020,76 @@ function renderGATEPYQPracticeArena(container) {
     { subject: 'Computer Organization & Architecture', questions: 105, completed: 50, avgScore: '64%' }
   ];
 
+  const allSubjects = (window.GATEQuestionBank && typeof window.GATEQuestionBank.getSubjects === 'function')
+    ? window.GATEQuestionBank.getSubjects()
+    : ['Computer Networks', 'Database Management Systems', 'Operating Systems', 'Algorithms', 'Theory of Computation', 'Digital Logic', 'Computer Organization'];
+
   container.innerHTML = `
+    <!-- Top Action Card: 65-Question Mock Exam Launchpad -->
+    <div class="nd-card" style="padding:18px 20px; margin-bottom:18px; border:1px solid rgba(56,189,248,0.4); background:radial-gradient(circle at top right, rgba(56,189,248,0.12), transparent 65%), var(--depth-2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <span style="font-size:32px;">⚡</span>
+        <div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="badge-pill" style="font-size:10px; background:rgba(56,189,248,0.15); color:var(--accent);">GATE CSE 2027 Simulator</span>
+            <strong style="font-size:15px; color:var(--text);">Full 65-Question 3-Hour GATE Mock Exam Engine</strong>
+          </div>
+          <p style="font-size:12px; color:var(--text-sub); margin:4px 0 0;">Official +1 / -0.33 marking, NAT numeric input, built-in Virtual Scientific Calculator, and real-time All India Rank (AIR) prediction.</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="cta-pill-primary" onclick="openGATEPredictorStudio()" style="font-size:12px; padding:10px 22px; font-weight:800; background:linear-gradient(135deg, #10B981, #059669); border:none; box-shadow:0 4px 14px rgba(16,185,129,0.3);">
+          <span>🚀</span> <span>Launch 65Q Mock Exam</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Topic-Wise PYQ Drill & Filter Arena (Option 3) -->
+    <div class="nd-card" style="padding:16px 20px; margin-bottom:18px; border:1px solid var(--border-subtle); background:var(--depth-2);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <div>
+          <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--primary-light);">Topic-Wise PYQ Filter Studio</div>
+          <strong style="font-size:14px; color:var(--text);">GATE CSE Previous Year Questions with Explanations</strong>
+        </div>
+        <div style="font-size:11px; color:var(--text-muted);" id="pyq-count-badge">Displaying curated questions</div>
+      </div>
+
+      <!-- Filters Bar -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:14px;">
+        <div>
+          <label for="pyq-filter-subject" style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:4px;">Subject</label>
+          <select id="pyq-filter-subject" onchange="updatePYQTopicDropdown()" class="form-input" style="width:100%; padding:8px 10px; font-size:12px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:4px; color:var(--text);">
+            <option value="">All Subjects (Comprehensive)</option>
+            ${allSubjects.map(s => `<option value="${s}">${s}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label for="pyq-filter-topic" style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:4px;">Topic</label>
+          <select id="pyq-filter-topic" class="form-input" style="width:100%; padding:8px 10px; font-size:12px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:4px; color:var(--text);">
+            <option value="">All Topics (Subnetting, Deadlocks, Normalization...)</option>
+          </select>
+        </div>
+        <div>
+          <label for="pyq-filter-type" style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:4px;">Question Type</label>
+          <select id="pyq-filter-type" class="form-input" style="width:100%; padding:8px 10px; font-size:12px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:4px; color:var(--text);">
+            <option value="">All Types (MCQ + NAT)</option>
+            <option value="MCQ">Multiple Choice (MCQ)</option>
+            <option value="NAT">Numerical Answer Type (NAT)</option>
+          </select>
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button type="button" onclick="filterGATEPYQCards()" class="submit-btn" style="width:100%; padding:8px 14px; font-size:12px; font-weight:700;">
+            🔍 Filter PYQs
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtered PYQ Cards Display Grid -->
+      <div id="pyq-interactive-cards-container" style="display:flex; flex-direction:column; gap:12px;">
+        <!-- Injected dynamically by filterGATEPYQCards() -->
+      </div>
+    </div>
+
     <!-- Google Drive Question Paper Vault Banner -->
     <div class="nd-card" style="padding:18px 20px; margin-bottom:18px; border:1px solid rgba(16,185,129,0.35); background:radial-gradient(circle at top right, rgba(16,185,129,0.08), transparent 60%), var(--depth-2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -8060,19 +8129,27 @@ function renderGATEPYQPracticeArena(container) {
       </div>
     </div>
 
+    <!-- Subject Mastery Cards Grid -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
       ${gateSubjects.map(g => `
         <div class="track-card" style="padding:16px;">
           <div style="font-weight:800;color:var(--text);font-size:14px;margin-bottom:6px;">${g.subject}</div>
           <div style="font-size:12px;color:var(--text-sub);margin-bottom:10px;">${g.completed} / ${g.questions} Historical PYQs Solved (${g.avgScore} Avg)</div>
           <div style="display:flex; gap:8px;">
-            <button class="action-btn" onclick="openGATEPredictorStudio()" style="font-size:11px;flex:1;text-align:center;">Practice Drills →</button>
+            <button class="action-btn" onclick="filterGATEPYQBySubject('${g.subject}')" style="font-size:11px;flex:1;text-align:center;">Practice Drills →</button>
             <a href="https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud" target="_blank" rel="noopener noreferrer" class="action-btn" style="font-size:11px;padding:4px 10px;text-decoration:none;" title="Download Question Paper PDF">📂 PDF ↗</a>
           </div>
         </div>
       `).join('')}
     </div>
   `;
+
+  // Initial render of filtered cards
+  setTimeout(() => {
+    if (typeof window.filterGATEPYQCards === 'function') {
+      window.filterGATEPYQCards();
+    }
+  }, 50);
 }
 
 function renderAptitudePracticeArena(container) {
@@ -11034,7 +11111,7 @@ window.renderHomeView = function () {
     if (weaks.length === 0) {
       weakList.innerHTML = `
         <div style="padding:12px;color:var(--text-muted);font-size:12px;text-align:center;width:100%;">
-          No weak areas identified yet. Practice questions to record topic diagnostics.
+          No data yet. Complete 10 questions to identify weak spots.
         </div>`;
     } else {
       weakList.innerHTML = weaks.map(w => `
@@ -11049,6 +11126,33 @@ window.renderHomeView = function () {
   // 6. Career Sync Matrix (Signature Experience 2.5)
   if (typeof window.renderCareerSyncMatrix === 'function') {
     window.renderCareerSyncMatrix();
+  }
+
+  // 7. Sunday Mistake Bank Repetition Ritual Reminder (Option 3)
+  const isSunday = new Date().getDay() === 0;
+  const mistakeCount = (typeof MistakeBookModule !== 'undefined') ? MistakeBookModule.getMistakes().length : 0;
+  const sundayBanner = document.getElementById('sunday-mistake-banner');
+  if (sundayBanner) {
+    if (isSunday || mistakeCount > 0) {
+      sundayBanner.style.display = 'block';
+      sundayBanner.innerHTML = `
+        <div style="background:linear-gradient(135deg, rgba(239,68,68,0.1), rgba(147,51,234,0.12)); border:1px solid rgba(239,68,68,0.3); border-left:4px solid var(--danger); border-radius:var(--radius-sm); padding:14px 18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:26px;">📅</span>
+            <div>
+              <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--danger);">${isSunday ? 'Sunday Mistake Bank Repetition Ritual' : 'Active Mistake Repetition Protocol'}</div>
+              <strong style="font-size:13px; color:var(--text);">${mistakeCount} Flagged Misconception${mistakeCount === 1 ? '' : 's'} Pending Spaced Repetition</strong>
+              <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Reinforce conceptual blindspots from previous mock exams and PYQs to eliminate recurrence before the new week.</div>
+            </div>
+          </div>
+          <button class="cta-pill-primary" onclick="navigateToView('progress','mistakes')" style="font-size:12px; padding:8px 16px; background:linear-gradient(135deg, #ef4444, #b91c1c); border-color:#ef4444;">
+            <span>🔄</span> <span>Reattempt Mistakes (${mistakeCount})</span>
+          </button>
+        </div>
+      `;
+    } else {
+      sundayBanner.style.display = 'none';
+    }
   }
 };
 
@@ -11791,6 +11895,686 @@ window.renderCareerSyncMatrix = function () {
       </div>
     </div>
   `).join('');
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// 5. GATE CSE PYQ FILTER ARENA & FULL 65-QUESTION MOCK EXAM ENGINE (Option 3)
+// ══════════════════════════════════════════════════════════════════════
+
+// Updates Topic dropdown based on selected Subject
+window.updatePYQTopicDropdown = function () {
+  const subjectSelect = document.getElementById('pyq-filter-subject');
+  const topicSelect = document.getElementById('pyq-filter-topic');
+  if (!topicSelect) return;
+  const subj = subjectSelect ? subjectSelect.value : '';
+  const topics = (window.GATEQuestionBank && typeof window.GATEQuestionBank.getTopicsForSubject === 'function')
+    ? window.GATEQuestionBank.getTopicsForSubject(subj)
+    : [];
+
+  topicSelect.innerHTML = `<option value="">All Topics (${topics.length > 0 ? topics.slice(0, 3).join(', ') + '...' : 'General'})</option>` +
+    topics.map(t => `<option value="${t}">${t}</option>`).join('');
+};
+
+window.filterGATEPYQBySubject = function (subject) {
+  const subjectSelect = document.getElementById('pyq-filter-subject');
+  if (subjectSelect) {
+    subjectSelect.value = subject;
+    window.updatePYQTopicDropdown();
+  }
+  window.filterGATEPYQCards();
+  const arena = document.getElementById('pyq-interactive-cards-container');
+  if (arena) arena.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.filterGATEPYQCards = function () {
+  const subject = document.getElementById('pyq-filter-subject')?.value || '';
+  const topic = document.getElementById('pyq-filter-topic')?.value || '';
+  const type = document.getElementById('pyq-filter-type')?.value || '';
+  const container = document.getElementById('pyq-interactive-cards-container');
+  const countBadge = document.getElementById('pyq-count-badge');
+  if (!container || !window.GATEQuestionBank) return;
+
+  const questions = window.GATEQuestionBank.filterQuestions({ subject, topic, type });
+  if (countBadge) {
+    countBadge.textContent = `Showing ${questions.length} Question${questions.length === 1 ? '' : 's'}`;
+  }
+
+  if (questions.length === 0) {
+    container.innerHTML = `
+      <div style="padding:24px; text-align:center; color:var(--text-muted); background:var(--depth-3); border-radius:6px; font-size:13px;">
+        No questions matched the selected criteria. Try selecting "All Subjects" or resetting the filter.
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = questions.map((q, idx) => `
+    <div class="track-card" id="card-${q.id}" style="padding:16px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="badge-pill" style="font-size:10px; font-weight:800; background:rgba(56,189,248,0.15); color:var(--accent);">GATE ${q.year || 2024}</span>
+          <span class="badge-pill" style="font-size:10px; background:rgba(16,185,129,0.15); color:var(--success);">+${q.marks} Mark${q.marks > 1 ? 's' : ''} ${q.negativeMarks ? `(-${q.negativeMarks})` : '(No Negative)'}</span>
+          <span class="badge-pill" style="font-size:10px; background:rgba(147,51,234,0.15); color:#c084fc;">${q.type.includes('NAT') ? 'NAT' : 'MCQ'}</span>
+        </div>
+        <span style="font-size:11px; color:var(--text-muted); font-weight:600;">${q.subject} &bull; ${q.topic}</span>
+      </div>
+
+      <div style="font-size:13px; font-weight:600; color:var(--text); line-height:1.55; margin-bottom:12px;">
+        ${q.question}
+      </div>
+
+      ${q.type.includes('NAT') ? `
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+          <input type="number" step="any" id="input-${q.id}" placeholder="Enter numeric value..." class="form-input" style="width:200px; padding:8px 12px; font-size:13px; background:var(--depth-4); border:1px solid var(--border-subtle); border-radius:4px; color:var(--text);" />
+          <button type="button" onclick="checkPracticePYQAnswer('${q.id}')" class="submit-btn" style="padding:8px 16px; font-size:12px;">Check Answer</button>
+        </div>
+      ` : `
+        <div style="display:grid; grid-template-columns:1fr; gap:6px; margin-bottom:12px;">
+          ${(q.options || []).map((opt, optIdx) => `
+            <button type="button" id="btn-${q.id}-${optIdx}" onclick="checkPracticePYQAnswer('${q.id}', ${optIdx})" class="quiz-option-btn" style="text-align:left; padding:8px 14px; font-size:12px; background:var(--surface); border:1px solid var(--border-subtle); border-radius:6px; color:var(--text); cursor:pointer; transition:all 0.15s ease;">
+              <strong style="color:var(--accent); margin-right:6px;">${String.fromCharCode(65 + optIdx)}.</strong> ${opt}
+            </button>
+          `).join('')}
+        </div>
+      `}
+
+      <!-- Feedback / Explanation Block (Initially hidden) -->
+      <div id="fb-${q.id}" style="display:none; padding:12px 14px; border-radius:6px; font-size:12px; line-height:1.5; margin-top:8px;"></div>
+    </div>
+  `).join('');
+};
+
+window.checkPracticePYQAnswer = function (qId, chosenIdx) {
+  if (!window.GATEQuestionBank) return;
+  const q = window.GATEQuestionBank.getAllQuestions().find(item => item.id === qId);
+  if (!q) return;
+
+  const fb = document.getElementById(`fb-${qId}`);
+  if (!fb) return;
+
+  let isCorrect = false;
+
+  if (q.type.includes('NAT')) {
+    const input = document.getElementById(`input-${qId}`);
+    const val = input ? parseFloat(input.value) : NaN;
+    if (isNaN(val)) {
+      alert('Please enter a valid numeric value first.');
+      return;
+    }
+    if (q.range) {
+      isCorrect = (val >= q.range[0] && val <= q.range[1]);
+    } else {
+      isCorrect = (Math.abs(val - q.correctAnswer) < 0.01);
+    }
+  } else {
+    isCorrect = (chosenIdx === q.correctAnswer);
+    // Highlight options
+    (q.options || []).forEach((opt, idx) => {
+      const btn = document.getElementById(`btn-${qId}-${idx}`);
+      if (btn) {
+        btn.disabled = true;
+        if (idx === q.correctAnswer) {
+          btn.style.background = 'rgba(16,185,129,0.15)';
+          btn.style.borderColor = 'var(--success)';
+          btn.style.color = 'var(--success)';
+        } else if (idx === chosenIdx) {
+          btn.style.background = 'rgba(239,68,68,0.15)';
+          btn.style.borderColor = 'var(--danger)';
+          btn.style.color = 'var(--danger)';
+        }
+      }
+    });
+  }
+
+  fb.style.display = 'block';
+  if (isCorrect) {
+    fb.style.background = 'rgba(16,185,129,0.08)';
+    fb.style.border = '1px solid rgba(16,185,129,0.3)';
+    fb.style.color = 'var(--text)';
+    fb.innerHTML = `
+      <div style="font-weight:800; color:var(--success); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+        <span>✓ Correct! (+${q.marks} Mark${q.marks > 1 ? 's' : ''})</span>
+      </div>
+      <div style="color:var(--text-sub);">${q.explanation || ''}</div>
+    `;
+  } else {
+    fb.style.background = 'rgba(239,68,68,0.08)';
+    fb.style.border = '1px solid rgba(239,68,68,0.3)';
+    fb.style.color = 'var(--text)';
+    const encodedTopic = encodeURIComponent(q.topic);
+    const encodedNotes = encodeURIComponent(q.explanation || '');
+    fb.innerHTML = `
+      <div style="font-weight:800; color:var(--danger); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+        <span>✗ Incorrect (${q.negativeMarks ? `-${q.negativeMarks}` : '0'} marks)</span>
+        <button type="button" onclick="addPYQToMistakeBook('${q.id}', '${encodedTopic}', '${encodedNotes}')" class="action-btn" style="font-size:11px; padding:4px 10px; color:var(--danger); border-color:rgba(239,68,68,0.4); background:rgba(239,68,68,0.1);">
+          📌 Add to Mistake Book
+        </button>
+      </div>
+      <div style="color:var(--text-sub); margin-bottom:6px;"><strong>Correct Answer:</strong> ${q.type.includes('NAT') ? (q.range ? `${q.range[0]} to ${q.range[1]}` : q.correctAnswer) : `${String.fromCharCode(65 + q.correctAnswer)}. ${q.options[q.correctAnswer]}`}</div>
+      <div style="color:var(--text-sub); font-size:11px;">${q.explanation || ''}</div>
+    `;
+  }
+};
+
+window.addPYQToMistakeBook = function (qId, encodedTopic, encodedNotes) {
+  const topic = decodeURIComponent(encodedTopic);
+  const notes = decodeURIComponent(encodedNotes);
+  if (typeof MistakeBookModule !== 'undefined' && typeof MistakeBookModule.addMistake === 'function') {
+    MistakeBookModule.addMistake({
+      title: `GATE CSE PYQ: ${topic}`,
+      category: 'Misconception',
+      subject: 'GATE CSE',
+      topic: topic,
+      notes: notes
+    });
+    if (typeof showToast === 'function') showToast(`Flagged for Sunday Mistake Bank Review!`, 'warning');
+  } else {
+    alert('Mistake added to review queue.');
+  }
+};
+
+// ── FULL 65-QUESTION GATE MOCK EXAM ENGINE STATE ──
+window.gateMockExam = {
+  questions: [],
+  answers: [],
+  status: [],
+  currentIndex: 0,
+  timerSeconds: 180 * 60,
+  timerInterval: null,
+  active: false
+};
+
+window.openGATEPredictorStudio = function () {
+  if (!window.GATEQuestionBank) {
+    alert('GATE Question Bank is initializing. Please try again in a moment.');
+    return;
+  }
+
+  const questions = window.GATEQuestionBank.generateMockExam(65);
+  window.gateMockExam.questions = questions;
+  window.gateMockExam.answers = new Array(65).fill(null);
+  window.gateMockExam.status = new Array(65).fill('not-visited');
+  window.gateMockExam.currentIndex = 0;
+  window.gateMockExam.timerSeconds = 180 * 60; // 3 Hours
+  window.gateMockExam.active = true;
+
+  // Show live exam screen, hide results screen
+  const examScreen = document.getElementById('gate-exam-screen');
+  const resultsScreen = document.getElementById('gate-results-screen');
+  if (examScreen) examScreen.style.display = 'flex';
+  if (resultsScreen) resultsScreen.style.display = 'none';
+
+  // Render question 0 & palette
+  window.renderMockQuestion(0);
+  window.updateMockPalette();
+
+  // Start timer
+  clearInterval(window.gateMockExam.timerInterval);
+  window.gateMockExam.timerInterval = setInterval(() => {
+    window.gateMockExam.timerSeconds--;
+    const s = window.gateMockExam.timerSeconds;
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    const timerEl = document.getElementById('gate-mock-timer');
+    if (timerEl) {
+      timerEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+      if (s < 900) {
+        timerEl.style.color = '#EF4444';
+      }
+    }
+    if (s <= 0) {
+      clearInterval(window.gateMockExam.timerInterval);
+      alert('Time has expired! Submitting your exam automatically.');
+      window.submitGateMockExam(true);
+    }
+  }, 1000);
+
+  // Open modal
+  const modal = document.getElementById('gate-mock-modal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.renderMockQuestion = function (idx) {
+  if (idx < 0 || idx >= window.gateMockExam.questions.length) return;
+  window.gateMockExam.currentIndex = idx;
+  const q = window.gateMockExam.questions[idx];
+
+  // Update status if not yet answered
+  if (window.gateMockExam.status[idx] === 'not-visited') {
+    window.gateMockExam.status[idx] = 'not-answered';
+  }
+
+  // Header badges
+  const qNum = document.getElementById('mock-q-number');
+  const typeBadge = document.getElementById('mock-q-type-badge');
+  const marksBadge = document.getElementById('mock-q-marks-badge');
+  const subjBadge = document.getElementById('mock-q-subject-badge');
+  const topicBadge = document.getElementById('mock-q-topic-badge');
+
+  if (qNum) qNum.textContent = `Question ${idx + 1} of 65`;
+  if (typeBadge) typeBadge.textContent = q.type.includes('NAT') ? 'NAT (Numeric)' : 'MCQ';
+  if (marksBadge) marksBadge.textContent = `+${q.marks} / -${q.negativeMarks}`;
+  if (subjBadge) subjBadge.textContent = q.subject;
+  if (topicBadge) topicBadge.textContent = q.topic;
+
+  // Viewport
+  const viewport = document.getElementById('mock-question-viewport');
+  if (viewport) {
+    const existingAns = window.gateMockExam.answers[idx];
+
+    let html = `
+      <div style="font-size:15px; font-weight:600; color:var(--text); line-height:1.6; margin-bottom:20px;">
+        ${q.question}
+      </div>
+    `;
+
+    if (q.type.includes('NAT')) {
+      html += `
+        <div style="background:var(--depth-2); padding:20px; border-radius:8px; border:1px solid var(--border-subtle); max-width:420px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:8px;">
+            Numerical Answer Input
+          </label>
+          <div style="display:flex; gap:10px;">
+            <input type="number" step="any" id="mock-nat-input" oninput="window.setMockNatAnswer(this.value)" value="${existingAns !== null && existingAns !== undefined ? existingAns : ''}" placeholder="Enter real/integer value..." style="flex:1; padding:10px 14px; background:#050814; border:1px solid var(--accent); border-radius:4px; font-size:16px; font-family:var(--font-mono); color:#38BDF8;" />
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+            💡 Tip: Use the Virtual Calculator above if calculation is needed.
+          </div>
+        </div>
+      `;
+    } else {
+      html += `
+        <div style="display:flex; flex-direction:column; gap:10px; max-width:700px;">
+          ${(q.options || []).map((opt, optIdx) => `
+            <label onclick="window.selectMockAnswer(${optIdx})" style="display:flex; align-items:center; gap:12px; padding:12px 16px; background:${existingAns === optIdx ? 'rgba(56,189,248,0.12)' : 'var(--depth-2)'}; border:1px solid ${existingAns === optIdx ? 'var(--accent)' : 'var(--border-subtle)'}; border-radius:8px; cursor:pointer; transition:all 0.15s ease;">
+              <input type="radio" name="mock-option-group" value="${optIdx}" ${existingAns === optIdx ? 'checked' : ''} style="accent-color:var(--accent); width:18px; height:18px;" />
+              <span style="font-size:14px; color:var(--text);"><strong style="color:var(--accent);">${String.fromCharCode(65 + optIdx)}.</strong> ${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    viewport.innerHTML = html;
+  }
+
+  // Prev / Next button state
+  const prevBtn = document.getElementById('mock-prev-btn');
+  if (prevBtn) prevBtn.disabled = (idx === 0);
+
+  window.updateMockPalette();
+};
+
+window.selectMockAnswer = function (optIdx) {
+  const idx = window.gateMockExam.currentIndex;
+  window.gateMockExam.answers[idx] = optIdx;
+  if (window.gateMockExam.status[idx] === 'review') {
+    window.gateMockExam.status[idx] = 'review-answered';
+  } else {
+    window.gateMockExam.status[idx] = 'answered';
+  }
+  window.updateMockPalette();
+};
+
+window.setMockNatAnswer = function (val) {
+  const idx = window.gateMockExam.currentIndex;
+  if (val === '' || isNaN(parseFloat(val))) {
+    window.gateMockExam.answers[idx] = null;
+    window.gateMockExam.status[idx] = 'not-answered';
+  } else {
+    window.gateMockExam.answers[idx] = parseFloat(val);
+    if (window.gateMockExam.status[idx] === 'review') {
+      window.gateMockExam.status[idx] = 'review-answered';
+    } else {
+      window.gateMockExam.status[idx] = 'answered';
+    }
+  }
+  window.updateMockPalette();
+};
+
+window.saveAndNextMockQuestion = function () {
+  const idx = window.gateMockExam.currentIndex;
+  if (window.gateMockExam.answers[idx] !== null) {
+    if (window.gateMockExam.status[idx] === 'review') {
+      window.gateMockExam.status[idx] = 'review-answered';
+    } else {
+      window.gateMockExam.status[idx] = 'answered';
+    }
+  } else {
+    if (window.gateMockExam.status[idx] !== 'review') {
+      window.gateMockExam.status[idx] = 'not-answered';
+    }
+  }
+
+  if (idx < 64) {
+    window.renderMockQuestion(idx + 1);
+  } else {
+    window.updateMockPalette();
+  }
+};
+
+window.markMockForReview = function () {
+  const idx = window.gateMockExam.currentIndex;
+  if (window.gateMockExam.answers[idx] !== null) {
+    window.gateMockExam.status[idx] = 'review-answered';
+  } else {
+    window.gateMockExam.status[idx] = 'review';
+  }
+
+  if (idx < 64) {
+    window.renderMockQuestion(idx + 1);
+  } else {
+    window.updateMockPalette();
+  }
+};
+
+window.clearMockResponse = function () {
+  const idx = window.gateMockExam.currentIndex;
+  window.gateMockExam.answers[idx] = null;
+  window.gateMockExam.status[idx] = 'not-answered';
+  window.renderMockQuestion(idx);
+};
+
+window.prevMockQuestion = function () {
+  const idx = window.gateMockExam.currentIndex;
+  if (idx > 0) {
+    window.renderMockQuestion(idx - 1);
+  }
+};
+
+window.jumpToMockQuestion = function (idx) {
+  window.renderMockQuestion(idx);
+};
+
+window.updateMockPalette = function () {
+  const palette = document.getElementById('mock-palette-grid');
+  if (!palette) return;
+
+  let answered = 0;
+  let notAnswered = 0;
+  let notVisited = 0;
+  let review = 0;
+
+  window.gateMockExam.status.forEach((st) => {
+    if (st === 'answered' || st === 'review-answered') answered++;
+    if (st === 'not-answered') notAnswered++;
+    if (st === 'not-visited') notVisited++;
+    if (st === 'review' || st === 'review-answered') review++;
+  });
+
+  const statAns = document.getElementById('mock-stat-answered');
+  const statNotAns = document.getElementById('mock-stat-not-answered');
+  const statNotVis = document.getElementById('mock-stat-not-visited');
+  const statRev = document.getElementById('mock-stat-review');
+
+  if (statAns) statAns.textContent = answered;
+  if (statNotAns) statNotAns.textContent = notAnswered;
+  if (statNotVis) statNotVis.textContent = notVisited;
+  if (statRev) statRev.textContent = review;
+
+  const currentIdx = window.gateMockExam.currentIndex;
+
+  palette.innerHTML = window.gateMockExam.questions.map((q, idx) => {
+    const st = window.gateMockExam.status[idx];
+    let bg = '#374151'; // not-visited
+    let border = 'transparent';
+    let text = '#fff';
+
+    if (st === 'answered') {
+      bg = '#10B981';
+    } else if (st === 'not-answered') {
+      bg = '#EF4444';
+    } else if (st === 'review') {
+      bg = '#9333EA';
+    } else if (st === 'review-answered') {
+      bg = '#9333EA';
+      border = '#10B981';
+    }
+
+    const isCurrent = (idx === currentIdx);
+    return `
+      <button type="button" onclick="window.jumpToMockQuestion(${idx})" style="height:34px; border-radius:4px; border:${isCurrent ? '2px solid #38BDF8' : border === '#10B981' ? '2px solid #10B981' : '1px solid var(--border-subtle)'}; background:${bg}; color:${text}; font-size:11px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; position:relative; box-shadow:${isCurrent ? '0 0 10px rgba(56,189,248,0.5)' : 'none'};">
+        ${idx + 1}
+        ${border === '#10B981' ? '<span style="position:absolute; top:2px; right:2px; width:5px; height:5px; border-radius:50%; background:#10B981;"></span>' : ''}
+      </button>
+    `;
+  }).join('');
+};
+
+window.submitGateMockExam = function (force = false) {
+  if (!force) {
+    const answered = window.gateMockExam.answers.filter(a => a !== null && a !== undefined && a !== '').length;
+    const confirmMsg = `Are you sure you want to submit your GATE Mock Exam?\n\n• Questions Answered: ${answered} / 65\n• Questions Unanswered: ${65 - answered}\n• Time Remaining: ${document.getElementById('gate-mock-timer')?.textContent || '00:00:00'}\n\nClick OK to evaluate your score and predict your All India Rank.`;
+    if (!confirm(confirmMsg)) return;
+  }
+
+  // Stop timer
+  clearInterval(window.gateMockExam.timerInterval);
+  window.gateMockExam.active = false;
+
+  let totalScore = 0;
+  let correctCount = 0;
+  let incorrectCount = 0;
+  let unattemptedCount = 0;
+  const mistakeList = [];
+
+  window.gateMockExam.questions.forEach((q, idx) => {
+    const ans = window.gateMockExam.answers[idx];
+    if (ans === null || ans === undefined || ans === '') {
+      unattemptedCount++;
+      return;
+    }
+
+    let isCorrect = false;
+    if (q.type.includes('NAT')) {
+      const val = parseFloat(ans);
+      if (q.range) {
+        isCorrect = (val >= q.range[0] && val <= q.range[1]);
+      } else {
+        isCorrect = (Math.abs(val - q.correctAnswer) < 0.01);
+      }
+    } else {
+      isCorrect = (ans === q.correctAnswer);
+    }
+
+    if (isCorrect) {
+      correctCount++;
+      totalScore += q.marks;
+    } else {
+      incorrectCount++;
+      totalScore -= (q.negativeMarks || 0);
+      mistakeList.push({
+        q,
+        chosen: ans
+      });
+    }
+  });
+
+  const finalScore = Math.max(0, Math.min(100, Math.round(totalScore * 100) / 100));
+  const rankData = window.GATEQuestionBank.calculateRankAndPercentile(finalScore);
+
+  // Switch to Results Screen
+  const examScreen = document.getElementById('gate-exam-screen');
+  const resultsScreen = document.getElementById('gate-results-screen');
+  if (examScreen) examScreen.style.display = 'none';
+  if (resultsScreen) {
+    resultsScreen.style.display = 'block';
+    resultsScreen.innerHTML = `
+      <div style="max-width:860px; margin:0 auto;">
+        <!-- Header Banner -->
+        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(56,189,248,0.15)); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:24px; margin-bottom:20px; text-align:center;">
+          <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--success); margin-bottom:6px;">
+            GATE CSE 2027 Official Simulation Mock Evaluation
+          </div>
+          <h2 style="font-size:28px; font-weight:900; margin:0 0 10px; color:var(--text);">
+            Your Score: <span style="color:var(--success);">${finalScore}</span> <span style="font-size:16px; color:var(--text-muted);">/ 100</span>
+          </h2>
+          <div style="font-size:14px; color:var(--text-sub);">
+            Predicted Rank: <strong style="color:var(--accent);">AIR ${rankData.predictedAIR}</strong> &bull; Percentile: <strong style="color:var(--accent);">${rankData.percentile}</strong>
+          </div>
+          <div style="margin-top:8px; display:inline-block; padding:4px 12px; background:rgba(16,185,129,0.2); border-radius:20px; font-size:12px; font-weight:700; color:var(--success);">
+            Tier: ${rankData.category}
+          </div>
+        </div>
+
+        <!-- 4 Stat Summary Cards -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
+          <div style="background:var(--depth-2); padding:14px; border-radius:8px; border:1px solid var(--border-subtle); text-align:center;">
+            <div style="font-size:24px; font-weight:900; color:var(--text);">${correctCount + incorrectCount}</div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-top:4px;">Attempted</div>
+          </div>
+          <div style="background:var(--depth-2); padding:14px; border-radius:8px; border:1px solid var(--border-subtle); text-align:center;">
+            <div style="font-size:24px; font-weight:900; color:var(--success);">${correctCount}</div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-top:4px;">Correct (+Marks)</div>
+          </div>
+          <div style="background:var(--depth-2); padding:14px; border-radius:8px; border:1px solid var(--border-subtle); text-align:center;">
+            <div style="font-size:24px; font-weight:900; color:var(--danger);">${incorrectCount}</div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-top:4px;">Incorrect (-Penalty)</div>
+          </div>
+          <div style="background:var(--depth-2); padding:14px; border-radius:8px; border:1px solid var(--border-subtle); text-align:center;">
+            <div style="font-size:24px; font-weight:900; color:var(--text-muted);">${unattemptedCount}</div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700; margin-top:4px;">Unattempted</div>
+          </div>
+        </div>
+
+        <!-- Admissions & Recommendations -->
+        <div style="background:var(--depth-2); border:1px solid var(--border-subtle); border-radius:8px; padding:18px; margin-bottom:20px;">
+          <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--accent); margin-bottom:6px;">Admissions &amp; Roadmap Outlook</div>
+          <div style="font-size:13px; color:var(--text); line-height:1.5;">${rankData.recommendations}</div>
+        </div>
+
+        <!-- Mistake Bank Sync Action -->
+        ${mistakeList.length > 0 ? `
+          <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); border-radius:8px; padding:16px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <strong style="color:var(--danger); font-size:13px;">${mistakeList.length} Mistakes Identified for Spaced Repetition</strong>
+              <div style="font-size:11px; color:var(--text-sub); margin-top:2px;">Sync these missed concepts directly to your Mistake Book for Sunday review.</div>
+            </div>
+            <button type="button" onclick="window.syncAllMockMistakes()" class="submit-btn" style="background:#EF4444; border:none; padding:8px 18px; font-size:12px; font-weight:700;">
+              📥 Sync All to Mistake Book
+            </button>
+          </div>
+        ` : ''}
+
+        <!-- Actions -->
+        <div style="display:flex; justify-content:center; gap:12px; margin-top:20px;">
+          <button type="button" onclick="window.closeGateMockModal()" class="submit-btn" style="padding:10px 24px; font-size:13px; font-weight:800;">
+            Close &amp; Return to Dashboard
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Cache mistake list for syncing
+    window._cachedMockMistakes = mistakeList;
+  }
+};
+
+window.syncAllMockMistakes = function () {
+  const list = window._cachedMockMistakes || [];
+  if (list.length === 0) return;
+
+  if (typeof MistakeBookModule !== 'undefined' && typeof MistakeBookModule.addMistake === 'function') {
+    list.forEach(m => {
+      MistakeBookModule.addMistake({
+        title: `GATE Mock Miss: ${m.q.topic}`,
+        category: 'Concept gap',
+        subject: m.q.subject,
+        topic: m.q.topic,
+        notes: m.q.explanation || 'Reviewed during full GATE Mock simulation.'
+      });
+    });
+    alert(`Successfully transferred ${list.length} questions to your Mistake Book for Sunday review!`);
+  } else {
+    alert('Mistakes recorded.');
+  }
+};
+
+window.closeGateMockModal = function () {
+  if (window.gateMockExam.active) {
+    if (!confirm('Exam is in progress. Are you sure you want to exit? Your progress will be cleared.')) {
+      return;
+    }
+  }
+  clearInterval(window.gateMockExam.timerInterval);
+  window.gateMockExam.active = false;
+  const modal = document.getElementById('gate-mock-modal');
+  if (modal) modal.style.display = 'none';
+};
+
+// ── VIRTUAL SCIENTIFIC CALCULATOR ENGINE ──
+window.toggleVirtualCalc = function () {
+  const calc = document.getElementById('gate-calc-dialog');
+  if (!calc) return;
+  calc.style.display = (calc.style.display === 'none' || !calc.style.display) ? 'block' : 'none';
+};
+
+window.vcalcInput = function (ch) {
+  const d = document.getElementById('vcalc-display');
+  if (!d) return;
+  if (d.value === '0' && ch !== '.') d.value = '';
+  d.value += ch;
+};
+
+window.vcalcClear = function () {
+  const d = document.getElementById('vcalc-display');
+  if (d) d.value = '0';
+};
+
+window.vcalcBackspace = function () {
+  const d = document.getElementById('vcalc-display');
+  if (!d) return;
+  d.value = d.value.slice(0, -1);
+  if (d.value === '') d.value = '0';
+};
+
+window.vcalcNegate = function () {
+  const d = document.getElementById('vcalc-display');
+  if (!d) return;
+  try {
+    let val = parseFloat(d.value);
+    if (!isNaN(val)) d.value = String(-val);
+  } catch (e) {}
+};
+
+window.vcalcSci = function (fn) {
+  const d = document.getElementById('vcalc-display');
+  if (!d) return;
+  try {
+    let val = parseFloat(d.value);
+    if (isNaN(val)) return;
+    let res = 0;
+    switch (fn) {
+      case 'sin': res = Math.sin(val); break;
+      case 'cos': res = Math.cos(val); break;
+      case 'tan': res = Math.tan(val); break;
+      case 'log': res = Math.log10(val); break;
+      case 'ln': res = Math.log(val); break;
+      case 'sqrt': res = Math.sqrt(val); break;
+      case 'sq': res = val * val; break;
+      case 'inv': res = 1 / val; break;
+      case 'exp': res = Math.exp(val); break;
+    }
+    d.value = String(Math.round(res * 1000000) / 1000000);
+  } catch (e) {
+    d.value = 'Error';
+  }
+};
+
+window.vcalcEvaluate = function () {
+  const d = document.getElementById('vcalc-display');
+  if (!d) return;
+  try {
+    let expr = d.value.replace(/pi/g, Math.PI).replace(/\^/g, '**');
+    if (/^[0-9+\-*/(). e]+$/.test(expr)) {
+      const res = Function(`'use strict'; return (${expr})`)();
+      d.value = String(Math.round(res * 1000000) / 1000000);
+    } else {
+      d.value = 'Error';
+    }
+  } catch (e) {
+    d.value = 'Error';
+  }
 };
 
 

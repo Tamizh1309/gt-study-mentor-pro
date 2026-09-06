@@ -361,8 +361,107 @@ async function runSuite() {
   assert(appJs.includes('window.renderWizardStep'), 'app.js defines window.renderWizardStep');
   assert(appJs.includes('window.applyCustomizedDashboard'), 'app.js defines window.applyCustomizedDashboard');
 
+  // ── 6. Testing Real AI Mentorship in JARVIS (Option 2) ──
+  console.log('\n6. Testing Option 2: Structured AI Mentorship & Honest Weak Spot Detection...');
+  
+  // Concept queries return 3-part structured breakdown
+  const aiChatRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'Explain normalization in DBMS',
+    mode: 'study'
+  });
+  assert(aiChatRes.status === 200, 'POST /api/jarvis/chat for DBMS normalization returned 200');
+  const replyText = aiChatRes.body.reply || '';
+  assert(replyText.includes('Concept Notes'), 'AI Mentorship response includes 📝 Concept Notes');
+  assert(replyText.includes('Curated Video Lesson'), 'AI Mentorship response includes 📺 Curated Video Lesson');
+  assert(replyText.includes('Practice Questions'), 'AI Mentorship response includes 🎯 Practice Questions');
+  assert(replyText.includes('Hint'), 'AI Mentorship practice questions contain hints');
+
+  // Honest weak spot detection
+  const weakChatRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'What are my weak areas in GATE?',
+    mode: 'study',
+    context: { day: 0, weakTopics: [] }
+  });
+  assert(weakChatRes.status === 200, 'POST /api/jarvis/chat for weak spots returned 200');
+  const weakReply = weakChatRes.body.reply || '';
+  assert(weakReply.includes('No data yet. Complete 10 questions to identify weak spots'), 'Returns honest message for weak spots without fake assumptions');
+  assert(appJs.includes('No data yet. Complete 10 questions to identify weak spots'), 'app.js home view displays honest 10-question message');
+
+  // ── 7. Testing Question Bank, 65Q Mock Exam & Rank Predictor (Option 3) ──
+  console.log('\n7. Testing Option 3: GATE Question Bank, 65Q Mock Engine & AIR Rank Predictor...');
+
+  const gateQBank = require('./gateQuestionBankService');
+  assert(typeof gateQBank.getAllQuestions === 'function', 'gateQuestionBankService exports getAllQuestions');
+  assert(typeof gateQBank.filterQuestions === 'function', 'gateQuestionBankService exports filterQuestions');
+  assert(typeof gateQBank.generateMockExam === 'function', 'gateQuestionBankService exports generateMockExam');
+  assert(typeof gateQBank.calculateRankAndPercentile === 'function', 'gateQuestionBankService exports calculateRankAndPercentile');
+
+  const allQ = gateQBank.getAllQuestions();
+  assert(allQ.length >= 10, `Question bank has ${allQ.length} verified GATE CSE PYQs`);
+
+  // Filtering checks
+  const cnQuestions = gateQBank.filterQuestions({ subject: 'Computer Networks' });
+  assert(cnQuestions.length > 0, 'Filters Computer Networks questions successfully');
+  assert(cnQuestions.some(q => q.topic.includes('Subnetting')), 'Contains Subnetting questions');
+
+  const dbmsQuestions = gateQBank.filterQuestions({ subject: 'Database Management Systems' });
+  assert(dbmsQuestions.length > 0, 'Filters DBMS questions successfully');
+  assert(dbmsQuestions.some(q => q.topic.includes('Normalization')), 'Contains Normalization questions');
+
+  const osQuestions = gateQBank.filterQuestions({ subject: 'Operating Systems' });
+  assert(osQuestions.length > 0, 'Filters OS questions successfully');
+  assert(osQuestions.some(q => q.topic.includes('Deadlocks')), 'Contains Deadlocks questions');
+
+  // 65Q Mock Generation check
+  const mock65 = gateQBank.generateMockExam(65);
+  assert(mock65.length === 65, `Generated full official mock of 65 questions (got ${mock65.length})`);
+  const totalMockMarks = mock65.reduce((sum, q) => sum + (q.marks || 1), 0);
+  assert(totalMockMarks === 100, `Full mock totals exactly 100 marks (got ${totalMockMarks})`);
+
+  // Rank & Percentile Predictor checks
+  const rank85 = gateQBank.calculateRankAndPercentile(85);
+  assert(rank85.predictedAIR === '1 – 50', 'Score 85 predicts Top 50 AIR rank');
+  assert(rank85.category.includes('IISc / Top IITs'), 'Score 85 qualifies for IISc / Top IITs');
+
+  const rank65 = gateQBank.calculateRankAndPercentile(65);
+  assert(rank65.predictedAIR === '251 – 1000', 'Score 65 predicts AIR 251-1000');
+  assert(rank65.category.includes('Top NITs / Newer IITs'), 'Score 65 qualifies for Top NITs');
+
+  const rank25 = gateQBank.calculateRankAndPercentile(25);
+  assert(rank25.category.includes('Below Cutoff'), 'Score 25 correctly marked as Below Cutoff');
+
+  // DOM & Script checks in index.html
+  assert(indexHtml.includes('src="gateQuestionBankService.js"'), 'index.html loads gateQuestionBankService.js');
+  assert(indexHtml.includes('id="gate-mock-modal"'), 'index.html contains #gate-mock-modal');
+  assert(indexHtml.includes('id="gate-mock-timer"'), 'index.html contains #gate-mock-timer');
+  assert(indexHtml.includes('id="mock-palette-grid"'), 'index.html contains #mock-palette-grid for 65 question navigation');
+  assert(indexHtml.includes('id="gate-calc-dialog"'), 'index.html contains #gate-calc-dialog virtual calculator');
+  assert(indexHtml.includes('id="vcalc-display"'), 'index.html contains #vcalc-display');
+  assert(indexHtml.includes('id="sunday-mistake-banner"'), 'index.html contains #sunday-mistake-banner');
+
+  // app.js controller checks
+  assert(appJs.includes('window.openGATEPredictorStudio'), 'app.js defines window.openGATEPredictorStudio');
+  assert(appJs.includes('window.submitGateMockExam'), 'app.js defines window.submitGateMockExam');
+  assert(appJs.includes('window.updateMockPalette'), 'app.js defines window.updateMockPalette');
+  assert(appJs.includes('window.toggleVirtualCalc'), 'app.js defines window.toggleVirtualCalc');
+  assert(appJs.includes('window.vcalcEvaluate'), 'app.js defines window.vcalcEvaluate');
+  assert(appJs.includes('window.filterGATEPYQCards'), 'app.js defines window.filterGATEPYQCards');
+  assert(appJs.includes('Sunday Mistake Bank Repetition Ritual'), 'app.js includes Sunday Mistake Bank Repetition Ritual logic');
+
   console.log('\n======================================================');
-  console.log('✅ ALL TESTS (ROADMAPS, SETUP WIZARD, MOBILE 3D) VERIFIED (100%)');
+  console.log('✅ ALL TESTS (OPTIONS 1, 2, AND 3) VERIFIED (100% PASS)');
   console.log('======================================================\n');
 }
 
