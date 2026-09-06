@@ -114,13 +114,33 @@ function updateDashboard(data) {
   // 2. Readiness Scores
   console.log("📈 Scores:", data.readinessScores);
   if (data.readinessScores) {
+    // Update .skill-score elements with data-topic
+    document.querySelectorAll('.skill-score').forEach(el => {
+      const topic = el.dataset.topic;
+      if (topic && data.readinessScores[topic] !== undefined) {
+        el.textContent = data.readinessScores[topic] + '%';
+      }
+    });
+
     const dsaBar = document.getElementById('dsa-readiness-bar');
     if (dsaBar && data.readinessScores.dsa) dsaBar.style.width = data.readinessScores.dsa + '%';
     const osBar = document.getElementById('os-readiness-bar');
     if (osBar && data.readinessScores.os) osBar.style.width = data.readinessScores.os + '%';
+    const dbmsBar = document.getElementById('dbms-readiness-bar');
+    if (dbmsBar && data.readinessScores.dbms) dbmsBar.style.width = data.readinessScores.dbms + '%';
+    const cnBar = document.getElementById('cn-readiness-bar');
+    if (cnBar && (data.readinessScores.networks || data.readinessScores.cn)) {
+      cnBar.style.width = (data.readinessScores.networks || data.readinessScores.cn) + '%';
+    }
   }
 
-  // 3. Update header status badge
+  // 3. User Study Streak & Hours update
+  if (data.studyStreak !== undefined) {
+    const streakBadges = document.querySelectorAll('.streak-count, #user-streak-display');
+    streakBadges.forEach(el => el.textContent = data.studyStreak + ' Days');
+  }
+
+  // 4. Update header status badge
   const fbText = document.getElementById('firebase-status-text');
   if (fbText) fbText.textContent = 'Cloud Active';
 }

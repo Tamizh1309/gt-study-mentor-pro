@@ -308,6 +308,12 @@
     // 3. Collect active student context from local page state
     const studentContext = collectLocalStudentContext();
 
+    // If hosted statically (e.g. GitHub Pages), directly run resilient client fallback without generating HTTP 405
+    if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
+      handleOfflineFallback(cleanText, studentContext);
+      return;
+    }
+
     try {
       const response = await fetch('/api/jarvis/chat', {
         method: 'POST',
