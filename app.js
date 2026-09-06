@@ -5326,29 +5326,6 @@ function formatStatus(st) {
   }
 }
 
-function openCompanyDetail(companyId) {
-  const c = MASTER_100_COMPANIES.find(item => item.id === companyId);
-  if (!c) return;
-
-  const headerEl = document.getElementById('company-detail-header');
-  const bodyEl = document.getElementById('company-detail-body');
-
-  const curStatus = companyApplications[c.id] || 'none';
-
-  if (headerEl) {
-    headerEl.innerHTML = '<div><div style="display:flex;align-items:center;gap:10px;"><div style="font-size:22px;font-weight:800;color:var(--text);font-family:var(--font-display);">' + c.name + '</div><span class="company-tier-badge">' + formatCategory(c.category) + '</span></div><div style="font-size:12px;color:var(--text-sub);margin-top:4px;">📍 ' + c.location + ' | ⭐ ' + c.rating + ' Rating | Cutoff: <strong>' + c.cgpa + ' CGPA</strong></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;"><div class="company-ctc-pill" style="font-size:14px;">' + c.salary + '</div><a href="' + c.applyUrl + '" target="_blank" rel="noopener" class="apply-now-btn">🚀 Official Careers Portal ↗</a></div>';
-  }
-
-  if (bodyEl) {
-    bodyEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:14px;"><div class="company-stat-card"><div class="company-stat-lbl">Minimum CGPA</div><div class="company-stat-val" style="color:var(--warning);">' + c.cgpa + ' / 10</div></div><div class="company-stat-card"><div class="company-stat-lbl">Primary Tech Stack</div><div class="company-stat-val" style="font-size:12px;color:var(--accent);">' + c.tags.join(', ') + '</div></div><div class="company-stat-card"><div class="company-stat-lbl">Application Status</div><select class="form-input" style="padding:4px;font-size:12px;margin-top:2px;" onchange="updateCompanyApplicationStatus(' + c.id + ', this.value)"><option value="none" ' + (curStatus==='none'?'selected':'') + '>Not Applied</option><option value="wishlist" ' + (curStatus==='wishlist'?'selected':'') + '>📌 Wishlist</option><option value="applied" ' + (curStatus==='applied'?'selected':'') + '>📨 Applied</option><option value="oa" ' + (curStatus==='oa'?'selected':'') + '>💻 OA Scheduled</option><option value="interview" ' + (curStatus==='interview'?'selected':'') + '>🧠 Interviewing</option><option value="offered" ' + (curStatus==='offered'?'selected':'') + '>🎉 Offered!</option></select></div></div><div style="margin-bottom:14px;"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">🏢 About the Company:</div><div style="font-size:12px;color:var(--text-sub);line-height:1.5;">' + c.desc + '</div></div><div style="margin-bottom:14px;"><div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px;">🎯 Step-by-Step Recruitment Process:</div>' + c.rounds.map((r, i) => '<div class="round-step-card"><strong style="color:var(--primary-light);">' + (i+1) + '. </strong>' + r + '</div>').join('') + '</div><div><div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:8px;">💡 Top 5 Recurring Technical & DSA Questions:</div>' + c.questions.map(q => '<div class="past-q-item">⚡ ' + q + '</div>').join('') + '</div>';
-  }
-
-  openModal('company-detail-modal');
-  addXP(2, 'Explored ' + c.name + ' recruitment details');
-}
-
-window.openCompanyDetail = openCompanyDetail;
-
 function updateCompanyApplicationStatus(companyId, status) {
   if (status === 'none') {
     delete companyApplications[companyId];

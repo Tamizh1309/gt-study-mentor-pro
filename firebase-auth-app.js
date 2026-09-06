@@ -12,6 +12,9 @@ window.signInWithGoogle = async function() {
   } catch (error) {
     console.error("❌ Sign-in error:", error);
     // Fallback for popup blocking or unconfigured origin
+    if (error.code === 'auth/unauthorized-domain') {
+      alert("⚠️ Firebase Auth Notice:\n\nPlease add 'tamizh1309.github.io' to your Firebase Console under:\nAuthentication > Settings > Authorized domains.\n\nLogging in with Demo Student profile so your testing is not blocked!");
+    }
     if (error.code === 'auth/popup-blocked' || error.code === 'auth/unauthorized-domain' || error.code === 'auth/cancelled-popup-request') {
       console.info("ℹ️ Using student fallback session");
       const fallbackUser = {
