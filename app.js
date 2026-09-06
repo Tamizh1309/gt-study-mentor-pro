@@ -8021,12 +8021,32 @@ function renderGATEPYQPracticeArena(container) {
   ];
 
   container.innerHTML = `
+    <!-- Google Drive Question Paper Vault Banner -->
+    <div class="nd-card" style="padding:18px 20px; margin-bottom:18px; border:1px solid rgba(16,185,129,0.35); background:radial-gradient(circle at top right, rgba(16,185,129,0.08), transparent 60%), var(--depth-2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:28px;">📂</span>
+        <div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:11px; font-weight:800; color:var(--success); background:rgba(16,185,129,0.15); padding:2px 6px; border-radius:4px; text-transform:uppercase;">Drive Resource</span>
+            <strong style="font-size:14px; color:var(--text);">GATE CS &amp; IT Previous Years Question Papers Vault</strong>
+          </div>
+          <p style="font-size:12px; color:var(--text-sub); margin:4px 0 0;">Official past years GATE question papers, answer keys, and solution PDF documents curated on Google Drive.</p>
+        </div>
+      </div>
+      <a href="https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud" target="_blank" rel="noopener noreferrer" class="cta-pill-primary" style="font-size:12px; padding:10px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+        <span>📂</span> <span>Open Question Papers Drive ↗</span>
+      </a>
+    </div>
+
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
       ${gateSubjects.map(g => `
         <div class="track-card" style="padding:16px;">
           <div style="font-weight:800;color:var(--text);font-size:14px;margin-bottom:6px;">${g.subject}</div>
           <div style="font-size:12px;color:var(--text-sub);margin-bottom:10px;">${g.completed} / ${g.questions} Historical PYQs Solved (${g.avgScore} Avg)</div>
-          <button class="action-btn" onclick="openGATEPredictorStudio()" style="font-size:11px;width:100%;text-align:center;">Launch GATE PYQ Drills →</button>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn" onclick="openGATEPredictorStudio()" style="font-size:11px;flex:1;text-align:center;">Practice Drills →</button>
+            <a href="https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud" target="_blank" rel="noopener noreferrer" class="action-btn" style="font-size:11px;padding:4px 10px;text-decoration:none;" title="Download Question Paper PDF">📂 PDF ↗</a>
+          </div>
         </div>
       `).join('')}
     </div>
@@ -8187,6 +8207,10 @@ function renderGATEPrepare(container) {
         <a href="https://gate2027.iitm.ac.in/download" target="_blank" rel="noopener noreferrer" class="gate-official-link-btn" style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text); text-decoration:none; font-size:12px; font-weight:700; transition:all 0.2s;">
           <span style="display:flex; align-items:center; gap:8px;"><span>📥</span> Official Downloads</span>
           <span style="color:var(--text-muted); font-size:10px;">↗</span>
+        </a>
+        <a href="https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud" target="_blank" rel="noopener noreferrer" class="gate-official-link-btn" style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--depth-3); border:1px solid rgba(16,185,129,0.35); border-radius:var(--radius-sm); color:var(--text); text-decoration:none; font-size:12px; font-weight:700; transition:all 0.2s;">
+          <span style="display:flex; align-items:center; gap:8px;"><span>📂</span> Question Papers (Drive)</span>
+          <span style="color:var(--success); font-size:10px;">↗</span>
         </a>
       </div>
 

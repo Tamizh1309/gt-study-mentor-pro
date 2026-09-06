@@ -141,17 +141,21 @@ const INTENT_RULES = [
       /(question\s+paper\s+)?pattern/i,
       /(what('s| is)|show|view|open)\s+(the\s+)?(official\s+)?(gate\s+)?pattern/i,
       /(official\s+)?(gate\s+)?(cs\s+|cse\s+)?syllabus/i,
-      /(where can i download|download|downloads)\s+(the\s+)?(gate\s+)?(official\s+)?(documents|papers|brochure)?/i,
+      /(where can i download|download|downloads)\s+(the\s+)?(gate\s+)?(official\s+)?(documents|brochure)?/i,
+      /(gate\s+)?(previous\s+years?\s+)?question\s+papers?/i,
+      /pyq\s+(papers?|drive|folder|vault)/i,
+      /gate\s+papers?\s+(drive|folder|vault|link)/i,
       /(open|show|launch|go to)\s+(the\s+)?(official\s+)?gate(\s+2027)?\s*(portal|website|iit madras)?/i,
       /gate\s+portal/i
     ],
     extractParams: (text) => {
       let target = 'portal';
-      if (/date/i.test(text)) target = 'dates';
+      if (/question\s+paper(?!.*pattern)|pyq\s+(papers?|drive|folder|vault)|paper\s+(drive|folder|vault|link)/i.test(text)) target = 'papers_drive';
+      else if (/date/i.test(text)) target = 'dates';
       else if (/pattern|marking/i.test(text)) target = 'pattern';
       else if (/syllabus/i.test(text)) target = 'syllabus';
       else if (/download|document|brochure/i.test(text)) target = 'downloads';
-      return { target, source: 'IIT Madras' };
+      return { target, source: target === 'papers_drive' ? 'GATE Question Papers Vault' : 'IIT Madras' };
     }
   },
   {

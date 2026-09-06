@@ -157,7 +157,8 @@ function resolveAction(intent, params = {}) {
         dates: 'https://gate2027.iitm.ac.in/important_dates',
         syllabus: 'https://gate2027.iitm.ac.in/exam_papers_and_syllabus',
         pattern: 'https://gate2027.iitm.ac.in/question_paper_pattern',
-        downloads: 'https://gate2027.iitm.ac.in/download'
+        downloads: 'https://gate2027.iitm.ac.in/download',
+        papers_drive: 'https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'
       };
       const url = urls[target] || urls.portal;
       const targetLabels = {
@@ -165,17 +166,21 @@ function resolveAction(intent, params = {}) {
         dates: 'Important Dates',
         syllabus: 'Official Papers & Syllabus',
         pattern: 'Question Paper Pattern',
-        downloads: 'Official Downloads'
+        downloads: 'Official Downloads',
+        papers_drive: 'Question Papers Drive Vault'
       };
+      const source = target === 'papers_drive' ? 'GATE Question Papers Vault' : 'GATE 2027 — IIT Madras';
       return {
         type: ALLOWED_ACTIONS.OPEN_GATE_OFFICIAL,
         params: {
           url,
           target,
           label: targetLabels[target] || 'Official Portal',
-          source: 'GATE 2027 — IIT Madras'
+          source
         },
-        spokenConfirmation: `Opening the official GATE 2027 ${targetLabels[target] || 'Portal'} from IIT Madras.`
+        spokenConfirmation: target === 'papers_drive'
+          ? "Opening the GATE Previous Years Question Papers Drive Vault."
+          : `Opening the official GATE 2027 ${targetLabels[target] || 'Portal'} from IIT Madras.`
       };
     }
 

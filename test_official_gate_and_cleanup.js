@@ -104,11 +104,37 @@ async function runSuite() {
   assert(chatRes.body.action.type === 'open_gate_official', 'Action type is open_gate_official');
   assert(chatRes.body.action.params.url === 'https://gate2027.iitm.ac.in/important_dates', 'Target URL is official IIT Madras dates page');
 
-  // ── 4. Codebase Cleanup Audit ──
-  console.log('\n4. Testing Codebase Cleanliness (Zero hardcoded localhost in app.js)...');
+  // Test question papers drive query
+  const iDrive = classifyIntent('JARVIS open GATE question papers');
+  assert(iDrive.intent === 'OPEN_GATE_OFFICIAL', 'Classifies question papers query as OPEN_GATE_OFFICIAL');
+  assert(iDrive.parameters.target === 'papers_drive', 'Extracts target as "papers_drive"');
+
+  const actDrive = resolveAction('OPEN_GATE_OFFICIAL', { target: 'papers_drive' });
+  assert(actDrive.params.url === 'https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud', 'Action returns Google Drive Question Papers link');
+
+  const chatDriveRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'JARVIS open GATE question papers',
+    mode: 'study'
+  });
+
+  assert(chatDriveRes.status === 200, 'POST /api/jarvis/chat for question papers returned 200');
+  assert(chatDriveRes.body.action.params.url === 'https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud', 'Live action returns Google Drive folder URL');
+
+  // ── 4. Codebase Cleanup & Drive Link Verification ──
+  console.log('\n4. Testing Codebase Cleanliness & Question Paper Link...');
   const appJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
   assert(!appJs.includes('http://localhost:3000'), 'app.js has zero occurrences of http://localhost:3000');
   assert(appJs.includes('API_BASE_URL'), 'app.js defines and uses API_BASE_URL');
+  assert(appJs.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'app.js contains Google Drive question papers link');
+
+  const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  assert(indexHtml.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'index.html contains Google Drive question papers link');
 
   console.log('\n======================================================');
   console.log('✅ ALL OFFICIAL GATE & CLEANUP TESTS PASSED (100%)');
