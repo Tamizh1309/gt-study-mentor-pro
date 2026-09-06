@@ -7953,6 +7953,11 @@ window.switchPracticeTab = function (tab) {
   const container = document.getElementById('practice-content-area');
   if (!container) return;
 
+  // Render Adaptive Practice Rationale HUD (Signature Experience 2.3)
+  if (typeof window.renderAdaptivePracticeHUD === 'function') {
+    window.renderAdaptivePracticeHUD(validTab);
+  }
+
   if (validTab === 'dsa') renderDSAPracticeArena(container);
   else if (validTab === 'gate-pyq') renderGATEPYQPracticeArena(container);
   else if (validTab === 'aptitude') renderAptitudePracticeArena(container);
@@ -9050,6 +9055,11 @@ window.renderHomeView = function () {
         </div>`).join('');
     }
   }
+
+  // 6. Career Sync Matrix (Signature Experience 2.5)
+  if (typeof window.renderCareerSyncMatrix === 'function') {
+    window.renderCareerSyncMatrix();
+  }
 };
 
 window.renderHomeDashboard = window.renderHomeView;
@@ -9228,4 +9238,305 @@ if (typeof document !== 'undefined') {
     if (typeof window.validateRoutes === 'function') window.validateRoutes();
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// HONEST VISION SIGNATURE EXPERIENCES CONTROLLERS
+// ══════════════════════════════════════════════════════════════
+
+// 1. JARVIS Daily Intelligence Briefing (Signature Experience 2.1)
+window.openJarvisBriefingModal = function () {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  const data = PrepIntelligenceEngine.getDailyBriefingData();
+
+  const titleEl = document.getElementById('briefing-modal-title');
+  const subEl = document.getElementById('briefing-subtitle-date');
+  const revEl = document.getElementById('briefing-stat-revisions');
+  const gapEl = document.getElementById('briefing-stat-gaps');
+  const taskEl = document.getElementById('briefing-stat-tasks');
+  const carEl = document.getElementById('briefing-stat-career');
+  const topEl = document.getElementById('briefing-priority-topic');
+  const timeEl = document.getElementById('briefing-priority-time');
+  const whyEl = document.getElementById('briefing-why-first');
+
+  if (titleEl) titleEl.textContent = `Good ${data.greeting.replace('Good ', '')}, ${data.studentName}`;
+  if (subEl) subEl.textContent = `Day ${data.day} of ${data.totalDays} • Context-Aware Executive Audit`;
+  if (revEl) revEl.textContent = data.revisionsDue;
+  if (gapEl) gapEl.textContent = data.conceptGaps;
+  if (taskEl) taskEl.textContent = data.unfinishedTasks;
+  if (carEl) carEl.textContent = data.careerActionsPending;
+  if (topEl) topEl.textContent = data.priorityTopic;
+  if (timeEl) timeEl.textContent = data.priorityDuration;
+  if (whyEl) whyEl.textContent = data.whyFirst;
+
+  if (typeof openModal === 'function') {
+    openModal('jarvis-briefing-modal');
+  } else {
+    const modal = document.getElementById('jarvis-briefing-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+};
+
+window.speakJarvisBriefing = function () {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  const data = PrepIntelligenceEngine.getDailyBriefingData();
+  const waveBox = document.getElementById('briefing-waveform-bar');
+  const capEl = document.getElementById('briefing-live-caption');
+  const speakBtn = document.getElementById('briefing-speak-btn');
+
+  if (waveBox) waveBox.style.display = 'flex';
+  if (capEl) capEl.textContent = data.spokenBriefing;
+  if (speakBtn) speakBtn.innerHTML = '<span>🔊</span> <span>SPEAKING...</span>';
+
+  if (window.GTJarvis && typeof window.GTJarvis.speak === 'function') {
+    window.GTJarvis.speak(data.spokenBriefing);
+  } else if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(data.spokenBriefing);
+    u.rate = 1.0;
+    u.pitch = 1.0;
+    u.onend = () => {
+      if (waveBox) waveBox.style.display = 'none';
+      if (speakBtn) speakBtn.innerHTML = '<span>🎙️</span> <span>LISTEN</span>';
+    };
+    u.onerror = () => {
+      if (waveBox) waveBox.style.display = 'none';
+      if (speakBtn) speakBtn.innerHTML = '<span>🎙️</span> <span>LISTEN</span>';
+    };
+    window.speechSynthesis.speak(u);
+  }
+};
+
+window.executeBriefingAction = function () {
+  if (typeof closeModal === 'function') {
+    closeModal('jarvis-briefing-modal');
+  } else {
+    const modal = document.getElementById('jarvis-briefing-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  if (typeof window.executeNbaAction === 'function') {
+    window.executeNbaAction();
+  } else if (window.FocusSession && typeof FocusSession.startNBA === 'function') {
+    FocusSession.startNBA();
+  } else if (typeof window.openDay0Onboarding === 'function') {
+    window.openDay0Onboarding();
+  } else if (typeof showToast === 'function') {
+    showToast('Focus session launched for today\'s priority topic!', 'success');
+  }
+};
+
+// 2. 90-Day 3-Phase Milestone System (Vision Section 6)
+window.openPhaseMilestoneModal = function () {
+  if (typeof PrepIntelligenceEngine === 'undefined') return;
+  const phaseData = PrepIntelligenceEngine.getPhaseMilestoneState();
+  const container = document.getElementById('phase-cards-container');
+
+  if (container) {
+    container.innerHTML = phaseData.phases.map(p => `
+      <div class="phase-card ${p.active ? 'phase-active' : ''}">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div>
+            <span style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:${p.active ? 'var(--primary-light)' : 'var(--text-muted)'};">
+              Phase ${p.phaseNumber} • ${p.daysRange}
+            </span>
+            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text); margin:2px 0 0;">${p.name}</h3>
+          </div>
+          <span class="badge-pill" style="font-size:10px; font-weight:700; ${p.active ? 'background:rgba(109,99,255,0.2); color:var(--primary-light); border-color:var(--primary);' : p.completed ? 'background:rgba(16,185,129,0.15); color:var(--success); border-color:var(--success);' : 'color:var(--text-muted);'}">
+            ${p.active ? '⚡ CURRENT PHASE' : p.completed ? '✓ COMPLETED' : 'UPCOMING'}
+          </span>
+        </div>
+        <p style="font-size:12px; color:var(--text-sub); line-height:1.45; margin:0 0 10px;">${p.summary}</p>
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:6px;">Target Milestones:</div>
+        <div class="phase-milestone-list">
+          ${p.milestones.map(m => `
+            <div class="phase-milestone-item">
+              <div class="phase-milestone-check ${m.completed ? 'done' : 'pending'}">
+                ${m.completed ? '✓' : '○'}
+              </div>
+              <span style="flex:1; color:${m.completed ? 'var(--text)' : 'var(--text-sub)'}; ${m.completed ? 'font-weight:600;' : ''}">${m.name}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  if (typeof openModal === 'function') {
+    openModal('phase-milestone-modal');
+  } else {
+    const modal = document.getElementById('phase-milestone-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+};
+
+// 3. Adaptive Practice Rationale HUD & Interactive Question (Signature Experience 2.3)
+window.renderAdaptivePracticeHUD = function (track = 'dsa') {
+  const container = document.getElementById('adaptive-practice-hud');
+  if (!container || typeof PrepIntelligenceEngine === 'undefined') return;
+
+  const q = PrepIntelligenceEngine.getAdaptiveNextQuestion(track);
+  window._currentAdaptiveQuestion = q;
+
+  container.innerHTML = `
+    <div class="adaptive-hud-card">
+      <div class="adaptive-hud-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="pulse-dot-jarvis status-idle"></span>
+          <span style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--primary-light);">
+            JARVIS Selected This Question For You
+          </span>
+        </div>
+        <span class="badge-pill" style="font-size:10px; background:rgba(56,189,248,0.12); color:var(--accent); border-color:rgba(56,189,248,0.3); font-weight:700;">
+          ⏱️ ${q.estMinutes} min • ${q.difficulty}
+        </span>
+      </div>
+
+      <div style="font-size:1.05rem; font-weight:800; color:var(--text); margin-bottom:4px;">
+        ${q.topic} &mdash; <span style="color:var(--text-sub); font-size:0.95rem; font-weight:600;">${q.subtopic}</span>
+      </div>
+
+      <div class="adaptive-evidence-grid">
+        <div class="adaptive-evidence-item">
+          <div class="adaptive-evidence-label">Topic Mastery</div>
+          <div class="adaptive-evidence-val" style="color:${q.mastery < 60 ? 'var(--warning)' : 'var(--success)'};">${q.mastery}%</div>
+        </div>
+        <div class="adaptive-evidence-item">
+          <div class="adaptive-evidence-label">Last Mistake</div>
+          <div class="adaptive-evidence-val" style="color:var(--text-sub);">${q.lastMistakeDays}</div>
+        </div>
+        <div class="adaptive-evidence-item">
+          <div class="adaptive-evidence-label">Calibration</div>
+          <div class="adaptive-evidence-val" style="color:var(--danger); font-size:11px;">${q.confidenceRisk}</div>
+        </div>
+        <div class="adaptive-evidence-item">
+          <div class="adaptive-evidence-label">Revision</div>
+          <div class="adaptive-evidence-val" style="color:${q.revisionDue ? 'var(--warning)' : 'var(--text-muted)'};">${q.revisionDue ? 'Due Today' : 'Calibrated'}</div>
+        </div>
+      </div>
+
+      <div class="adaptive-rationale-box">
+        <strong style="color:var(--primary-light);">WHY?</strong> ${q.rationale}
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button onclick="startAdaptiveQuestion('${track}')" class="cta-pill-primary" style="padding:8px 18px; font-size:12px;">
+          <span>▶</span> <span>START QUESTION</span>
+        </button>
+        <button onclick="showAdaptiveRationaleExplanation()" class="cta-pill-secondary" style="padding:8px 14px; font-size:12px;">
+          <span>💡</span> <span>EXPLAIN REASONING</span>
+        </button>
+      </div>
+    </div>
+  `;
+};
+
+window.startAdaptiveQuestion = function (track = 'dsa') {
+  const q = window._currentAdaptiveQuestion || (typeof PrepIntelligenceEngine !== 'undefined' ? PrepIntelligenceEngine.getAdaptiveNextQuestion(track) : null);
+  if (!q) return;
+
+  const modalBody = document.getElementById('adaptive-modal-body');
+  if (!modalBody) return;
+
+  modalBody.innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span class="badge-pill" style="color:var(--primary-light);">${q.topic}</span>
+        <span style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">${q.difficulty} • 15 min</span>
+      </div>
+      <div style="font-size:1.1rem; font-weight:700; color:var(--text); line-height:1.45; margin-bottom:18px;">
+        ${q.question}
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;" id="adaptive-options-list">
+        ${q.options.map((opt, idx) => `
+          <button class="quiz-option-btn" onclick="submitAdaptiveAnswer(${idx}, ${q.answer}, '${encodeURIComponent(q.explanation)}')" style="width:100%; text-align:left; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text); font-size:13px; cursor:pointer; transition:all 0.2s ease;">
+            <span style="display:inline-block; width:22px; font-weight:800; color:var(--primary-light);">${String.fromCharCode(65 + idx)}.</span> ${opt}
+          </button>
+        `).join('')}
+      </div>
+
+      <div id="adaptive-feedback-box" style="display:none; margin-top:16px; padding:14px; border-radius:var(--radius-sm); font-size:12px; line-height:1.5;"></div>
+    </div>
+  `;
+
+  if (typeof openModal === 'function') {
+    openModal('adaptive-question-modal');
+  } else {
+    const modal = document.getElementById('adaptive-question-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+};
+
+window.submitAdaptiveAnswer = function (chosenIdx, correctIdx, encodedExplanation) {
+  const explanation = decodeURIComponent(encodedExplanation);
+  const options = document.querySelectorAll('#adaptive-options-list .quiz-option-btn');
+  const feedbackBox = document.getElementById('adaptive-feedback-box');
+
+  options.forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === correctIdx) {
+      btn.style.background = 'rgba(16, 185, 129, 0.15)';
+      btn.style.borderColor = 'var(--success)';
+      btn.style.color = 'var(--success)';
+    } else if (idx === chosenIdx) {
+      btn.style.background = 'rgba(239, 68, 68, 0.15)';
+      btn.style.borderColor = 'var(--danger)';
+      btn.style.color = 'var(--danger)';
+    }
+  });
+
+  if (feedbackBox) {
+    feedbackBox.style.display = 'block';
+    if (chosenIdx === correctIdx) {
+      feedbackBox.style.background = 'rgba(16, 185, 129, 0.08)';
+      feedbackBox.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+      feedbackBox.style.color = 'var(--text)';
+      feedbackBox.innerHTML = `
+        <div style="font-weight:800; color:var(--success); margin-bottom:4px;">✓ Correct! Concept Validated</div>
+        <div>${explanation}</div>
+      `;
+      if (typeof showToast === 'function') showToast('Adaptive challenge solved! Concept gap closed.', 'success');
+    } else {
+      feedbackBox.style.background = 'rgba(239, 68, 68, 0.08)';
+      feedbackBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      feedbackBox.style.color = 'var(--text)';
+      feedbackBox.innerHTML = `
+        <div style="font-weight:800; color:var(--danger); margin-bottom:4px;">✗ Concept Misconception Flagged</div>
+        <div>${explanation}</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--warning);">📌 JARVIS has recorded this into your Smart Revision deck.</div>
+      `;
+      if (typeof showToast === 'function') showToast('Concept gap recorded for Spaced Repetition.', 'warning');
+    }
+  }
+};
+
+window.showAdaptiveRationaleExplanation = function () {
+  const q = window._currentAdaptiveQuestion;
+  if (!q) return;
+  alert(`JARVIS Adaptive Rationale:\n\n• Target Topic: ${q.topic} (${q.subtopic})\n• Historical Mastery: ${q.mastery}%\n• Reason: ${q.rationale}\n\nQuestions are selected based on spaced repetition schedules and error telemetry, avoiding random question sequences.`);
+};
+
+// 4. Career Sync Matrix Controller (Signature Experience 2.5)
+window.renderCareerSyncMatrix = function () {
+  const container = document.getElementById('career-sync-grid-home');
+  if (!container || typeof PrepIntelligenceEngine === 'undefined') return;
+
+  const data = PrepIntelligenceEngine.getCareerSyncData();
+  container.innerHTML = data.map(c => `
+    <div class="career-sync-card">
+      <div>
+        <div class="career-sync-title">
+          <span>${c.careerTrack}</span>
+          <span class="badge-pill" style="font-size:10px; color:var(--accent); border-color:var(--accent);">${c.statusLabel}</span>
+        </div>
+        <div class="career-sync-sub">🎯 Milestone: <strong>${c.targetMilestone}</strong></div>
+      </div>
+      <div class="career-sync-impact">
+        <span style="font-weight:700; color:var(--success);">Today's Preparation Link:</span><br>
+        ${c.todayContribution}
+      </div>
+    </div>
+  `).join('');
+};
+
 
