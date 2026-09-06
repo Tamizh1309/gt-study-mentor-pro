@@ -244,6 +244,17 @@ async function runSuite() {
   const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   assert(indexHtml.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'index.html contains Google Drive question papers link');
   assert(indexHtml.includes('swe-roadmap-modal'), 'index.html contains swe-roadmap-modal');
+  assert(indexHtml.includes('gate-roadmap-modal'), 'index.html contains gate-roadmap-modal');
+
+  // GATE 2027 CS Roadmap Verifications
+  assert(appJs.includes('GATE_2027_PHASES'), 'app.js defines GATE_2027_PHASES');
+  assert(appJs.includes('Concept Completion'), 'app.js includes Phase 1: Concept Completion (Sept 2026)');
+  assert(appJs.includes('GATE_2027_SUBJECTS'), 'app.js defines GATE_2027_SUBJECTS');
+  assert(appJs.includes('Discrete Mathematics'), 'app.js contains Discrete Mathematics');
+  assert(appJs.includes('Cryptography & Network Security'), 'app.js contains Cryptography & Network Security');
+  assert(appJs.includes('GATE_2027_MONTHLY_PLAN'), 'app.js defines GATE_2027_MONTHLY_PLAN');
+  assert(appJs.includes('Discipline today, a better tomorrow.'), 'app.js contains IIT Madras roadmap motto');
+  assert(appJs.includes('Same You, But Stronger for GATE 2027.'), 'app.js contains GATE 2027 closing quote');
 
   console.log('\n======================================================');
   console.log('✅ ALL RESOURCE, ROADMAP & CLEANUP TESTS PASSED (100%)');

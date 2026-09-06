@@ -8332,40 +8332,432 @@ function renderGATEPrepare(container) {
       </div>
     </div>
 
-    <!-- PREPARATION PROGRESS & SYLLABUS TRACKING -->
-    <div style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <h3 style="font-size:1.1rem; font-weight:800; color:var(--text); margin:0;">GATE CS &amp; IT Syllabus Progress</h3>
-        <p style="font-size:12px; color:var(--text-muted); margin:2px 0 0;">Personal preparation mastery across all 12 core subjects. Honest, evidence-backed tracking.</p>
+    <!-- ─── GATE 2027 CS PREPARATION ROADMAP (Sept 2026 – Jan 2027) ─── -->
+    <div id="gate-prepare-roadmap-embed">
+      <!-- Populated via renderGATE2027Roadmap -->
+    </div>
+  `;
+
+  const roadmapEmbed = document.getElementById('gate-prepare-roadmap-embed');
+  if (roadmapEmbed) {
+    renderGATE2027Roadmap(roadmapEmbed, false);
+  }
+}
+
+// ─── GATE 2027 CS PREPARATION ROADMAP DATA & ENGINE ───
+const GATE_2027_PHASES = [
+  {
+    phase: 1,
+    title: 'Concept Completion',
+    month: 'Sept 2026',
+    goal: 'Learn & Build Strong Fundamentals',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)',
+    isActive: true,
+    desc: 'Cover all core subjects from standard books and notes.'
+  },
+  {
+    phase: 2,
+    title: 'Practice & Strengthen',
+    month: 'Oct 2026',
+    goal: 'Solve Questions & Improve Speed',
+    color: '#3b82f6',
+    border: 'rgba(59, 130, 246, 0.4)',
+    desc: 'Solve topic-wise questions, previous year questions (PYQs).'
+  },
+  {
+    phase: 3,
+    title: 'Advanced Practice',
+    month: 'Nov 2026',
+    goal: 'Topic-wise + Subject-wise Mocks',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.4)',
+    desc: 'Subject-wise tests, mix questions, focus on weak areas.'
+  },
+  {
+    phase: 4,
+    title: 'Mock Tests & Analysis',
+    month: 'Dec 2026',
+    goal: 'Full-length Mocks, Analyze & Improve',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)',
+    desc: 'Take full-length mocks, analyze performance, improve speed.'
+  },
+  {
+    phase: 5,
+    title: 'Final Revision',
+    month: 'Jan 2027',
+    goal: 'Revise, Formula Sheet, Stay Exam Ready',
+    color: '#8b5cf6',
+    border: 'rgba(139, 92, 246, 0.4)',
+    desc: 'Revise all topics, formula sheet, short notes, stay calm.'
+  }
+];
+
+const GATE_2027_SUBJECTS = [
+  {
+    id: 1,
+    name: 'Discrete Mathematics',
+    weight: '8–10%',
+    icon: '⚖️',
+    color: '#8b5cf6',
+    border: 'rgba(139, 92, 246, 0.4)',
+    topics: ['Set Theory, Relations, Functions', 'Combinatorics', 'Graph Theory', 'Logic & Proofs', 'Recurrence Relations', 'Generating Functions']
+  },
+  {
+    id: 2,
+    name: 'Data Structures & Algorithms',
+    weight: '15–18%',
+    icon: '🌲',
+    color: '#3b82f6',
+    border: 'rgba(59, 130, 246, 0.4)',
+    topics: ['Arrays, Linked Lists, Stacks, Queues', 'Trees, Binary Trees, BST, Heaps', 'Graphs (BFS, DFS, Shortest Path)', 'Hashing', 'Sorting & Searching', 'Dynamic Programming', 'Greedy Algorithms']
+  },
+  {
+    id: 3,
+    name: 'Computer Organization',
+    weight: '8–10%',
+    icon: '🧮',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)',
+    topics: ['Digital Logic & Boolean Algebra', 'Combinational & Sequential Circuits', 'CPU Architecture', 'Pipelining, Cache Memory', 'Memory Hierarchy', 'I/O and Interrupts']
+  },
+  {
+    id: 4,
+    name: 'Operating Systems',
+    weight: '8–10%',
+    icon: '⚙️',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.4)',
+    topics: ['Processes & Threads', 'CPU Scheduling', 'Synchronization', 'Deadlocks', 'Memory Management', 'File Systems', 'I/O Systems']
+  },
+  {
+    id: 5,
+    name: 'Databases',
+    weight: '8–10%',
+    icon: '🗄️',
+    color: '#06b6d4',
+    border: 'rgba(6, 182, 212, 0.4)',
+    topics: ['ER Model, Relational Model', 'SQL (Queries, Normalization)', 'Transactions & Concurrency', 'Indexing & B+ Trees', 'Query Optimization', 'NoSQL (Basics)']
+  },
+  {
+    id: 6,
+    name: 'Computer Networks',
+    weight: '8–10%',
+    icon: '🌐',
+    color: '#38bdf8',
+    border: 'rgba(56, 189, 248, 0.4)',
+    topics: ['OSI & TCP/IP Models', 'Network Protocols (IP, TCP, UDP)', 'Routing Algorithms', 'Flow & Congestion Control', 'Network Security (Basics)', 'Application Layer Protocols']
+  },
+  {
+    id: 7,
+    name: 'Theory of Computation',
+    weight: '8–10%',
+    icon: '🔄',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)',
+    topics: ['Regular Languages & Automata', 'Context Free Grammars (CFG)', 'Pushdown Automata (PDA)', 'Turing Machines', 'Decidability & Undecidability', 'Complexity Classes (P, NP, NP-Complete)']
+  },
+  {
+    id: 8,
+    name: 'Compiler Design',
+    weight: '5–8%',
+    icon: '🧩',
+    color: '#a855f7',
+    border: 'rgba(168, 85, 247, 0.4)',
+    topics: ['Lexical Analysis', 'Syntax Analysis (Parsing)', 'Semantic Analysis', 'Intermediate Code Generation', 'Code Optimization', 'Symbol Table & Runtime Environment']
+  },
+  {
+    id: 9,
+    name: 'Software Engineering',
+    weight: '5–8%',
+    icon: '🛠️',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)',
+    topics: ['SDLC Models', 'Requirements Analysis', 'Design & Modeling (UML)', 'Testing & Maintenance', 'Agile Methodologies', 'Software Metrics']
+  },
+  {
+    id: 10,
+    name: 'Cryptography & Network Security',
+    weight: '3–5%',
+    icon: '🔒',
+    color: '#f97316',
+    border: 'rgba(249, 115, 22, 0.4)',
+    topics: ['Symmetric & Asymmetric Encryption', 'Hash Functions', 'Digital Signatures', 'Authentication Protocols', 'Network Security Basics']
+  }
+];
+
+const GATE_2027_MONTHLY_PLAN = [
+  { month: 'Sept 2026', focus: 'Concept Completion', goals: 'Cover all core subjects from standard books and notes.' },
+  { month: 'Oct 2026', focus: 'Practice & Strengthen', goals: 'Solve topic-wise questions, previous year questions (PYQs).' },
+  { month: 'Nov 2026', focus: 'Advanced Practice', goals: 'Subject-wise tests, mix questions, focus on weak areas.' },
+  { month: 'Dec 2026', focus: 'Mock Tests & Analysis', goals: 'Take full-length mocks, analyze performance, improve accuracy & speed.' },
+  { month: 'Jan 2027', focus: 'Final Revision', goals: 'Revise all topics, formula sheet, short notes, high-weightage areas, stay exam ready.' }
+];
+
+function getGATE2027CoveredSubjects() {
+  try {
+    const raw = localStorage.getItem('gt_gate2027_covered_subjects');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+window.toggleGATE2027Subject = function(subId, isModal = false) {
+  const covered = getGATE2027CoveredSubjects();
+  const index = covered.indexOf(subId);
+  if (index > -1) {
+    covered.splice(index, 1);
+  } else {
+    covered.push(subId);
+  }
+  localStorage.setItem('gt_gate2027_covered_subjects', JSON.stringify(covered));
+
+  // Re-render
+  const container = isModal
+    ? document.getElementById('modal-gate-roadmap-container')
+    : document.getElementById('gate-prepare-roadmap-embed');
+  if (container) {
+    renderGATE2027Roadmap(container, isModal);
+  }
+
+  // Update modal badge if present
+  const modalBadge = document.getElementById('gate-roadmap-modal-progress-badge');
+  if (modalBadge) {
+    modalBadge.textContent = `${covered.length} / 10 Subjects Covered`;
+  }
+
+  if (typeof showToast === 'function') {
+    const sub = GATE_2027_SUBJECTS.find(s => s.id === subId);
+    const name = sub ? sub.name : `Subject ${subId}`;
+    if (covered.includes(subId)) {
+      showToast(`🎯 Marked ${name} as covered!`, 'success');
+    } else {
+      showToast(`${name} marked as in progress.`, 'info');
+    }
+  }
+};
+
+window.openGATERoadmapStudio = function() {
+  const container = document.getElementById('modal-gate-roadmap-container');
+  if (container) {
+    renderGATE2027Roadmap(container, true);
+  }
+  if (typeof window.openModal === 'function') {
+    window.openModal('gate-roadmap-modal');
+  }
+};
+
+function renderGATE2027Roadmap(container, isModal = false) {
+  if (!container) return;
+  const covered = getGATE2027CoveredSubjects();
+  const percent = Math.round((covered.length / 10) * 100);
+
+  container.innerHTML = `
+    <!-- ROADMAP BANNER -->
+    <div class="nd-card" style="padding:22px; margin-bottom:20px; border:1px solid rgba(245,158,11,0.35); background:radial-gradient(circle at top right, rgba(245,158,11,0.1), transparent 60%), var(--depth-2); position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:800; color:var(--warning); letter-spacing:0.8px; text-transform:uppercase; background:rgba(245,158,11,0.15); padding:3px 8px; border-radius:4px; border:1px solid rgba(245,158,11,0.3);">🏛️ IIT MADRAS • 5-MONTH FOCUSED PLAN</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">Discipline today, a better tomorrow.</span>
+          </div>
+          <h2 style="font-size:1.45rem; font-weight:800; color:var(--text); margin:4px 0;">GATE 2027 Computer Science (CS) Preparation Roadmap</h2>
+          <p style="font-size:12px; color:var(--text-sub); margin:0;">
+            Focused 5-Month Plan (Sept 2026 – Jan 2027) &bull; Concept Clarity &bull; Consistent Practice &bull; Smart Revision &bull; Crack GATE 2027
+          </p>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; font-weight:800; color:var(--success); background:rgba(34,197,94,0.15); padding:4px 10px; border-radius:6px; display:inline-block; margin-bottom:4px;">
+            ${covered.length} / 10 Subjects Covered (${percent}%)
+          </div>
+          <div style="font-size:10px; color:var(--text-muted);">Target: Feb 2027 Examination</div>
+        </div>
       </div>
-      <button class="action-btn" onclick="navigateToView('practice', 'gate-pyq')" style="font-size:11px; padding:5px 12px;">Practice PYQs →</button>
+
+      <!-- Progress Bar -->
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; margin-bottom:18px;">
+        <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, #10b981, #3b82f6, #f59e0b); transition:width 0.4s ease;"></div>
+      </div>
+
+      <!-- 5-PHASE TIMELINE TRACK -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; margin-bottom:14px;">
+        ${GATE_2027_PHASES.map(p => `
+          <div style="background:${p.isActive ? 'rgba(16,185,129,0.12)' : 'var(--depth-3)'}; border:1px solid ${p.isActive ? 'var(--success)' : 'var(--border-subtle)'}; border-radius:var(--radius-sm); padding:10px 12px; position:relative;">
+            ${p.isActive ? `
+              <span style="position:absolute; top:-7px; right:8px; font-size:9px; font-weight:800; background:var(--success); color:#000; padding:1px 6px; border-radius:10px; text-transform:uppercase;">
+                Active Now
+              </span>
+            ` : ''}
+            <div style="font-size:10px; font-weight:800; color:${p.color}; text-transform:uppercase;">${p.month}</div>
+            <div style="font-size:12px; font-weight:800; color:var(--text); margin:2px 0;">${p.title}</div>
+            <div style="font-size:10px; color:var(--text-sub); line-height:1.3;">${p.goal}</div>
+          </div>
+        `).join('')}
+        <div style="background:linear-gradient(135deg, rgba(245,158,11,0.15), rgba(234,179,8,0.05)); border:1px solid rgba(245,158,11,0.4); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:center;">
+          <div style="font-size:10px; font-weight:800; color:var(--warning); text-transform:uppercase;">Feb 2027</div>
+          <div style="font-size:12px; font-weight:800; color:#fff; display:flex; align-items:center; gap:4px;">
+            <span>🏆</span> <span>GATE 2027</span>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted);">Organized by IIT Madras</div>
+        </div>
+      </div>
+
+      ${!isModal ? `
+        <div style="display:flex; justify-content:flex-end;">
+          <button onclick="openGATERoadmapStudio()" class="action-btn" style="font-size:11px; padding:4px 12px;">
+            ⛶ Fullscreen GATE Roadmap Studio
+          </button>
+        </div>
+      ` : ''}
     </div>
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
-      ${subjects.map(s => `
-        <div class="track-card" style="padding:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <strong style="color:var(--text); font-size:13px;">${s.name}</strong>
-            <span class="score-pill ${s.accuracy >= 75 ? 'high' : s.accuracy >= 65 ? 'med' : 'low'}">${s.accuracy}% Acc</span>
-          </div>
-          <div style="margin:10px 0 6px;">
-            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:4px;">
-              <span>Syllabus Covered</span>
-              <span>${s.progress}%</span>
+    <!-- SUBJECT-WISE PREPARATION PLAN (CS) -->
+    <div style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <div>
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text); margin:0;">Subject-Wise Preparation Plan (CS)</h3>
+        <p style="font-size:11px; color:var(--text-muted); margin:2px 0 0;">Focus on understanding, problem solving and regular revision across all 10 core areas.</p>
+      </div>
+      <button class="action-btn" onclick="navigateToView('practice', 'gate-pyq')" style="font-size:11px; padding:4px 12px;">Solve GATE PYQs →</button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:24px;">
+      ${GATE_2027_SUBJECTS.map(s => {
+        const isCovered = covered.includes(s.id);
+        return `
+          <div class="track-card" style="padding:16px; border:1px solid ${isCovered ? 'rgba(34,197,94,0.45)' : s.border}; background:${isCovered ? 'radial-gradient(circle at top right, rgba(34,197,94,0.08), transparent 60%), var(--depth-2)' : 'var(--depth-2)'}; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.25s ease;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-size:18px;">${s.icon}</span>
+                  <div>
+                    <strong style="font-size:13px; color:var(--text); line-height:1.2; display:block;">${s.id}. ${s.name}</strong>
+                    <span style="font-size:10px; font-weight:800; color:${s.color};">Weightage: ${s.weight}</span>
+                  </div>
+                </div>
+              </div>
+
+              <ul style="list-style:none; padding:0; margin:8px 0 12px 0; font-size:11px; color:var(--text-sub); line-height:1.5;">
+                ${s.topics.map(t => `
+                  <li style="display:flex; align-items:flex-start; gap:6px; margin-bottom:3px;">
+                    <span style="color:${s.color};">•</span>
+                    <span>${t}</span>
+                  </li>
+                `).join('')}
+              </ul>
             </div>
-            <div style="width:100%; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
-              <div style="width:${s.progress}%; height:100%; background:var(--primary);"></div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; pt:8px; border-top:1px solid var(--border-subtle); gap:8px;">
+              <button onclick="toggleGATE2027Subject(${s.id}, ${isModal})" class="action-btn" style="font-size:10px; padding:4px 8px; background:${isCovered ? 'rgba(34,197,94,0.15)' : 'transparent'}; color:${isCovered ? 'var(--success)' : 'var(--text-sub)'}; border-color:${isCovered ? 'var(--success)' : 'var(--border-subtle)'};">
+                ${isCovered ? '✓ Covered' : '○ Mark Covered'}
+              </button>
+              <button onclick="navigateToView('practice', 'gate-pyq')" class="action-btn" style="font-size:10px; padding:4px 8px; color:${s.color}; border-color:${s.border};">
+                PYQs →
+              </button>
             </div>
           </div>
-          <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">
-            Solved: <strong style="color:var(--text);">${s.pyqs} PYQs</strong> &bull; Weak Focus: <span style="color:var(--danger); font-weight:600;">${s.weak}</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:8px; border-top:1px solid var(--border-subtle);">
-            <span style="font-size:10px; color:var(--warning); font-weight:600;">Next Target: ${s.next}</span>
-            <button class="action-btn" onclick="navigateToView('practice', 'gate-pyq')" style="font-size:10px; padding:3px 8px;">Solve PYQs →</button>
-          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <!-- MONTHLY STUDY PLAN TABLE -->
+    <div class="nd-card" style="padding:18px; margin-bottom:20px; border:1px solid var(--border-subtle);">
+      <h3 style="font-size:1.1rem; font-weight:800; color:var(--text); margin:0 0 10px; display:flex; align-items:center; gap:8px;">
+        <span>🗓️</span> Monthly Study Plan (Sept 2026 – Jan 2027)
+      </h3>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border-subtle); color:var(--text-muted); font-size:10px; text-transform:uppercase;">
+              <th style="padding:8px 10px;">Month</th>
+              <th style="padding:8px 10px;">Focus Area</th>
+              <th style="padding:8px 10px;">Goals &amp; Milestones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${GATE_2027_MONTHLY_PLAN.map((m, idx) => `
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04); ${idx === 0 ? 'background:rgba(16,185,129,0.06);' : ''}">
+                <td style="padding:10px; font-weight:800; color:${idx === 0 ? 'var(--success)' : 'var(--text)'};">
+                  ${m.month} ${idx === 0 ? '<span style="font-size:9px; background:rgba(16,185,129,0.2); padding:1px 4px; border-radius:3px; margin-left:4px;">CURRENT</span>' : ''}
+                </td>
+                <td style="padding:10px; font-weight:700; color:var(--primary-light);">${m.focus}</td>
+                <td style="padding:10px; color:var(--text-sub);">${m.goals}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4 STRATEGY & GUIDANCE PANELS -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-bottom:14px;">
+      <!-- Panel 1: Practice Strategy -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(239,68,68,0.3); background:rgba(239,68,68,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">🎯</span>
+          <strong style="font-size:12px; color:var(--text);">Practice Strategy</strong>
         </div>
-      `).join('')}
+        <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <li>• Solve topic-wise questions after each topic</li>
+          <li>• Use previous year papers (at least 10 years)</li>
+          <li>• Take regular mock tests (from Nov 2026)</li>
+          <li>• Analyze mistakes and maintain an error log in Mistake Book</li>
+          <li>• Improve speed and accuracy on NAT &amp; MSQ questions</li>
+          <li>• Revise important formulas and concepts regularly</li>
+        </ul>
+      </div>
+
+      <!-- Panel 2: Mock Test Plan -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">⏱️</span>
+          <strong style="font-size:12px; color:var(--text);">Mock Test Plan</strong>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <li>• Start subject-wise tests from Nov 2026</li>
+          <li>• Take 1–2 full-length tests per week (Dec–Jan)</li>
+          <li>• Simulate real exam environment (3-hour CBT, virtual calculator)</li>
+          <li>• Analyze performance (accuracy, time, weak topics)</li>
+          <li>• Target 20+ full mocks before the final exam</li>
+        </ul>
+      </div>
+
+      <!-- Panel 3: Recommended Resources -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(16,185,129,0.3); background:rgba(16,185,129,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">📚</span>
+          <strong style="font-size:12px; color:var(--text);">Recommended Resources</strong>
+        </div>
+        <div style="font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <div>• <a href="https://gate2027.iitm.ac.in/" target="_blank" rel="noopener" style="color:var(--warning); font-weight:700;">Official GATE 2027 Website ↗</a> (IIT Madras)</div>
+          <div>• Standard Textbooks (Cormen, Tanenbaum, Silberschatz)</div>
+          <div>• Free NPTEL Video Lectures</div>
+          <div>• <a href="https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud" target="_blank" rel="noopener" style="color:var(--success); font-weight:700;">Question Papers Drive Vault ↗</a></div>
+          <div>• <a href="https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/pyq-questions?q=68ecac7295474565f43ef40d" target="_blank" rel="noopener" style="color:#c084fc; font-weight:700;">Knowledge Gate PYQs (Sanchit Sir) ↗</a></div>
+        </div>
+      </div>
+
+      <!-- Panel 4: Key Tips -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(245,158,11,0.3); background:rgba(245,158,11,0.04); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <span style="font-size:16px;">💡</span>
+            <strong style="font-size:12px; color:var(--text);">Key Tips</strong>
+          </div>
+          <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+            <li>✓ Be consistent and follow a daily study schedule</li>
+            <li>✓ Focus on understanding, not just memorizing</li>
+            <li>✓ Solve previous year papers regularly</li>
+            <li>✓ Take mock tests and analyze performance</li>
+            <li>✓ Revise short notes and formulas</li>
+            <li>✓ Take care of your health and stay positive</li>
+          </ul>
+        </div>
+        <div style="margin-top:10px; font-size:11px; font-weight:800; color:var(--warning); text-align:center;">
+          "Same You, But Stronger for GATE 2027." 🚀
+        </div>
+      </div>
     </div>
   `;
 }
