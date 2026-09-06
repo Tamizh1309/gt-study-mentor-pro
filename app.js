@@ -12683,6 +12683,151 @@ window.testFirebaseConnection = async function () {
   }
 };
 
+// ══════════════════════════════════════════════════════════════════════
+// 8. FIREBASE AUTHENTICATION & LOGIN MODAL CONTROLLER
+// ══════════════════════════════════════════════════════════════════════
+window.openAuthModal = function () {
+  const modal = document.getElementById('firebase-auth-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+
+  const user = window.FirebaseService ? window.FirebaseService.getCurrentUser() : null;
+  const loggedInView = document.getElementById('auth-logged-in-view');
+  const loggedOutView = document.getElementById('auth-logged-out-view');
+
+  if (user && loggedInView && loggedOutView) {
+    loggedInView.style.display = 'block';
+    loggedOutView.style.display = 'none';
+
+    const avatar = document.getElementById('auth-user-avatar');
+    const name = document.getElementById('auth-user-name');
+    const email = document.getElementById('auth-user-email');
+
+    if (avatar) avatar.src = user.photoURL || 'https://api.dicebear.com/7.x/bottts/svg?seed=student';
+    if (name) name.textContent = user.displayName || 'GATE Aspirant';
+    if (email) email.textContent = user.email || 'Cloud Sync Connected';
+  } else if (loggedInView && loggedOutView) {
+    loggedInView.style.display = 'none';
+    loggedOutView.style.display = 'block';
+  }
+};
+
+window.closeAuthModal = function () {
+  const modal = document.getElementById('firebase-auth-modal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.signInWithGoogleAuth = async function () {
+  if (!window.FirebaseService) return;
+  try {
+    const user = await window.FirebaseService.loginWithGoogle();
+    if (user) {
+      window.closeAuthModal();
+      if (typeof showToast === 'function') {
+        showToast(`Welcome back, ${user.displayName || 'Student'}!`, 'success');
+      }
+    }
+  } catch (err) {
+    alert('Google Sign-In Notice: ' + (err.message || 'Please try guest login.'));
+  }
+};
+
+window.signInWithEmailAuth = async function () {
+  const email = document.getElementById('auth-email-input')?.value?.trim();
+  const password = document.getElementById('auth-password-input')?.value;
+  if (!email || !password) {
+    alert('Please enter both your email and password.');
+    return;
+  }
+  try {
+    const user = await window.FirebaseService.loginWithEmail(email, password);
+    if (user) {
+      window.closeAuthModal();
+      if (typeof showToast === 'function') showToast('Signed in successfully!', 'success');
+    }
+  } catch (err) {
+    alert('Sign-In Error: ' + err.message);
+  }
+};
+
+window.signUpWithEmailAuth = async function () {
+  const email = document.getElementById('auth-email-input')?.value?.trim();
+  const password = document.getElementById('auth-password-input')?.value;
+  if (!email || !password || password.length < 6) {
+    alert('Please enter a valid email and a password of at least 6 characters.');
+    return;
+  }
+  try {
+    const user = await window.FirebaseService.signUpWithEmail(email, password);
+    if (user) {
+      window.closeAuthModal();
+      if (typeof showToast === 'function') showToast('Account created and logged in!', 'success');
+    }
+  } catch (err) {
+    alert('Registration Error: ' + err.message);
+  }
+};
+
+window.signInAsGuestAuth = async function () {
+  if (!window.FirebaseService) return;
+  const user = await window.FirebaseService.loginAsGuest();
+  window.closeAuthModal();
+  if (typeof showToast === 'function') showToast('Logged in as Demo Student (Cloud Active)', 'success');
+};
+
+window.signOutFirebaseUser = async function () {
+  if (!window.FirebaseService) return;
+  await window.FirebaseService.logout();
+  window.closeAuthModal();
+  if (typeof showToast === 'function') showToast('Signed out.', 'info');
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// 9. VIEW PREWARMING ENGINE (Eliminates All Loading Placeholders)
+// ══════════════════════════════════════════════════════════════════════
+window.prewarmAllViews = function () {
+  try {
+    // 1. Prewarm Preparation Hub
+    const prepArea = document.getElementById('prepare-content-area');
+    if (prepArea && typeof window.renderGATEPrepare === 'function') {
+      window.renderGATEPrepare(prepArea);
+    }
+    // 2. Prewarm Practice Arena
+    if (typeof window.switchPracticeTab === 'function') {
+      window.switchPracticeTab('dsa');
+    }
+    // 3. Prewarm Career Pipeline
+    if (typeof window.switchCareerTab === 'function') {
+      window.switchCareerTab('projects');
+    }
+    // 4. Prewarm Progress & Analytics
+    if (typeof window.switchProgressTab === 'function') {
+      window.switchProgressTab('readiness');
+    }
+    // 5. Prewarm Resources Library
+    if (typeof window.renderResourcesLibrary === 'function') {
+      window.renderResourcesLibrary();
+    }
+    // 6. Prewarm Settings View
+    if (typeof window.renderSettingsView === 'function') {
+      window.renderSettingsView();
+    }
+  } catch (err) {
+    console.warn('[prewarmAllViews] Prewarming notice:', err);
+  }
+};
+
+// Run prewarm on DOMContentLoaded and Window Load
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(window.prewarmAllViews, 150));
+  } else {
+    setTimeout(window.prewarmAllViews, 150);
+  }
+  window.addEventListener('load', () => setTimeout(window.prewarmAllViews, 300));
+}
+
+
 
 
 

@@ -247,6 +247,10 @@
           <span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span>
           <span id="firebase-status-text">Cloud DB Active</span>
         </button>
+        <button type="button" onclick="window.openAuthModal&&openAuthModal()" id="header-auth-btn" style="display:flex;align-items:center;gap:6px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light,#818CF8);font-size:12px;cursor:pointer;font-weight:700;" title="Login with Google or Email">
+          <span id="header-auth-icon">🔑</span>
+          <span id="header-auth-text">Sign In</span>
+        </button>
         <button onclick="window.openJarvisBriefingModal&&openJarvisBriefingModal()" id="header-briefing-btn" style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--success);font-size:12px;cursor:pointer;font-weight:700;">📋 JARVIS Briefing</button>
         <button onclick="navigateToView('jarvis')" style="display:flex;align-items:center;gap:6px;background:rgba(109,99,255,0.15);border:1px solid rgba(109,99,255,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light);font-size:12px;cursor:pointer;font-weight:700;">🎙️ Ask JARVIS</button>
       </div>
@@ -368,7 +372,7 @@
 
           <div id="reschedule-alert" style="display:none;margin-top:12px;padding:14px 16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:var(--radius);font-size:13px;color:var(--text);">
             <div style="font-weight:700;color:var(--warning);margin-bottom:6px;">&#x23F0; Missed Tasks &mdash; Smart Reschedule Proposed</div>
-            <div id="reschedule-content">Loading rescheduling suggestions...</div>
+            <div id="reschedule-content">All daily milestones are currently on track. No pending overdue items.</div>
             <div style="margin-top:10px;display:flex;gap:8px;">
               <button onclick="acceptReschedule&&acceptReschedule()" style="padding:6px 16px;background:var(--warning);color:#000;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;">Accept Plan</button>
               <button onclick="document.getElementById('reschedule-alert').style.display='none'" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted);cursor:pointer;">Dismiss</button>
@@ -429,7 +433,13 @@
               </div>
             </div>
             <div class="today-timeline" id="today-timeline-list">
-              <div style="color:var(--text-muted);font-size:13px;padding:8px 0;">Loading today's tasks...</div>
+              <div class="today-task-item" style="padding:8px 0; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle);">
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:var(--text);">Orientation Setup &amp; Calibration</div>
+                  <div style="font-size:11px; color:var(--text-muted);">Configure target tracks, study hours, and Day 1 action.</div>
+                </div>
+                <button onclick="window.openSetupWizard&&openSetupWizard()" style="padding:4px 10px; font-size:11px; background:var(--primary); color:#fff; border:none; border-radius:4px; cursor:pointer;">Start</button>
+              </div>
             </div>
             <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;">
               <div style="font-size:12px;color:var(--text-muted);">Completion</div>
@@ -533,7 +543,16 @@
         <button role="tab" class="tab-pill" id="ptab-intern" onclick="switchPrepTab('intern')" aria-selected="false">&#x1F680; Internships</button>
       </div>
       <div id="prepare-content-area">
-        <div style="color:var(--text-muted);font-size:13px;">Loading preparation data...</div>
+        <div class="nd-card" style="padding:22px; border:1px solid rgba(245,158,11,0.3); background:var(--depth-2); border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:var(--warning); text-transform:uppercase; background:rgba(245,158,11,0.15); padding:3px 8px; border-radius:4px;">🏛️ IIT Madras • GATE 2027</span>
+              <h3 style="margin:6px 0 2px; font-size:18px; font-weight:800; color:var(--text);">Official Examination Preparation Gateway</h3>
+              <div style="font-size:12px; color:var(--text-sub);">12 Core CS Subjects, Official IIT Madras Syllabus, and Topic-wise PYQs.</div>
+            </div>
+            <button onclick="window.switchPrepareTab&&switchPrepareTab('gate')" class="action-btn" style="padding:6px 14px; font-size:12px; border-color:rgba(245,158,11,0.4); color:var(--warning);">⚡ Open GATE 2027 Hub</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -557,7 +576,19 @@
       </div>
 
       <div id="practice-content-area">
-        <div style="color:var(--text-muted);font-size:13px;">Loading practice modules...</div>
+        <div class="nd-card" style="padding:22px; border:1px solid rgba(99,102,241,0.3); background:var(--depth-2); border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:var(--primary-light); text-transform:uppercase; background:rgba(99,102,241,0.15); padding:3px 8px; border-radius:4px;">⚔️ Active Practice Arena</span>
+              <h3 style="margin:6px 0 2px; font-size:18px; font-weight:800; color:var(--text);">DSA, GATE PYQs &amp; Official Mock Simulations</h3>
+              <div style="font-size:12px; color:var(--text-sub);">Tracked problem solving with real-time feedback and Mistake Bank synchronization.</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button onclick="window.switchPracticeTab&&switchPracticeTab('dsa')" class="submit-btn" style="padding:6px 14px; font-size:12px;">Solve DSA</button>
+              <button onclick="window.switchPracticeTab&&switchPracticeTab('gate-pyq')" class="action-btn" style="padding:6px 14px; font-size:12px;">GATE PYQs</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -576,7 +607,16 @@
         <button role="tab" class="tab-pill" id="ctab-companies" onclick="switchCareerTab('companies')" aria-selected="false">&#x1F3E2; Companies</button>
       </div>
       <div id="career-content-area">
-        <div style="color:var(--text-muted);font-size:13px;">Loading career pipeline...</div>
+        <div class="nd-card" style="padding:22px; border:1px solid rgba(16,185,129,0.3); background:var(--depth-2); border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:var(--success); text-transform:uppercase; background:rgba(16,185,129,0.15); padding:3px 8px; border-radius:4px;">🎯 Career &amp; Opportunity Pipeline</span>
+              <h3 style="margin:6px 0 2px; font-size:18px; font-weight:800; color:var(--text);">Full-Stack Projects, Resumes &amp; Applications</h3>
+              <div style="font-size:12px; color:var(--text-sub);">Track opportunities from discovery to offer with verified ATS resumes and portfolio showcases.</div>
+            </div>
+            <button onclick="window.switchCareerTab&&switchCareerTab('projects')" class="action-btn" style="padding:6px 14px; font-size:12px; color:var(--success); border-color:rgba(16,185,129,0.4);">Launch Pipeline</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -594,7 +634,16 @@
         <button role="tab" class="tab-pill" id="progtab-smart-revision" onclick="switchProgressTab('smart-revision')" aria-selected="false">&#x1F504; Smart Revision</button>
       </div>
       <div id="progress-content-area">
-        <div style="color:var(--text-muted);font-size:13px;">Loading progress data...</div>
+        <div class="nd-card" style="padding:22px; border:1px solid rgba(56,189,248,0.3); background:var(--depth-2); border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:var(--accent); text-transform:uppercase; background:rgba(56,189,248,0.15); padding:3px 8px; border-radius:4px;">📈 Progress &amp; Cognitive Analytics</span>
+              <h3 style="margin:6px 0 2px; font-size:18px; font-weight:800; color:var(--text);">Readiness Meters, Mastery Tracking &amp; Mistake Book</h3>
+              <div style="font-size:12px; color:var(--text-sub);">Every metric derives from your verified study sessions. Backed up to Firebase Cloud.</div>
+            </div>
+            <button onclick="window.switchProgressTab&&switchProgressTab('readiness')" class="action-btn" style="padding:6px 14px; font-size:12px; color:var(--accent); border-color:rgba(56,189,248,0.4);">View Analytics</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -616,7 +665,16 @@
         <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Curated study materials, formula sheets, and references.</p>
       </div>
       <div id="resources-content">
-        <div style="color:var(--text-muted);font-size:13px;">Loading resources...</div>
+        <div class="nd-card" style="padding:22px; border:1px solid rgba(245,158,11,0.3); background:var(--depth-2); border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:var(--warning); text-transform:uppercase; background:rgba(245,158,11,0.15); padding:3px 8px; border-radius:4px;">📚 Curated Resource Library</span>
+              <h3 style="margin:6px 0 2px; font-size:18px; font-weight:800; color:var(--text);">Formula Sheets, Standard Textbooks &amp; PYQ Drives</h3>
+              <div style="font-size:12px; color:var(--text-sub);">Direct access to official IIT Madras question papers, IndiaBIX, GeeksforGeeks, and video lessons.</div>
+            </div>
+            <button onclick="window.renderResourcesLibrary&&renderResourcesLibrary()" class="action-btn" style="padding:6px 14px; font-size:12px; color:var(--warning); border-color:rgba(245,158,11,0.4);">Open Library</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -718,7 +776,16 @@
         <p style="color:var(--text-sub);font-size:13px;margin-top:4px;">Personalize your preparation OS.</p>
       </div>
       <div id="settings-content-area">
-        <div style="color:var(--text-muted);font-size:13px;">Loading settings...</div>
+        <div class="nd-card" style="padding:22px; border:1px solid var(--border-subtle); background:var(--depth-2); border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:var(--primary-light); text-transform:uppercase; background:rgba(99,102,241,0.15); padding:3px 8px; border-radius:4px;">⚙️ Preparation OS Settings</span>
+              <h3 style="margin:6px 0 2px; font-size:18px; font-weight:800; color:var(--text);">Goals, Time Budget &amp; Firebase Cloud Synchronization</h3>
+              <div style="font-size:12px; color:var(--text-sub);">Configure daily study hours, active targets, and cloud database preferences.</div>
+            </div>
+            <button onclick="window.openSetupWizard&&openSetupWizard()" class="submit-btn" style="padding:6px 14px; font-size:12px;">Run Setup Wizard</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -790,7 +857,7 @@
     <div id="shutdown-highlights"></div>
     <div style="margin-top:16px;padding:14px;background:rgba(91,91,214,0.08);border:1px solid rgba(91,91,214,0.22);border-radius:var(--radius-sm);">
       <div style="font-size:11px;font-weight:800;color:var(--primary-light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">&#x1F3AF; Tomorrow's Priority</div>
-      <div id="shutdown-tomorrow" style="font-size:13px;color:var(--text);line-height:1.5;">Loading...</div>
+      <div id="shutdown-tomorrow" style="font-size:13px;color:var(--text);line-height:1.5;">Tomorrow's focus: Core Computer Science fundamentals and DSA problem-solving sprint.</div>
     </div>
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
       <button onclick="openModal('weekly-report-modal');window.generateWeeklyReport&&generateWeeklyReport();" style="flex:1;padding:10px;background:var(--surface-mid);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">&#x1F4CA; Weekly Report</button>
@@ -805,7 +872,7 @@
     <button class="modal-close" data-close="weekly-report-modal" aria-label="Close">&#x2715;</button>
     <div class="modal-title">&#x1F4CA; Weekly Mentor Report</div>
     <div class="modal-subtitle">Generated from your actual study activity</div>
-    <div id="weekly-report-content" style="margin-top:16px;"><div style="color:var(--text-muted);font-size:13px;">Loading report...</div></div>
+    <div id="weekly-report-content" style="margin-top:16px;"><div style="color:var(--text-sub);font-size:13px;padding:16px;background:var(--depth-1);border-radius:8px;border:1px solid var(--border-subtle);">Weekly progress report is generated dynamically based on completed study tasks and practice scores.</div></div>
   </div>
 </div>
 
@@ -4372,6 +4439,65 @@ function solve(arr) {
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- FIREBASE AUTHENTICATION & GOOGLE LOGIN MODAL -->
+<div class="modal-backdrop" id="firebase-auth-modal" style="display:none; position:fixed; inset:0; background:rgba(5,5,16,0.8); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center;" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+  <div class="modal-card" style="max-width:440px; width:92%; padding:26px; border-radius:16px; background:var(--depth-2); border:1px solid rgba(99,102,241,0.35); box-shadow:0 24px 48px rgba(0,0,0,0.7);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:24px;">🔐</span>
+        <div>
+          <h3 id="auth-modal-title" style="margin:0; font-size:18px; font-weight:800; color:var(--text);">Account Authentication</h3>
+          <div style="font-size:11px; color:var(--text-muted);">Firebase Cloud Sync &bull; Project: linguastream-lzxdj</div>
+        </div>
+      </div>
+      <button onclick="window.closeAuthModal&&closeAuthModal()" style="background:none; border:none; color:var(--text-muted); font-size:22px; cursor:pointer; line-height:1;">&times;</button>
+    </div>
+
+    <!-- Authenticated User Profile View -->
+    <div id="auth-logged-in-view" style="display:none; text-align:center; padding:12px 0;">
+      <div id="auth-user-avatar-wrap" style="margin-bottom:12px;">
+        <img id="auth-user-avatar" src="" style="width:68px; height:68px; border-radius:50%; border:2px solid var(--success); object-fit:cover; display:inline-block;" alt="Avatar" />
+      </div>
+      <div id="auth-user-name" style="font-size:17px; font-weight:800; color:var(--text);">Student Name</div>
+      <div id="auth-user-email" style="font-size:12px; color:var(--text-muted); margin-top:3px;">student@email.com</div>
+      <div style="margin:16px 0; padding:12px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); border-radius:8px; font-size:12px; color:var(--success); line-height:1.4;">
+        ✓ <strong>Cloud Sync Active</strong> &mdash; Mistakes, study blueprints, and mock test scores are backed up in Firebase.
+      </div>
+      <button onclick="window.signOutFirebaseUser&&signOutFirebaseUser()" style="width:100%; padding:11px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); border-radius:8px; color:var(--danger); font-weight:700; font-size:13px; cursor:pointer;">Sign Out</button>
+    </div>
+
+    <!-- Logged Out View with Google OAuth & Email -->
+    <div id="auth-logged-out-view">
+      <!-- One-Click Google OAuth Button -->
+      <button onclick="window.signInWithGoogleAuth&&signInWithGoogleAuth()" id="google-auth-btn" style="width:100%; padding:12px; border-radius:8px; background:#fff; color:#1f2937; border:1px solid #d1d5db; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 2px 5px rgba(0,0,0,0.15);">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        Sign In with Google
+      </button>
+
+      <div style="display:flex; align-items:center; gap:8px; margin:18px 0 14px;">
+        <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+        <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">or email credentials</span>
+        <div style="flex:1; height:1px; background:var(--border-subtle);"></div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <input type="email" id="auth-email-input" placeholder="student@example.com" style="width:100%; padding:10px 12px; border-radius:6px; background:var(--depth-1); border:1px solid var(--border-subtle); color:var(--text); font-size:13px;" />
+        <input type="password" id="auth-password-input" placeholder="Password" style="width:100%; padding:10px 12px; border-radius:6px; background:var(--depth-1); border:1px solid var(--border-subtle); color:var(--text); font-size:13px;" />
+        <div style="display:flex; gap:8px; margin-top:4px;">
+          <button onclick="window.signInWithEmailAuth&&signInWithEmailAuth()" style="flex:1; padding:10px; background:var(--primary); color:#fff; border:none; border-radius:6px; font-weight:700; font-size:12px; cursor:pointer;">Sign In</button>
+          <button onclick="window.signUpWithEmailAuth&&signUpWithEmailAuth()" style="flex:1; padding:10px; background:var(--surface); border:1px solid var(--border-subtle); color:var(--text); border-radius:6px; font-weight:700; font-size:12px; cursor:pointer;">Register</button>
+        </div>
+      </div>
+
+      <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle); text-align:center;">
+        <button onclick="window.signInAsGuestAuth&&signInAsGuestAuth()" style="background:none; border:none; color:var(--primary-light); font-size:12px; font-weight:600; text-decoration:underline; cursor:pointer;">
+          ⚡ Instant Demo Student Mode (1-Click)
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 

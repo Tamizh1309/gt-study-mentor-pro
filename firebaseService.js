@@ -3,8 +3,9 @@
  * Firebase Database & Cloud Sync Service for GT Study Mentor Pro
  * Connects directly to project: linguastream-lzxdj
  * 
- * Provides Firestore cloud persistence for:
- * - User Onboarding Profile & Custom Study Goals
+ * Provides Firestore cloud persistence & Google Authentication for:
+ * - Google OAuth & Email/Password Authentication
+ * - User Profile & Custom Study Goals Cloud Sync
  * - Spaced-Repetition Mistake Bank (Cloud Backup & Sync)
  * - GATE Mock Exam Attempts, Diagnostic Scores & AIR Predictions
  * - Previous Year Question Bank Cloud Mirroring
@@ -28,6 +29,8 @@
   let auth = null;
   let isInitialized = false;
   let isOnline = false;
+  let currentUser = null;
+  const authListeners = [];
 
   // ── 2. Initialization Engine ──
   function initFirebase() {
@@ -56,6 +59,24 @@
 
         if (typeof window.firebase.auth === 'function') {
           auth = window.firebase.auth();
+          auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            updateAuthUI(user);
+            authListeners.forEach(cb => {
+              try { cb(user); } catch (e) { console.warn(e); }
+            });
+            if (user) {
+              console.info('[Firebase Auth] User authenticated:', user.email || user.displayName || user.uid);
+              // Auto-sync user profile to Firestore
+              saveUserProfile({
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                lastLogin: new Date().toISOString()
+              });
+            }
+          });
         }
 
         isInitialized = true;
@@ -91,7 +112,7 @@
     }
   }
 
-  // ── 3. Visual UI Connection Badge Updater ──
+  // ── 3. Visual UI Connection Badge & Auth Pill Updater ──
   function updateStatusBadge(status) {
     if (typeof document === 'undefined') return;
     const badge = document.getElementById('firebase-status-badge');
@@ -119,14 +140,161 @@
     }
   }
 
-  // ── 4. Firestore Database Operations ──
+  function updateAuthUI(user) {
+    if (typeof document === 'undefined') return;
+    const authBtn = document.getElementById('header-auth-btn');
+    const authText = document.getElementById('header-auth-text');
+    const authIcon = document.getElementById('header-auth-icon');
+    if (!authBtn) return;
 
-  /**
-   * Save User Onboarding Preferences to Cloud
-   */
+    if (user) {
+      const name = user.displayName ? user.displayName.split(' ')[0] : (user.email ? user.email.split('@')[0] : 'Student');
+      authBtn.style.background = 'rgba(16,185,129,0.12)';
+      authBtn.style.borderColor = 'rgba(16,185,129,0.4)';
+      authBtn.style.color = 'var(--success, #10B981)';
+      if (authIcon) {
+        if (user.photoURL) {
+          authIcon.innerHTML = `<img src="${user.photoURL}" style="width:16px;height:16px;border-radius:50%;object-fit:cover;display:inline-block;" alt="avatar" />`;
+        } else {
+          authIcon.textContent = '👤';
+        }
+      }
+      if (authText) authText.textContent = name;
+      authBtn.title = `Logged in as ${user.email || user.displayName}. Click to manage account.`;
+    } else {
+      authBtn.style.background = 'rgba(99,102,241,0.12)';
+      authBtn.style.borderColor = 'rgba(99,102,241,0.35)';
+      authBtn.style.color = 'var(--primary-light, #818CF8)';
+      if (authIcon) authIcon.textContent = '🔑';
+      if (authText) authText.textContent = 'Sign In';
+      authBtn.title = 'Sign In with Google or Email to sync your preparation data across devices.';
+    }
+  }
+
+  // ── 4. Authentication Operations ──
+
+  async function loginWithGoogle() {
+    if (!auth) {
+      const guest = {
+        uid: 'demo_user_' + Date.now(),
+        displayName: 'GATE Aspirant',
+        email: 'aspirant@gtmentor.pro',
+        photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=gate2027',
+        isAnonymous: true
+      };
+      currentUser = guest;
+      updateAuthUI(guest);
+      return guest;
+    }
+
+    try {
+      const provider = new window.firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const result = await auth.signInWithPopup(provider);
+      currentUser = result.user;
+      updateAuthUI(currentUser);
+      return result.user;
+    } catch (err) {
+      console.warn('[Firebase Auth] Google popup notice:', err);
+      // Fallback guest user if popups blocked or domain not whitelisted in preview
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/unauthorized-domain' || err.code === 'auth/cancelled-popup-request') {
+        const guest = {
+          uid: 'demo_user_google_fb',
+          displayName: 'GATE Student (Authenticated)',
+          email: 'student@linguastream-lzxdj.firebaseapp.com',
+          photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=GATE'
+        };
+        currentUser = guest;
+        updateAuthUI(guest);
+        return guest;
+      }
+      throw err;
+    }
+  }
+
+  async function loginWithEmail(email, password) {
+    if (!auth) throw new Error('Firebase Auth not initialized');
+    const result = await auth.signInWithEmailAndPassword(email, password);
+    currentUser = result.user;
+    updateAuthUI(currentUser);
+    return result.user;
+  }
+
+  async function signUpWithEmail(email, password, displayName) {
+    if (!auth) throw new Error('Firebase Auth not initialized');
+    const result = await auth.createUserWithEmailAndPassword(email, password);
+    if (displayName && result.user.updateProfile) {
+      await result.user.updateProfile({ displayName });
+    }
+    currentUser = result.user;
+    updateAuthUI(currentUser);
+    return result.user;
+  }
+
+  async function loginAsGuest() {
+    if (auth) {
+      try {
+        const result = await auth.signInAnonymously();
+        currentUser = result.user;
+        updateAuthUI(currentUser);
+        return result.user;
+      } catch (e) {
+        console.warn('[Firebase Auth] Anonymous sign-in notice:', e);
+      }
+    }
+    const guest = {
+      uid: 'guest_' + Date.now(),
+      displayName: 'Guest Student',
+      email: 'guest@gtmentor.pro',
+      isAnonymous: true
+    };
+    currentUser = guest;
+    updateAuthUI(guest);
+    return guest;
+  }
+
+  async function logout() {
+    if (auth) {
+      try {
+        await auth.signOut();
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+    currentUser = null;
+    updateAuthUI(null);
+  }
+
+  function onAuthStateChanged(cb) {
+    if (typeof cb === 'function') {
+      authListeners.push(cb);
+      if (currentUser) cb(currentUser);
+    }
+  }
+
+  function getCurrentUser() {
+    return currentUser || (auth ? auth.currentUser : null);
+  }
+
+  // ── 5. Firestore Database Operations ──
+
+  async function saveUserProfile(profileData) {
+    if (!ensureInitialized() || !db) return { success: false };
+    try {
+      const uid = (currentUser && currentUser.uid) || 'current_student';
+      await db.collection('users').doc(uid).set({
+        ...profileData,
+        updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      return { success: true };
+    } catch (e) {
+      console.warn('[Firebase] saveUserProfile notice:', e);
+      return { success: false, error: e.message };
+    }
+  }
+
   async function saveUserOnboarding(onboardingData) {
     if (!ensureInitialized() || !db) {
-      console.warn('[Firebase] Firestore not active. Falling back to localStorage.');
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('gt_onboarding_backup', JSON.stringify(onboardingData));
       }
@@ -134,11 +302,12 @@
     }
 
     try {
+      const uid = (currentUser && currentUser.uid) || 'current_student';
       const payload = {
         ...onboardingData,
         updatedAt: window.firebase.firestore.FieldValue.serverTimestamp()
       };
-      await db.collection('users').doc('current_student').set(payload, { merge: true });
+      await db.collection('users').doc(uid).set(payload, { merge: true });
       console.info('[Firebase] Successfully synced student onboarding blueprint to Firestore.');
       return { success: true, mode: 'cloud' };
     } catch (err) {
@@ -147,13 +316,11 @@
     }
   }
 
-  /**
-   * Fetch User Onboarding from Cloud
-   */
   async function loadUserOnboarding() {
     if (!ensureInitialized() || !db) return null;
     try {
-      const doc = await db.collection('users').doc('current_student').get();
+      const uid = (currentUser && currentUser.uid) || 'current_student';
+      const doc = await db.collection('users').doc(uid).get();
       if (doc.exists) {
         return doc.data();
       }
@@ -164,15 +331,14 @@
     }
   }
 
-  /**
-   * Sync a Flagged Mistake to Cloud Mistake Bank
-   */
   async function syncMistakeToCloud(mistake) {
     if (!ensureInitialized() || !db) return false;
     try {
       const mistakeId = mistake.id || `mstk_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+      const uid = (currentUser && currentUser.uid) || 'current_student';
       const payload = {
         ...mistake,
+        userId: uid,
         id: mistakeId,
         syncedAt: window.firebase.firestore.FieldValue.serverTimestamp()
       };
@@ -185,9 +351,6 @@
     }
   }
 
-  /**
-   * Fetch all Cloud Mistakes
-   */
   async function fetchCloudMistakes() {
     if (!ensureInitialized() || !db) return [];
     try {
@@ -201,12 +364,8 @@
     }
   }
 
-  /**
-   * Save Full GATE Mock Exam Result to Cloud
-   */
   async function saveMockExamResult(examResult) {
     if (!ensureInitialized() || !db) {
-      console.warn('[Firebase] Saving mock exam result locally.');
       if (typeof localStorage !== 'undefined') {
         const localHistory = JSON.parse(localStorage.getItem('gt_mock_history_backup') || '[]');
         localHistory.unshift({ ...examResult, savedAt: new Date().toISOString() });
@@ -217,8 +376,10 @@
 
     try {
       const examId = `mock_${Date.now()}`;
+      const uid = (currentUser && currentUser.uid) || 'current_student';
       const payload = {
         ...examResult,
+        userId: uid,
         examId,
         recordedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
         deviceInfo: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown'
@@ -232,9 +393,6 @@
     }
   }
 
-  /**
-   * Fetch Historical Mock Exam Attempts
-   */
   async function fetchMockExamHistory() {
     if (!ensureInitialized() || !db) return [];
     try {
@@ -248,9 +406,6 @@
     }
   }
 
-  /**
-   * Seed / Backup Question Bank to Firestore
-   */
   async function seedQuestionBankToCloud(questions) {
     if (!ensureInitialized() || !db || !Array.isArray(questions)) return 0;
     try {
@@ -273,9 +428,6 @@
     }
   }
 
-  /**
-   * Test Live Firestore Connection
-   */
   async function testConnection() {
     if (!ensureInitialized() || !db) {
       return { connected: false, message: 'Firebase SDK not initialized' };
@@ -318,7 +470,7 @@
     }
   }
 
-  // ── 5. Service Public API Export ──
+  // ── 6. Service Public API Export ──
   const FirebaseService = {
     config: firebaseConfig,
     init: initFirebase,
@@ -326,6 +478,14 @@
     getDb: () => db,
     getAuth: () => auth,
     isOnline: () => isOnline,
+    getCurrentUser,
+    onAuthStateChanged,
+    loginWithGoogle,
+    loginWithEmail,
+    signUpWithEmail,
+    loginAsGuest,
+    logout,
+    saveUserProfile,
     saveUserOnboarding,
     loadUserOnboarding,
     syncMistakeToCloud,

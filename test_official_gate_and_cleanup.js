@@ -480,8 +480,8 @@ async function runSuite() {
   console.log('✅ ALL TESTS (OPTIONS 1, 2, 3 & DATE/TIME ENGINE) VERIFIED (100% PASS)');
   console.log('======================================================\n');
 
-  // ── 9. Testing Firebase Cloud Database Integration (linguastream-lzxdj) ──
-  console.log('9. Testing Firebase Cloud Database Service & Firestore Sync...');
+  // ── 9. Testing Firebase Cloud Database & Authentication Integration (linguastream-lzxdj) ──
+  console.log('9. Testing Firebase Cloud Database Service, Google Auth & Firestore Sync...');
   const firebaseService = require('./firebaseService');
   assert(firebaseService !== undefined, 'firebaseService exports FirebaseService module');
   assert(firebaseService.config.projectId === 'linguastream-lzxdj', 'Firebase configured with project ID linguastream-lzxdj');
@@ -491,20 +491,47 @@ async function runSuite() {
   assert(typeof firebaseService.saveMockExamResult === 'function', 'firebaseService defines saveMockExamResult');
   assert(typeof firebaseService.seedQuestionBankToCloud === 'function', 'firebaseService defines seedQuestionBankToCloud');
   assert(typeof firebaseService.testConnection === 'function', 'firebaseService defines testConnection');
+  assert(typeof firebaseService.loginWithGoogle === 'function', 'firebaseService defines loginWithGoogle');
+  assert(typeof firebaseService.loginWithEmail === 'function', 'firebaseService defines loginWithEmail');
+  assert(typeof firebaseService.signUpWithEmail === 'function', 'firebaseService defines signUpWithEmail');
+  assert(typeof firebaseService.loginAsGuest === 'function', 'firebaseService defines loginAsGuest');
+  assert(typeof firebaseService.logout === 'function', 'firebaseService defines logout');
+  assert(typeof firebaseService.onAuthStateChanged === 'function', 'firebaseService defines onAuthStateChanged');
+  assert(typeof firebaseService.saveUserProfile === 'function', 'firebaseService defines saveUserProfile');
 
-  // DOM checks
-  assert(indexHtml.includes('src="firebaseService.js"'), 'index.html loads firebaseService.js');
-  assert(indexHtml.includes('id="firebase-status-badge"'), 'index.html contains #firebase-status-badge in header');
-  assert(indexHtml.includes('firebase-firestore-compat.js'), 'index.html includes official Firebase Firestore SDK');
+  // DOM checks for Firebase & Auth
+  const freshIndexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  assert(freshIndexHtml.includes('src="firebaseService.js"'), 'index.html loads firebaseService.js');
+  assert(freshIndexHtml.includes('id="firebase-status-badge"'), 'index.html contains #firebase-status-badge in header');
+  assert(freshIndexHtml.includes('id="header-auth-btn"'), 'index.html contains #header-auth-btn in header');
+  assert(freshIndexHtml.includes('id="firebase-auth-modal"'), 'index.html contains #firebase-auth-modal dialog');
+  assert(freshIndexHtml.includes('id="google-auth-btn"'), 'index.html contains #google-auth-btn with Google OAuth');
+  assert(freshIndexHtml.includes('firebase-firestore-compat.js'), 'index.html includes official Firebase Firestore SDK');
+  assert(freshIndexHtml.includes('firebase-auth-compat.js'), 'index.html includes official Firebase Auth SDK');
 
-  assert(updatedAppJs.includes('window.testFirebaseConnection'), 'app.js defines window.testFirebaseConnection');
-  assert(updatedAppJs.includes('saveMockExamResult'), 'app.js wires saveMockExamResult to GATE mock submissions');
+  // Zero-Loading Verification across all primary views
+  assert(!freshIndexHtml.includes('Loading preparation data...'), 'Eliminated Loading preparation data placeholder');
+  assert(!freshIndexHtml.includes('Loading practice modules...'), 'Eliminated Loading practice modules placeholder');
+  assert(!freshIndexHtml.includes('Loading career pipeline...'), 'Eliminated Loading career pipeline placeholder');
+  assert(!freshIndexHtml.includes('Loading progress data...'), 'Eliminated Loading progress data placeholder');
+  assert(!freshIndexHtml.includes('Loading resources...'), 'Eliminated Loading resources placeholder');
+  assert(!freshIndexHtml.includes('Loading settings...'), 'Eliminated Loading settings placeholder');
+  assert(!freshIndexHtml.includes("Loading today's tasks..."), "Eliminated Loading today's tasks placeholder");
+  assert(!freshIndexHtml.includes('Loading rescheduling suggestions...'), 'Eliminated Loading rescheduling suggestions placeholder');
+
+  const freshAppJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  assert(freshAppJs.includes('window.testFirebaseConnection'), 'app.js defines window.testFirebaseConnection');
+  assert(freshAppJs.includes('saveMockExamResult'), 'app.js wires saveMockExamResult to GATE mock submissions');
+  assert(freshAppJs.includes('window.prewarmAllViews'), 'app.js defines window.prewarmAllViews');
+  assert(freshAppJs.includes('window.openAuthModal'), 'app.js defines window.openAuthModal');
+  assert(freshAppJs.includes('window.signInWithGoogleAuth'), 'app.js defines window.signInWithGoogleAuth');
+  assert(freshAppJs.includes('window.signInAsGuestAuth'), 'app.js defines window.signInAsGuestAuth');
 
   const mistakeBookJs = fs.readFileSync(path.join(__dirname, 'mistakeBook.js'), 'utf8');
   assert(mistakeBookJs.includes('syncMistakeToCloud'), 'mistakeBook.js triggers Firebase syncMistakeToCloud');
 
   console.log('\n======================================================');
-  console.log('✅ ALL TESTS (INCLUDING FIREBASE DATABASE) VERIFIED (100% PASS)');
+  console.log('✅ ALL TESTS (FIREBASE AUTH & ZERO-LOADING COMPLETE) (100% PASS)');
   console.log('======================================================\n');
 }
 
