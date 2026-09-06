@@ -225,6 +225,50 @@ async function runSuite() {
   assert(chatSweRes.status === 200, 'POST /api/jarvis/chat for SWE Roadmap returned 200');
   assert(chatSweRes.body.action.type === 'open_swe_roadmap', 'Live action returns open_swe_roadmap');
 
+  // Test Placement Roadmap queries
+  const iPlacement = classifyIntent('JARVIS show placement preparation roadmap');
+  assert(iPlacement.intent === 'OPEN_PLACEMENT_ROADMAP', 'Classifies Placement Roadmap query');
+
+  const actPlacement = resolveAction('OPEN_PLACEMENT_ROADMAP');
+  assert(actPlacement.type === 'open_placement_roadmap', 'Action type is open_placement_roadmap');
+  assert(actPlacement.params.tab === 'placement', 'Target tab is placement');
+
+  const chatPlacementRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'JARVIS open placement roadmap',
+    mode: 'study'
+  });
+
+  assert(chatPlacementRes.status === 200, 'POST /api/jarvis/chat for Placement Roadmap returned 200');
+  assert(chatPlacementRes.body.action.type === 'open_placement_roadmap', 'Live action returns open_placement_roadmap');
+
+  // Test Internship Roadmap queries
+  const iInternship = classifyIntent('JARVIS show internship preparation roadmap');
+  assert(iInternship.intent === 'OPEN_INTERNSHIP_ROADMAP', 'Classifies Internship Roadmap query');
+
+  const actInternship = resolveAction('OPEN_INTERNSHIP_ROADMAP');
+  assert(actInternship.type === 'open_internship_roadmap', 'Action type is open_internship_roadmap');
+  assert(actInternship.params.tab === 'intern', 'Target tab is intern');
+
+  const chatInternshipRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'JARVIS open internship roadmap',
+    mode: 'study'
+  });
+
+  assert(chatInternshipRes.status === 200, 'POST /api/jarvis/chat for Internship Roadmap returned 200');
+  assert(chatInternshipRes.body.action.type === 'open_internship_roadmap', 'Live action returns open_internship_roadmap');
+
   // ── 4. Codebase Cleanup & Resource Links Verification ──
   console.log('\n4. Testing Codebase Cleanliness & External Resource Links...');
   const appJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
@@ -245,6 +289,8 @@ async function runSuite() {
   assert(indexHtml.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'index.html contains Google Drive question papers link');
   assert(indexHtml.includes('swe-roadmap-modal'), 'index.html contains swe-roadmap-modal');
   assert(indexHtml.includes('gate-roadmap-modal'), 'index.html contains gate-roadmap-modal');
+  assert(indexHtml.includes('placement-roadmap-modal'), 'index.html contains placement-roadmap-modal');
+  assert(indexHtml.includes('internship-roadmap-modal'), 'index.html contains internship-roadmap-modal');
 
   // GATE 2027 CS Roadmap Verifications
   assert(appJs.includes('GATE_2027_PHASES'), 'app.js defines GATE_2027_PHASES');
@@ -256,8 +302,22 @@ async function runSuite() {
   assert(appJs.includes('Discipline today, a better tomorrow.'), 'app.js contains IIT Madras roadmap motto');
   assert(appJs.includes('Same You, But Stronger for GATE 2027.'), 'app.js contains GATE 2027 closing quote');
 
+  // Placement Roadmap Verifications
+  assert(appJs.includes('PLACEMENT_ROADMAP_PHASES'), 'app.js defines PLACEMENT_ROADMAP_PHASES');
+  assert(appJs.includes('PLACEMENT_ROADMAP_AREAS'), 'app.js defines PLACEMENT_ROADMAP_AREAS');
+  assert(appJs.includes('Opportunities don\'t happen, you create them.'), 'app.js contains Placement quote');
+  assert(appJs.includes('Prepared Mind. Better Opportunities. Brighter Future.'), 'app.js contains Placement outcome');
+
+  // Internship Roadmap Verifications
+  assert(appJs.includes('INTERNSHIP_ROADMAP_PHASES'), 'app.js defines INTERNSHIP_ROADMAP_PHASES');
+  assert(appJs.includes('INTERNSHIP_ROADMAP_AREAS'), 'app.js defines INTERNSHIP_ROADMAP_AREAS');
+  assert(appJs.includes('An internship today, a stronger tomorrow.'), 'app.js contains Internship quote');
+  assert(appJs.includes('Today\'s preparation leads to tomorrow\'s opportunities.'), 'app.js contains Internship outcome');
+  assert(appJs.includes('https://internshala.com'), 'app.js contains Internshala link');
+  assert(appJs.includes('https://wellfound.com'), 'app.js contains Wellfound link');
+
   console.log('\n======================================================');
-  console.log('✅ ALL RESOURCE, ROADMAP & CLEANUP TESTS PASSED (100%)');
+  console.log('✅ ALL ROADMAPS (SWE, GATE, PLACEMENT, INTERNSHIP) VERIFIED (100%)');
   console.log('======================================================\n');
 }
 

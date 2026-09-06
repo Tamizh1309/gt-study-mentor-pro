@@ -36,7 +36,9 @@ const ALLOWED_ACTIONS = {
   OPEN_GATE_OFFICIAL: 'open_gate_official',
   OPEN_GATE_PREPARE: 'open_gate_prepare',
   OPEN_APTITUDE_RESOURCE: 'open_aptitude_resource',
-  OPEN_SWE_ROADMAP: 'open_swe_roadmap'
+  OPEN_SWE_ROADMAP: 'open_swe_roadmap',
+  OPEN_PLACEMENT_ROADMAP: 'open_placement_roadmap',
+  OPEN_INTERNSHIP_ROADMAP: 'open_internship_roadmap'
 };
 
 /**
@@ -231,6 +233,22 @@ function resolveAction(intent, params = {}) {
         type: ALLOWED_ACTIONS.OPEN_SWE_ROADMAP,
         params: { view: 'prepare', tab: 'swe' },
         spokenConfirmation: "Opening the 12-Step Software Engineer Roadmap."
+      };
+    }
+
+    case 'OPEN_PLACEMENT_ROADMAP': {
+      return {
+        type: ALLOWED_ACTIONS.OPEN_PLACEMENT_ROADMAP,
+        params: { view: 'prepare', tab: 'placement' },
+        spokenConfirmation: "Opening the Placement Preparation Roadmap."
+      };
+    }
+
+    case 'OPEN_INTERNSHIP_ROADMAP': {
+      return {
+        type: ALLOWED_ACTIONS.OPEN_INTERNSHIP_ROADMAP,
+        params: { view: 'prepare', tab: 'intern' },
+        spokenConfirmation: "Opening the Internship Preparation Roadmap."
       };
     }
 

@@ -8762,40 +8762,451 @@ function renderGATE2027Roadmap(container, isModal = false) {
   `;
 }
 
+// ─── PLACEMENT PREPARATION ROADMAP DATA & ENGINE ───
+const PLACEMENT_ROADMAP_PHASES = [
+  {
+    phase: 1,
+    title: 'Foundation',
+    timeline: '1–2 Months (Month 1–2)',
+    goal: 'Build core skills and problem solving ability',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)'
+  },
+  {
+    phase: 2,
+    title: 'Skill Development',
+    timeline: '2–3 Months (Month 3–5)',
+    goal: 'Strengthen DSA, CS core and development skills',
+    color: '#3b82f6',
+    border: 'rgba(59, 130, 246, 0.4)'
+  },
+  {
+    phase: 3,
+    title: 'Projects & Profile',
+    timeline: '2 Months (Month 6–7)',
+    goal: 'Build real-world projects and online presence',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.4)'
+  },
+  {
+    phase: 4,
+    title: 'Practice & Mock Interviews',
+    timeline: '1–2 Months (Month 8–9)',
+    goal: 'Solve, test, improve and gain confidence',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)'
+  },
+  {
+    phase: 5,
+    title: 'Applications & Interviews',
+    timeline: 'Ongoing (Month 10+)',
+    goal: 'Apply, attend interviews and keep improving',
+    color: '#8b5cf6',
+    border: 'rgba(139, 92, 246, 0.4)'
+  }
+];
+
+const PLACEMENT_ROADMAP_AREAS = [
+  {
+    id: 1,
+    number: 1,
+    title: 'Problem Solving (DSA)',
+    icon: '💻',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)',
+    timeline: '3–5 months',
+    items: [
+      'Arrays, Strings, Linked Lists',
+      'Stacks, Queues, Trees, Graphs',
+      'Searching & Sorting',
+      'Recursion & Backtracking',
+      'Dynamic Programming & Greedy Algorithms',
+      'Practice on LeetCode / Codeforces'
+    ],
+    action: { label: 'Launch DSA Tracker →', handler: "navigateToView('practice', 'dsa')" }
+  },
+  {
+    id: 2,
+    number: 2,
+    title: 'CS Core Subjects',
+    icon: '⚙️',
+    color: '#3b82f6',
+    border: 'rgba(59, 130, 246, 0.4)',
+    timeline: '2–4 months',
+    items: [
+      'Operating Systems',
+      'Database Management Systems',
+      'Computer Networks',
+      'Software Engineering',
+      'Object Oriented Programming',
+      'Compiler Design & Computer Architecture'
+    ],
+    action: { label: 'Practice CS Core →', handler: "navigateToView('practice', 'cs-core')" }
+  },
+  {
+    id: 3,
+    number: 3,
+    title: 'Programming & Development',
+    icon: '🖥️',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)',
+    timeline: '3–5 months',
+    items: [
+      'C++ / Java / Python (choose & master one)',
+      'Learn clean code & OOPs',
+      'Web Development (HTML, CSS, JS, React / Next.js)',
+      'Backend Development (Node.js / Spring Boot)',
+      'Version Control (Git & GitHub)',
+      'API basics and deployment'
+    ],
+    action: { label: 'Code Studio →', handler: "openModal('code-studio-modal')" }
+  },
+  {
+    id: 4,
+    number: 4,
+    title: 'Projects (Real-World)',
+    icon: '🗄️',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.4)',
+    timeline: '2 months',
+    items: [
+      'Build 2–4 end-to-end projects',
+      'Solve real-world problems',
+      'Use modern tech stack',
+      'Write good README and documentation',
+      'Deploy projects (Vercel / Render / AWS)',
+      'Showcase on GitHub and portfolio'
+    ],
+    action: { label: 'Portfolio Projects →', handler: "navigateToView('career', 'projects')" }
+  },
+  {
+    id: 5,
+    number: 5,
+    title: 'Aptitude & Reasoning',
+    icon: '📊',
+    color: '#8b5cf6',
+    border: 'rgba(139, 92, 246, 0.4)',
+    timeline: '1–2 months (parallel)',
+    items: [
+      'Quantitative Aptitude',
+      'Logical Reasoning',
+      'Verbal Ability (basic)',
+      'Practice previous year questions',
+      'Focus on speed and accuracy'
+    ],
+    customLinks: `
+      <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+        <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="badge-pill" style="font-size:10px; text-decoration:none; background:rgba(99,216,255,0.12); color:var(--primary-light); border:1px solid rgba(99,216,255,0.3);">🌐 IndiaBIX ↗</a>
+        <a href="https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/" target="_blank" rel="noopener noreferrer" class="badge-pill" style="font-size:10px; text-decoration:none; background:rgba(34,197,94,0.12); color:var(--success); border:1px solid rgba(34,197,94,0.3);">🌿 GeeksforGeeks ↗</a>
+      </div>
+    `,
+    action: { label: 'Aptitude Drills →', handler: "navigateToView('practice', 'aptitude')" }
+  },
+  {
+    id: 6,
+    number: 6,
+    title: 'Resume & LinkedIn',
+    icon: '📄',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)',
+    timeline: '1 month',
+    items: [
+      'Create a clean, one-page resume',
+      'Highlight skills, projects and achievements',
+      'Use action verbs and quantifiable impact',
+      'Maintain an updated LinkedIn profile',
+      'Contribute to open source / write blogs'
+    ],
+    action: { label: 'ATS Resume Studio →', handler: "openModal('resume-ats-modal')" }
+  },
+  {
+    id: 7,
+    number: 7,
+    title: 'Interview Preparation',
+    icon: '👥',
+    color: '#0ea5e9',
+    border: 'rgba(14, 165, 233, 0.4)',
+    timeline: '1–2 months',
+    items: [
+      'DSA coding interviews',
+      'Technical interview (CS core + projects)',
+      'HR interview (STAR format, communication)',
+      'Mock interviews (LeetCode, InterviewBit, Pramp)',
+      'Revise frequently asked questions'
+    ],
+    action: { label: 'Mock Interview Studio →', handler: "openModal('mock-interview-modal')" }
+  },
+  {
+    id: 8,
+    number: 8,
+    title: 'Applications & Opportunities',
+    icon: '🎯',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)',
+    timeline: 'Ongoing',
+    items: [
+      'Apply on company career pages',
+      'Use LinkedIn, Naukri, Internshala, Wellfound',
+      'Participate in hackathons and contests',
+      'Explore internships (even off-campus)',
+      'Keep a tracker of applications and results',
+      'Be consistent and don\'t give up'
+    ],
+    action: { label: 'Applications Pipeline →', handler: "navigateToView('career', 'apps')" }
+  }
+];
+
+function getPlacementRoadmapCompletedAreas() {
+  try {
+    const raw = localStorage.getItem('gt_placement_roadmap_completed_areas');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+window.togglePlacementRoadmapArea = function(areaId, isModal = false) {
+  const completed = getPlacementRoadmapCompletedAreas();
+  const index = completed.indexOf(areaId);
+  if (index > -1) {
+    completed.splice(index, 1);
+  } else {
+    completed.push(areaId);
+  }
+  localStorage.setItem('gt_placement_roadmap_completed_areas', JSON.stringify(completed));
+
+  const container = isModal
+    ? document.getElementById('modal-placement-roadmap-container')
+    : document.getElementById('prepare-content-area');
+  if (container) {
+    renderPlacementRoadmap(container, isModal);
+  }
+
+  const modalBadge = document.getElementById('placement-roadmap-modal-progress-badge');
+  if (modalBadge) {
+    modalBadge.textContent = `${completed.length} / 8 Areas Completed`;
+  }
+
+  if (typeof showToast === 'function') {
+    const area = PLACEMENT_ROADMAP_AREAS.find(a => a.id === areaId);
+    const title = area ? area.title : `Area ${areaId}`;
+    if (completed.includes(areaId)) {
+      showToast(`💼 Marked ${title} as completed!`, 'success');
+    } else {
+      showToast(`${title} marked as in progress.`, 'info');
+    }
+  }
+};
+
+window.openPlacementRoadmapStudio = function() {
+  const container = document.getElementById('modal-placement-roadmap-container');
+  if (container) {
+    renderPlacementRoadmap(container, true);
+  }
+  if (typeof window.openModal === 'function') {
+    window.openModal('placement-roadmap-modal');
+  }
+};
+
+function renderPlacementRoadmap(container, isModal = false) {
+  if (!container) return;
+  const completed = getPlacementRoadmapCompletedAreas();
+  const percent = Math.round((completed.length / 8) * 100);
+
+  container.innerHTML = `
+    <!-- PLACEMENT HERO HEADER -->
+    <div class="nd-card" style="padding:22px; margin-bottom:20px; border:1px solid rgba(99,216,255,0.35); background:radial-gradient(circle at top right, rgba(99,216,255,0.12), transparent 60%), var(--depth-2); position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:800; color:var(--primary-light); letter-spacing:0.8px; text-transform:uppercase; background:rgba(99,216,255,0.15); padding:3px 8px; border-radius:4px; border:1px solid rgba(99,216,255,0.3);">💼 PLACEMENT ROADMAP</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">"Opportunities don't happen, you create them."</span>
+          </div>
+          <h2 style="font-size:1.45rem; font-weight:800; color:var(--text); margin:4px 0;">Placement Preparation Roadmap</h2>
+          <p style="font-size:12px; color:var(--text-sub); margin:0;">
+            From Learning → Practice → Projects → Interviews → <em>Your Dream Job</em> &bull; Consistent Practice Creates Opportunities
+          </p>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; font-weight:800; color:var(--success); background:rgba(34,197,94,0.15); padding:4px 10px; border-radius:6px; display:inline-block; margin-bottom:4px;">
+            ${completed.length} / 8 Areas Completed (${percent}%)
+          </div>
+          <div style="font-size:10px; color:var(--text-muted);">Trophy Milestone: Get Placed 🎯</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; margin-bottom:18px;">
+        <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6); transition:width 0.4s ease;"></div>
+      </div>
+
+      <!-- 5-PHASE TIMELINE TRACK -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; margin-bottom:14px;">
+        ${PLACEMENT_ROADMAP_PHASES.map((p, idx) => `
+          <div style="background:var(--depth-3); border:1px solid ${p.border}; border-radius:var(--radius-sm); padding:10px 12px;">
+            <div style="font-size:10px; font-weight:800; color:${p.color}; text-transform:uppercase;">Phase ${p.phase}</div>
+            <div style="font-size:12px; font-weight:800; color:var(--text); margin:2px 0;">${p.title}</div>
+            <div style="font-size:10px; color:var(--text-muted);">${p.timeline}</div>
+            <div style="font-size:10px; color:var(--text-sub); margin-top:4px; line-height:1.3;">${p.goal}</div>
+          </div>
+        `).join('')}
+        <div style="background:linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,185,129,0.05)); border:1px solid rgba(34,197,94,0.4); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:center;">
+          <div style="font-size:10px; font-weight:800; color:var(--success); text-transform:uppercase;">Final Goal</div>
+          <div style="font-size:12px; font-weight:800; color:#fff; display:flex; align-items:center; gap:4px;">
+            <span>🎯</span> <span>Get Placed</span>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted);">High-impact software engineering role</div>
+        </div>
+      </div>
+
+      ${!isModal ? `
+        <div style="display:flex; justify-content:flex-end;">
+          <button onclick="openPlacementRoadmapStudio()" class="action-btn" style="font-size:11px; padding:4px 12px;">
+            ⛶ Fullscreen Placement Studio
+          </button>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- 8 CORE WHAT TO LEARN AND PRACTICE AREAS -->
+    <div style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <div>
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text); margin:0;">What to Learn and Practice?</h3>
+        <p style="font-size:11px; color:var(--text-muted); margin:2px 0 0;">8 structured pillars covering DSA, CS fundamentals, development, projects, and interviews.</p>
+      </div>
+      <button class="action-btn" onclick="openModal('star-studio-modal')" style="font-size:11px; padding:4px 12px;">Open STAR Studio →</button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:24px;">
+      ${PLACEMENT_ROADMAP_AREAS.map(a => {
+        const isDone = completed.includes(a.id);
+        return `
+          <div class="track-card" style="padding:16px; border:1px solid ${isDone ? 'rgba(34,197,94,0.45)' : a.border}; background:${isDone ? 'radial-gradient(circle at top right, rgba(34,197,94,0.08), transparent 60%), var(--depth-2)' : 'var(--depth-2)'}; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.25s ease;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:${a.color}; color:#fff; font-weight:800; font-size:12px;">
+                    ${a.number}
+                  </span>
+                  <div>
+                    <strong style="font-size:13px; color:var(--text); line-height:1.2; display:block;">${a.title}</strong>
+                    <span style="font-size:10px; color:var(--text-muted);">${a.timeline}</span>
+                  </div>
+                </div>
+              </div>
+
+              <ul style="list-style:none; padding:0; margin:8px 0 10px 0; font-size:11px; color:var(--text-sub); line-height:1.5;">
+                ${a.items.map(it => `
+                  <li style="display:flex; align-items:flex-start; gap:6px; margin-bottom:3px;">
+                    <span style="color:${a.color};">•</span>
+                    <span>${it}</span>
+                  </li>
+                `).join('')}
+              </ul>
+
+              ${a.customLinks || ''}
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; pt:8px; border-top:1px solid var(--border-subtle); margin-top:10px; gap:8px;">
+              <button onclick="togglePlacementRoadmapArea(${a.id}, ${isModal})" class="action-btn" style="font-size:10px; padding:4px 8px; background:${isDone ? 'rgba(34,197,94,0.15)' : 'transparent'}; color:${isDone ? 'var(--success)' : 'var(--text-sub)'}; border-color:${isDone ? 'var(--success)' : 'var(--border-subtle)'};">
+                ${isDone ? '✓ Completed' : '○ Mark Done'}
+              </button>
+              <button onclick="${a.action.handler}" class="action-btn" style="font-size:10px; padding:4px 8px; color:${a.color}; border-color:${a.border};">
+                ${a.action.label}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <!-- 4 GUIDANCE PANELS (Recommended Resources, Daily Plan, Key Tips, Your Outcome) -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-bottom:14px;">
+      <!-- Panel 1: Recommended Resources -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(16,185,129,0.3); background:rgba(16,185,129,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">📚</span>
+          <strong style="font-size:12px; color:var(--text);">Recommended Resources</strong>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <li>✓ <a href="https://leetcode.com" target="_blank" rel="noopener" style="color:var(--primary-light);">LeetCode</a> (DSA)</li>
+          <li>✓ <a href="https://www.geeksforgeeks.org" target="_blank" rel="noopener" style="color:var(--success);">GeeksforGeeks</a> (DSA + CS Core)</li>
+          <li>✓ NPTEL (CS Subjects)</li>
+          <li>✓ Striver's A2Z DSA Sheet</li>
+          <li>✓ Apna College &amp; Love Babbar (YouTube)</li>
+          <li>✓ InterviewBit &amp; Pramp (Mock Interviews)</li>
+          <li>✓ HackerRank &amp; Codeforces</li>
+          <li>✓ System Design Primer (GitHub)</li>
+        </ul>
+      </div>
+
+      <!-- Panel 2: Daily / Weekly Plan -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">🗓️</span>
+          <strong style="font-size:12px; color:var(--text);">Daily / Weekly Plan (Example)</strong>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <li>✓ 2–3 hours DSA practice</li>
+          <li>✓ 1 hour CS core subject study</li>
+          <li>✓ 1 hour development / project work</li>
+          <li>✓ 30 minutes aptitude practice</li>
+          <li>✓ Read / write technical blogs</li>
+          <li>✓ Update LinkedIn / apply for jobs (weekly)</li>
+          <li>✓ Take one mock test per week</li>
+          <li>✓ Revise and track progress with GT Mentor</li>
+        </ul>
+      </div>
+
+      <!-- Panel 3: Key Tips -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(245,158,11,0.3); background:rgba(245,158,11,0.04); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <span style="font-size:16px;">💡</span>
+            <strong style="font-size:12px; color:var(--text);">Key Tips</strong>
+          </div>
+          <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+            <li>• Be consistent and follow a schedule</li>
+            <li>• Focus on problem solving and fundamentals</li>
+            <li>• Build and showcase real projects</li>
+            <li>• Keep learning and stay curious</li>
+            <li>• Practice mock interviews regularly</li>
+            <li>• Improve communication &amp; behavioral skills</li>
+            <li>• Take care of your mental well-being</li>
+          </ul>
+        </div>
+        <div style="margin-top:8px; font-size:10px; font-weight:800; color:var(--warning); text-align:center;">
+          Small Steps Every Day Lead to Big Opportunities!
+        </div>
+      </div>
+
+      <!-- Panel 4: Your Outcome -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(139,92,246,0.3); background:rgba(139,92,246,0.04); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <span style="font-size:16px;">🏆</span>
+            <strong style="font-size:12px; color:var(--text);">Your Outcome</strong>
+          </div>
+          <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+            <li>✓ Strong problem solving skills</li>
+            <li>✓ Good understanding of CS fundamentals</li>
+            <li>✓ Real-world projects and portfolio</li>
+            <li>✓ Confident in technical &amp; HR interviews</li>
+            <li>✓ Multiple job / internship opportunities</li>
+          </ul>
+        </div>
+        <div style="margin-top:8px; font-size:11px; font-weight:800; color:#c084fc; text-align:center;">
+          "Prepared Mind. Better Opportunities. Brighter Future." 🚀
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderPlacementPrepare(container) {
   if (!container) container = document.getElementById('prepare-content-area');
   if (!container) return;
-  container.innerHTML = `
-    <div class="track-card">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-        <h3 style="color:#fff; margin:0;">📊 Quantitative Aptitude (12 Core Topics)</h3>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="badge-pill" style="font-size:11px; text-decoration:none; background:rgba(99,216,255,0.12); color:var(--primary-light); border:1px solid rgba(99,216,255,0.3); display:inline-flex; align-items:center; gap:4px;">
-            <span>🌐</span> IndiaBIX ↗
-          </a>
-          <a href="https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/" target="_blank" rel="noopener noreferrer" class="badge-pill" style="font-size:11px; text-decoration:none; background:rgba(34,197,94,0.12); color:var(--success); border:1px solid rgba(34,197,94,0.3); display:inline-flex; align-items:center; gap:4px;">
-            <span>🌿</span> GeeksforGeeks ↗
-          </a>
-        </div>
-      </div>
-      <p style="font-size:12px; color:var(--text-muted);">Number Systems, Percentages, Profit &amp; Loss, Ratio &amp; Proportion, Time &amp; Work, Time-Speed-Distance, Permutation &amp; Combination, Probability, Geometry, Mixtures, Simple/Compound Interest, Data Interpretation.</p>
-      <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="action-btn" onclick="navigateToView('practice', 'aptitude')">Practice Aptitude Drills →</button>
-        <a href="https://www.indiabix.com/aptitude/questions-and-answers/" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(99,216,255,0.1); border-color:rgba(99,216,255,0.3); color:var(--primary-light);">🌐 IndiaBIX Questions ↗</a>
-        <a href="https://www.geeksforgeeks.org/aptitude/aptitude-questions-and-answers/" target="_blank" rel="noopener noreferrer" class="action-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.1); border-color:rgba(34,197,94,0.3); color:var(--success);">🌿 GeeksforGeeks Aptitude ↗</a>
-      </div>
-    </div>
-    <div class="track-card">
-      <h3 style="color:#fff; margin:0 0 10px;">🧠 Logical Reasoning (9 Core Topics)</h3>
-      <p style="font-size:12px; color:var(--text-muted);">Blood Relations, Direction Sense, Coding-Decoding, Syllogisms, Seating Arrangements, Clocks &amp; Calendars, Data Sufficiency, Series &amp; Analogy, Puzzles.</p>
-      <div style="margin-top:12px;"><button class="action-btn" onclick="openModal('puzzle-lab-modal')">Solve Logic Puzzles →</button></div>
-    </div>
-    <div class="track-card">
-      <h3 style="color:#fff; margin:0 0 10px;">⭐ Behavioral &amp; STAR HR Studio</h3>
-      <p style="font-size:12px; color:var(--text-muted);">Structured frameworks for Situation, Task, Action, Result. Master "Tell me about yourself", leadership under conflict, project setbacks, and salary expectations.</p>
-      <div style="margin-top:12px;"><button class="action-btn" onclick="openModal('star-studio-modal')">Open STAR Studio →</button></div>
-    </div>
-  `;
+  renderPlacementRoadmap(container, false);
 }
 
 // ─── SOFTWARE ENGINEER ROADMAP (12-Step Complete Journey) ───
@@ -9256,22 +9667,438 @@ function renderSWEPrepare(container) {
   renderSWERoadmap(container, false);
 }
 
+// ─── INTERNSHIP PREPARATION ROADMAP DATA & ENGINE ───
+const INTERNSHIP_ROADMAP_PHASES = [
+  {
+    phase: 1,
+    title: 'Foundation',
+    timeline: 'Month 1–2 (Learn & Prepare)',
+    goal: 'Learn fundamentals, set up environment, build consistency',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)'
+  },
+  {
+    phase: 2,
+    title: 'Skill Development',
+    timeline: 'Month 3–4 (Build Skills)',
+    goal: 'Deepen core skills, learn industry-relevant tools, start small projects',
+    color: '#3b82f6',
+    border: 'rgba(59, 130, 246, 0.4)'
+  },
+  {
+    phase: 3,
+    title: 'Projects & Portfolio',
+    timeline: 'Month 5–6 (Build & Showcase)',
+    goal: 'Build real-world projects, open source contributions, create a strong portfolio',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.4)'
+  },
+  {
+    phase: 4,
+    title: 'Applications & Networking',
+    timeline: 'Month 7–8 (Apply & Network)',
+    goal: 'Apply to internships, network with professionals, participate in hackathons',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)'
+  },
+  {
+    phase: 5,
+    title: 'Interviews & Selection',
+    timeline: 'Month 9–10 (Interview & Get Hired)',
+    goal: 'Prepare for interviews, solve problems, improve communication, get hired!',
+    color: '#8b5cf6',
+    border: 'rgba(139, 92, 246, 0.4)'
+  }
+];
+
+const INTERNSHIP_ROADMAP_AREAS = [
+  {
+    id: 1,
+    number: 1,
+    title: 'Mindset & Goal Setting',
+    icon: '🎯',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)',
+    timeline: '1–2 weeks',
+    items: [
+      'Understand why you want an internship',
+      'Choose your area of interest (Web Dev / App Dev / AI-ML / Core CS)',
+      'Set short-term and long-term goals',
+      'Be consistent and disciplined',
+      'Create a daily learning routine'
+    ],
+    action: { label: 'Set Career Goals →', handler: "navigateToView('settings')" }
+  },
+  {
+    id: 2,
+    number: 2,
+    title: 'Learn Core Skills',
+    icon: '💻',
+    color: '#3b82f6',
+    border: 'rgba(59, 130, 246, 0.4)',
+    timeline: '1–2 months',
+    items: [
+      'Choose a programming language (Python / Java / C++ / JavaScript)',
+      'Learn Data Structures & Algorithms',
+      'Learn CS fundamentals (OS, DBMS, CN, OOP, etc.)',
+      'Practice problem solving (LeetCode)',
+      'Learn Git & GitHub'
+    ],
+    action: { label: 'Launch DSA Tracker →', handler: "navigateToView('practice', 'dsa')" }
+  },
+  {
+    id: 3,
+    number: 3,
+    title: 'Explore Domains & Technologies',
+    icon: '⚙️',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)',
+    timeline: '2–3 months',
+    items: [
+      'Web Development (HTML, CSS, JS, React, Node.js)',
+      'App Development (Flutter / Android)',
+      'AI/ML (Python, ML basics, LLMs)',
+      'Cloud (AWS / Azure / GCP basics)',
+      'DevOps (Docker, CI/CD) & Cybersecurity',
+      'Choose one primary domain and go deep'
+    ],
+    action: { label: 'Code Studio →', handler: "openModal('code-studio-modal')" }
+  },
+  {
+    id: 4,
+    number: 4,
+    title: 'Build Projects',
+    icon: '🖥️',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.4)',
+    timeline: '3–5 months',
+    items: [
+      'Build 2–4 real-world projects',
+      'Solve real problems (not just tutorials)',
+      'Use modern tech stack',
+      'Host projects on GitHub (with README)',
+      'Deploy projects (Vercel / Render / AWS)',
+      'Add proper documentation & open source'
+    ],
+    action: { label: 'Portfolio Projects →', handler: "navigateToView('career', 'projects')" }
+  },
+  {
+    id: 5,
+    number: 5,
+    title: 'Build Your Portfolio',
+    icon: '📄',
+    color: '#8b5cf6',
+    border: 'rgba(139, 92, 246, 0.4)',
+    timeline: '4–6 months',
+    items: [
+      'Create a clean GitHub profile',
+      'Write good README files',
+      'Build a personal portfolio website',
+      'Showcase your skills, projects, and resume',
+      'Keep it continuously updated'
+    ],
+    action: { label: 'Portfolio Studio →', handler: "navigateToView('career', 'projects')" }
+  },
+  {
+    id: 6,
+    number: 6,
+    title: 'Networking & Opportunities',
+    icon: '👥',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)',
+    timeline: '5–8 months',
+    items: [
+      'Connect with recruiters & engineers on LinkedIn',
+      'Follow companies and hiring managers',
+      'Participate in hackathons and coding contests',
+      'Join student communities (Discord, WhatsApp)',
+      'Attend webinars and tech events',
+      'Find internships on LinkedIn, Internshala, Wellfound'
+    ],
+    action: { label: 'Internship Pipeline →', handler: "navigateToView('career', 'apps')" }
+  },
+  {
+    id: 7,
+    number: 7,
+    title: 'Resume & LinkedIn Profile',
+    icon: '📑',
+    color: '#0ea5e9',
+    border: 'rgba(14, 165, 233, 0.4)',
+    timeline: '5–7 months',
+    items: [
+      'Create a clean, one-page resume',
+      'Highlight skills, projects, achievements',
+      'Use action verbs and measurable impact',
+      'Keep your LinkedIn profile updated',
+      'Add projects, certifications, and experience',
+      'Write a short and clear bio'
+    ],
+    action: { label: 'ATS Resume Studio →', handler: "openModal('resume-ats-modal')" }
+  },
+  {
+    id: 8,
+    number: 8,
+    title: 'Interview Preparation',
+    icon: '💬',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)',
+    timeline: '7–9 months',
+    items: [
+      'Practice DSA problems (company-wise)',
+      'Learn system design basics (for SDE roles)',
+      'Prepare for technical + HR interviews',
+      'Solve previous interview questions',
+      'Do mock interviews (with friends / platforms)',
+      'Improve communication and confidence'
+    ],
+    action: { label: 'Mock Interview Studio →', handler: "openModal('mock-interview-modal')" }
+  }
+];
+
+function getInternshipRoadmapCompletedAreas() {
+  try {
+    const raw = localStorage.getItem('gt_internship_roadmap_completed_areas');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+window.toggleInternshipRoadmapArea = function(areaId, isModal = false) {
+  const completed = getInternshipRoadmapCompletedAreas();
+  const index = completed.indexOf(areaId);
+  if (index > -1) {
+    completed.splice(index, 1);
+  } else {
+    completed.push(areaId);
+  }
+  localStorage.setItem('gt_internship_roadmap_completed_areas', JSON.stringify(completed));
+
+  const container = isModal
+    ? document.getElementById('modal-internship-roadmap-container')
+    : document.getElementById('prepare-content-area');
+  if (container) {
+    renderInternshipRoadmap(container, isModal);
+  }
+
+  const modalBadge = document.getElementById('internship-roadmap-modal-progress-badge');
+  if (modalBadge) {
+    modalBadge.textContent = `${completed.length} / 8 Areas Completed`;
+  }
+
+  if (typeof showToast === 'function') {
+    const area = INTERNSHIP_ROADMAP_AREAS.find(a => a.id === areaId);
+    const title = area ? area.title : `Area ${areaId}`;
+    if (completed.includes(areaId)) {
+      showToast(`🚀 Marked ${title} as completed!`, 'success');
+    } else {
+      showToast(`${title} marked as in progress.`, 'info');
+    }
+  }
+};
+
+window.openInternshipRoadmapStudio = function() {
+  const container = document.getElementById('modal-internship-roadmap-container');
+  if (container) {
+    renderInternshipRoadmap(container, true);
+  }
+  if (typeof window.openModal === 'function') {
+    window.openModal('internship-roadmap-modal');
+  }
+};
+
+function renderInternshipRoadmap(container, isModal = false) {
+  if (!container) return;
+  const completed = getInternshipRoadmapCompletedAreas();
+  const percent = Math.round((completed.length / 8) * 100);
+
+  container.innerHTML = `
+    <!-- INTERNSHIP HERO HEADER -->
+    <div class="nd-card" style="padding:22px; margin-bottom:20px; border:1px solid rgba(16,185,129,0.35); background:radial-gradient(circle at top right, rgba(16,185,129,0.12), transparent 60%), var(--depth-2); position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:800; color:var(--success); letter-spacing:0.8px; text-transform:uppercase; background:rgba(16,185,129,0.15); padding:3px 8px; border-radius:4px; border:1px solid rgba(16,185,129,0.3);">🚀 INTERNSHIP ROADMAP</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">"An internship today, a stronger tomorrow."</span>
+          </div>
+          <h2 style="font-size:1.45rem; font-weight:800; color:var(--text); margin:4px 0;">Internship Preparation Roadmap</h2>
+          <p style="font-size:12px; color:var(--text-sub); margin:0;">
+            Learn → Build → Showcase → Apply → Interview → <em>Get Hired</em> &bull; Start Early &bull; Build Consistently &bull; Be Industry Ready
+          </p>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; font-weight:800; color:var(--success); background:rgba(34,197,94,0.15); padding:4px 10px; border-radius:6px; display:inline-block; margin-bottom:4px;">
+            ${completed.length} / 8 Areas Completed (${percent}%)
+          </div>
+          <div style="font-size:10px; color:var(--text-muted);">Trophy Milestone: Internship Success! 🏆</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; margin-bottom:18px;">
+        <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, #10b981, #06b6d4, #3b82f6); transition:width 0.4s ease;"></div>
+      </div>
+
+      <!-- 5-PHASE TIMELINE TRACK -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px; margin-bottom:14px;">
+        ${INTERNSHIP_ROADMAP_PHASES.map((p, idx) => `
+          <div style="background:var(--depth-3); border:1px solid ${p.border}; border-radius:var(--radius-sm); padding:10px 12px;">
+            <div style="font-size:10px; font-weight:800; color:${p.color}; text-transform:uppercase;">Phase ${p.phase}</div>
+            <div style="font-size:12px; font-weight:800; color:var(--text); margin:2px 0;">${p.title}</div>
+            <div style="font-size:10px; color:var(--text-muted);">${p.timeline}</div>
+            <div style="font-size:10px; color:var(--text-sub); margin-top:4px; line-height:1.3;">${p.goal}</div>
+          </div>
+        `).join('')}
+        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.05)); border:1px solid rgba(16,185,129,0.4); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:center;">
+          <div style="font-size:10px; font-weight:800; color:var(--success); text-transform:uppercase;">Milestone</div>
+          <div style="font-size:12px; font-weight:800; color:#fff; display:flex; align-items:center; gap:4px;">
+            <span>🏆</span> <span>Internship Offer</span>
+          </div>
+          <div style="font-size:10px; color:var(--text-muted);">High-growth tech role</div>
+        </div>
+      </div>
+
+      ${!isModal ? `
+        <div style="display:flex; justify-content:flex-end;">
+          <button onclick="openInternshipRoadmapStudio()" class="action-btn" style="font-size:11px; padding:4px 12px;">
+            ⛶ Fullscreen Internship Studio
+          </button>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- 8 CORE WHAT TO LEARN AND PRACTICE AREAS -->
+    <div style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <div>
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text); margin:0;">Core Internship Preparation Areas</h3>
+        <p style="font-size:11px; color:var(--text-muted); margin:2px 0 0;">8 progressive milestones from initial goal setting to technical and HR interview selection.</p>
+      </div>
+      <button class="action-btn" onclick="navigateToView('career', 'apps')" style="font-size:11px; padding:4px 12px;">Applications Pipeline →</button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:24px;">
+      ${INTERNSHIP_ROADMAP_AREAS.map(a => {
+        const isDone = completed.includes(a.id);
+        return `
+          <div class="track-card" style="padding:16px; border:1px solid ${isDone ? 'rgba(34,197,94,0.45)' : a.border}; background:${isDone ? 'radial-gradient(circle at top right, rgba(34,197,94,0.08), transparent 60%), var(--depth-2)' : 'var(--depth-2)'}; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.25s ease;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:${a.color}; color:#fff; font-weight:800; font-size:12px;">
+                    ${a.number}
+                  </span>
+                  <div>
+                    <strong style="font-size:13px; color:var(--text); line-height:1.2; display:block;">${a.title}</strong>
+                    <span style="font-size:10px; color:var(--text-muted);">${a.timeline}</span>
+                  </div>
+                </div>
+              </div>
+
+              <ul style="list-style:none; padding:0; margin:8px 0 10px 0; font-size:11px; color:var(--text-sub); line-height:1.5;">
+                ${a.items.map(it => `
+                  <li style="display:flex; align-items:flex-start; gap:6px; margin-bottom:3px;">
+                    <span style="color:${a.color};">•</span>
+                    <span>${it}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; pt:8px; border-top:1px solid var(--border-subtle); margin-top:10px; gap:8px;">
+              <button onclick="toggleInternshipRoadmapArea(${a.id}, ${isModal})" class="action-btn" style="font-size:10px; padding:4px 8px; background:${isDone ? 'rgba(34,197,94,0.15)' : 'transparent'}; color:${isDone ? 'var(--success)' : 'var(--text-sub)'}; border-color:${isDone ? 'var(--success)' : 'var(--border-subtle)'};">
+                ${isDone ? '✓ Completed' : '○ Mark Done'}
+              </button>
+              <button onclick="${a.action.handler}" class="action-btn" style="font-size:10px; padding:4px 8px; color:${a.color}; border-color:${a.border};">
+                ${a.action.label}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <!-- 4 GUIDANCE PANELS (Useful Resources, Application Platforms, Key Tips, Your Outcome) -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-bottom:14px;">
+      <!-- Panel 1: Useful Resources -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(16,185,129,0.3); background:rgba(16,185,129,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">📖</span>
+          <strong style="font-size:12px; color:var(--text);">Useful Resources</strong>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <li>✓ <a href="https://leetcode.com" target="_blank" rel="noopener" style="color:var(--primary-light);">LeetCode</a> – Practice problems</li>
+          <li>✓ <a href="https://www.geeksforgeeks.org" target="_blank" rel="noopener" style="color:var(--success);">GeeksforGeeks</a> – DSA &amp; CS fundamentals</li>
+          <li>✓ <a href="https://roadmap.sh" target="_blank" rel="noopener" style="color:#a855f7;">Roadmap.sh</a> – Learning roadmaps</li>
+          <li>✓ GitHub – Projects &amp; open source</li>
+          <li>✓ Dev.to &amp; Hashnode – Tech blogs</li>
+          <li>✓ YouTube – Free tutorials (freeCodeCamp, etc.)</li>
+        </ul>
+      </div>
+
+      <!-- Panel 2: Application Platforms -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">🔗</span>
+          <strong style="font-size:12px; color:var(--text);">Application Platforms</strong>
+        </div>
+        <div style="font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <div>• <a href="https://internshala.com" target="_blank" rel="noopener" style="color:var(--primary-light); font-weight:700;">Internshala ↗</a></div>
+          <div>• <a href="https://www.linkedin.com/jobs" target="_blank" rel="noopener" style="color:#0ea5e9; font-weight:700;">LinkedIn Jobs ↗</a></div>
+          <div>• <a href="https://wellfound.com" target="_blank" rel="noopener" style="color:#f59e0b; font-weight:700;">Wellfound (AngelList) ↗</a></div>
+          <div>• <a href="https://www.naukri.com" target="_blank" rel="noopener" style="color:var(--success); font-weight:700;">Naukri Internships ↗</a></div>
+          <div>• <a href="https://unstop.com" target="_blank" rel="noopener" style="color:#ec4899; font-weight:700;">Unstop ↗</a> &bull; <a href="https://devfolio.co" target="_blank" rel="noopener" style="color:#8b5cf6; font-weight:700;">Devfolio ↗</a></div>
+          <div>• Company Career Pages &amp; College TPO Portal</div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Key Tips -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(245,158,11,0.3); background:rgba(245,158,11,0.04); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <span style="font-size:16px;">💡</span>
+            <strong style="font-size:12px; color:var(--text);">Key Tips</strong>
+          </div>
+          <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+            <li>• Be consistent and keep learning</li>
+            <li>• Build and showcase real projects</li>
+            <li>• Apply early and regularly</li>
+            <li>• Customize your resume for each role</li>
+            <li>• Don't just apply, network!</li>
+            <li>• Give mock interviews and take feedback</li>
+          </ul>
+        </div>
+        <div style="margin-top:8px; font-size:10px; font-weight:800; color:var(--warning); text-align:center;">
+          Discipline + Action = Opportunities!
+        </div>
+      </div>
+
+      <!-- Panel 4: Your Outcome -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(16,185,129,0.3); background:rgba(16,185,129,0.04); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <span style="font-size:16px;">🏆</span>
+            <strong style="font-size:12px; color:var(--text);">Your Outcome</strong>
+          </div>
+          <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+            <li>✓ Strong technical &amp; problem solving skills</li>
+            <li>✓ A portfolio of real-world deployed projects</li>
+            <li>✓ Industry connections and professional network</li>
+            <li>✓ Internship offers from good companies</li>
+            <li>✓ Confidence for future career opportunities</li>
+          </ul>
+        </div>
+        <div style="margin-top:8px; font-size:11px; font-weight:800; color:var(--success); text-align:center;">
+          "Today's preparation leads to tomorrow's opportunities." 🌟
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderInternshipPrepare(container) {
   if (!container) container = document.getElementById('prepare-content-area');
   if (!container) return;
-  container.innerHTML = `
-    <div class="track-card">
-      <h3 style="color:#fff; margin:0 0 8px;">📬 Internship Pipeline Tracker</h3>
-      <p style="font-size:12px; color:var(--text-muted);">Active Applications: 8 • Online Assessments: 2 • Technical Interviews: 1 • Offers: 0</p>
-      <button class="action-btn" onclick="navigateToView('career', 'apps')" style="margin-top:10px;">View Applications Pipeline →</button>
-    </div>
-    <div class="track-card">
-      <h3 style="color:#fff; margin:0 0 8px;">📄 Resume Readiness</h3>
-      <div style="font-size:2rem; font-weight:900; color:var(--primary); font-family:var(--font-display);">84 / 100</div>
-      <p style="font-size:11px; color:var(--text-muted); margin:4px 0 10px;">Transparent heuristic ATS score. 3 high-impact verbs detected, GitHub links verified.</p>
-      <button class="action-btn" onclick="navigateToView('career', 'resume')">Check Checklist →</button>
-    </div>
-  `;
+  renderInternshipRoadmap(container, false);
 }
 
 // ── PROGRESS HUB TAB SWITCHER ──

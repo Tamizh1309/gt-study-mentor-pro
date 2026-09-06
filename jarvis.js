@@ -519,6 +519,26 @@
           break;
         }
 
+        case 'open_placement_roadmap': {
+          if (typeof window.navigateToView === 'function') {
+            window.navigateToView('prepare', 'placement');
+          }
+          if (typeof showToast === 'function') {
+            showToast('💼 Opened Placement Preparation Roadmap', 'info');
+          }
+          break;
+        }
+
+        case 'open_internship_roadmap': {
+          if (typeof window.navigateToView === 'function') {
+            window.navigateToView('prepare', 'intern');
+          }
+          if (typeof showToast === 'function') {
+            showToast('🚀 Opened Internship Preparation Roadmap', 'info');
+          }
+          break;
+        }
+
         default:
           console.log('[GT JARVIS] Unhandled action type:', action.type);
       }

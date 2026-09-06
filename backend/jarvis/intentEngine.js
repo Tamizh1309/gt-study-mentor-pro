@@ -191,6 +191,24 @@ const INTENT_RULES = [
     extractParams: () => ({ view: 'prepare', tab: 'swe' })
   },
   {
+    intent: 'OPEN_PLACEMENT_ROADMAP',
+    category: 'application_command',
+    patterns: [
+      /(placement|campus\s+placement|job)(\s+(prep|preparation))?\s+roadmap/i,
+      /(open|show|view|launch)\s+(the\s+)?placement(\s+(prep|preparation))?\s+roadmap/i
+    ],
+    extractParams: () => ({ view: 'prepare', tab: 'placement' })
+  },
+  {
+    intent: 'OPEN_INTERNSHIP_ROADMAP',
+    category: 'application_command',
+    patterns: [
+      /internship(\s+(prep|preparation))?\s+roadmap/i,
+      /(open|show|view|launch)\s+(the\s+)?internship(\s+(prep|preparation))?\s+roadmap/i
+    ],
+    extractParams: () => ({ view: 'prepare', tab: 'intern' })
+  },
+  {
     intent: 'OPEN_APTITUDE_RESOURCE',
     category: 'application_command',
     patterns: [
