@@ -509,6 +509,16 @@
           break;
         }
 
+        case 'open_swe_roadmap': {
+          if (typeof window.navigateToView === 'function') {
+            window.navigateToView('prepare', 'swe');
+          }
+          if (typeof showToast === 'function') {
+            showToast('🗺️ Opened Software Engineer Roadmap', 'info');
+          }
+          break;
+        }
+
         default:
           console.log('[GT JARVIS] Unhandled action type:', action.type);
       }

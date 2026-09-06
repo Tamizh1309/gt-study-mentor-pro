@@ -35,7 +35,8 @@ const ALLOWED_ACTIONS = {
   RESET_JOURNEY: 'reset_journey',
   OPEN_GATE_OFFICIAL: 'open_gate_official',
   OPEN_GATE_PREPARE: 'open_gate_prepare',
-  OPEN_APTITUDE_RESOURCE: 'open_aptitude_resource'
+  OPEN_APTITUDE_RESOURCE: 'open_aptitude_resource',
+  OPEN_SWE_ROADMAP: 'open_swe_roadmap'
 };
 
 /**
@@ -222,6 +223,14 @@ function resolveAction(intent, params = {}) {
           source
         },
         spokenConfirmation: `Opening ${source} Quantitative Aptitude Questions & Answers.`
+      };
+    }
+
+    case 'OPEN_SWE_ROADMAP': {
+      return {
+        type: ALLOWED_ACTIONS.OPEN_SWE_ROADMAP,
+        params: { view: 'prepare', tab: 'swe' },
+        spokenConfirmation: "Opening the 12-Step Software Engineer Roadmap."
       };
     }
 

@@ -181,6 +181,16 @@ const INTENT_RULES = [
     extractParams: () => ({ view: 'prepare', tab: 'gate' })
   },
   {
+    intent: 'OPEN_SWE_ROADMAP',
+    category: 'application_command',
+    patterns: [
+      /(software\s+engineer(ing)?|swe|developer)\s+roadmap/i,
+      /(open|show|view|launch)\s+(the\s+)?(swe|software\s+engineer(ing)?|developer)\s+roadmap/i,
+      /12[\s-]step\s+(swe\s+|software\s+engineer\s+)?roadmap/i
+    ],
+    extractParams: () => ({ view: 'prepare', tab: 'swe' })
+  },
+  {
     intent: 'OPEN_APTITUDE_RESOURCE',
     category: 'application_command',
     patterns: [

@@ -8406,21 +8406,462 @@ function renderPlacementPrepare(container) {
   `;
 }
 
+// ─── SOFTWARE ENGINEER ROADMAP (12-Step Complete Journey) ───
+const SWE_ROADMAP_STEPS = [
+  {
+    id: 1,
+    number: 1,
+    title: 'Mindset & Preparation',
+    icon: '🧠',
+    color: '#8b5cf6',
+    border: 'rgba(139, 92, 246, 0.4)',
+    badge: 'Start Here',
+    badgeColor: '#8b5cf6',
+    timeline: '1–2 weeks',
+    phase: 1,
+    items: [
+      'Set clear goals (job, higher studies, startup)',
+      'Be consistent (daily learning routine)',
+      'Learn how to learn (deep work, self-discipline)',
+      'Set up environment (laptop, tools, GitHub)'
+    ],
+    action: { label: 'Set Goals →', handler: "navigateToView('settings')" }
+  },
+  {
+    id: 2,
+    number: 2,
+    title: 'Programming Fundamentals',
+    icon: '💻',
+    color: '#3b82f6',
+    border: 'rgba(59, 130, 246, 0.4)',
+    timeline: '1–2 months',
+    phase: 1,
+    items: [
+      'Choose a language (C / C++ / Java / Python)',
+      'Learn syntax, data types, control structures',
+      'Practice input/output and problem solving',
+      'Write small programs daily'
+    ],
+    action: { label: 'Code Studio →', handler: "openModal('code-studio-modal')" }
+  },
+  {
+    id: 3,
+    number: 3,
+    title: 'Data Structures & Algorithms',
+    icon: '🌲',
+    color: '#10b981',
+    border: 'rgba(16, 185, 129, 0.4)',
+    timeline: '2–4 months',
+    phase: 1,
+    items: [
+      'Arrays, Strings, Linked Lists',
+      'Stacks, Queues, Trees, Graphs',
+      'Sorting, Searching, Recursion',
+      'Solve problems on LeetCode / GFG',
+      'Learn time & space complexity'
+    ],
+    action: { label: 'DSA Tracker →', handler: "navigateToView('practice', 'dsa')" }
+  },
+  {
+    id: 4,
+    number: 4,
+    title: 'Computer Science Core',
+    icon: '🖥️',
+    color: '#f59e0b',
+    border: 'rgba(245, 158, 11, 0.4)',
+    timeline: '2–4 months',
+    phase: 1,
+    items: [
+      'Operating Systems',
+      'Database Management Systems',
+      'Computer Networks',
+      'Software Engineering',
+      'Computer Organization & Architecture'
+    ],
+    action: { label: 'Practice CS Core →', handler: "navigateToView('practice', 'cs-core')" }
+  },
+  {
+    id: 5,
+    number: 5,
+    title: 'Development Tools & Practices',
+    icon: '🔧',
+    color: '#ec4899',
+    border: 'rgba(236, 72, 153, 0.4)',
+    timeline: '1–2 months',
+    phase: 2,
+    items: [
+      'Version Control (Git & GitHub)',
+      'IDE (VS Code, IntelliJ, etc.)',
+      'Debugging & Troubleshooting',
+      'Linux Basics (Command Line)',
+      'Learn to read & use documentation'
+    ],
+    action: { label: 'Linux & Git Lab →', handler: "navigateToView('cselabs')" }
+  },
+  {
+    id: 6,
+    number: 6,
+    title: 'Web Development',
+    icon: '🌐',
+    color: '#6366f1',
+    border: 'rgba(99, 102, 241, 0.4)',
+    badge: 'Optional but Valuable',
+    badgeColor: '#6366f1',
+    timeline: '2–4 months',
+    phase: 2,
+    items: [
+      'HTML, CSS, JavaScript',
+      'Frontend Framework (React / Next.js)',
+      'Backend Framework (Node.js / Express or Django / Spring Boot)',
+      'Build full-stack responsive projects'
+    ],
+    action: { label: 'Web Projects Studio →', handler: "navigateToView('career', 'projects')" }
+  },
+  {
+    id: 7,
+    number: 7,
+    title: 'Databases',
+    icon: '🗄️',
+    color: '#0ea5e9',
+    border: 'rgba(14, 165, 233, 0.4)',
+    timeline: '1–2 months',
+    phase: 2,
+    items: [
+      'SQL (MySQL / PostgreSQL)',
+      'Database design & normalization (3NF/BCNF)',
+      'Practice queries (joins, indexing, transactions)',
+      'Learn NoSQL (MongoDB / Redis)'
+    ],
+    action: { label: 'SQL Sandbox →', handler: "navigateToView('cselabs')" }
+  },
+  {
+    id: 8,
+    number: 8,
+    title: 'System Design',
+    icon: '⚙️',
+    color: '#14b8a6',
+    border: 'rgba(20, 184, 166, 0.4)',
+    badge: 'Later Stage',
+    badgeColor: '#14b8a6',
+    timeline: '2–4 months (after basics)',
+    phase: 2,
+    items: [
+      'Scalability, Reliability, Availability',
+      'Load Balancing, Caching, Sharded Databases',
+      'Microservices, Message Queues (Kafka/RabbitMQ)',
+      'Design real-world systems (URL shortener, chat app, ride booking)'
+    ],
+    action: { label: 'System Design Studio →', handler: "openModal('sysdesign-modal')" }
+  },
+  {
+    id: 9,
+    number: 9,
+    title: 'Build Projects',
+    icon: '📂',
+    color: '#eab308',
+    border: 'rgba(234, 179, 8, 0.4)',
+    timeline: 'Ongoing',
+    phase: 3,
+    items: [
+      'Start with small modular projects',
+      'Build real-world clone & SaaS projects',
+      'Add unique portfolio projects to GitHub',
+      'Write clean, detailed README documentation',
+      'Deploy using Vercel / Render / AWS'
+    ],
+    action: { label: 'Portfolio Projects →', handler: "navigateToView('career', 'projects')" }
+  },
+  {
+    id: 10,
+    number: 10,
+    title: 'Explore Advanced Topics',
+    icon: '💡',
+    color: '#d946ef',
+    border: 'rgba(217, 70, 239, 0.4)',
+    timeline: '3–6 months (as per interest)',
+    phase: 3,
+    items: [
+      'Cloud Computing (AWS / Azure / GCP)',
+      'DevOps (Docker, Kubernetes, CI/CD pipelines)',
+      'Mobile App Development (Flutter / React Native)',
+      'AI / ML (Optional, high industry value)',
+      'Cybersecurity & Web Security Basics'
+    ],
+    action: { label: 'Advanced Roadmap →', handler: "navigateToView('learning')" }
+  },
+  {
+    id: 11,
+    number: 11,
+    title: 'Prepare for Placements',
+    icon: '🎯',
+    color: '#818cf8',
+    border: 'rgba(129, 140, 248, 0.4)',
+    timeline: '3–6 months',
+    phase: 3,
+    items: [
+      'DSA practice (target 300+ problems)',
+      'Revise CS core subjects thoroughly',
+      'Solve previous year interview questions',
+      'Take AI & peer mock interviews',
+      'Build ATS resume & optimize LinkedIn profile'
+    ],
+    action: { label: 'Mock Interview Studio →', handler: "openModal('mock-interview-modal')" }
+  },
+  {
+    id: 12,
+    number: 12,
+    title: 'Get Hired / Grow Further',
+    icon: '📈',
+    color: '#06b6d4',
+    border: 'rgba(6, 182, 212, 0.4)',
+    badge: 'You Did It! 🚀',
+    badgeColor: '#06b6d4',
+    timeline: 'Ongoing',
+    phase: 3,
+    items: [
+      'Apply for internships & full-time roles',
+      'Keep learning on the job',
+      'Contribute to open source projects',
+      'Explore higher studies (MS/M.Tech) or specialization',
+      'Aim for continuous engineering growth'
+    ],
+    action: { label: 'Applications Pipeline →', handler: "navigateToView('career', 'apps')" }
+  }
+];
+
+let currentSWERoadmapPhase = 'all';
+
+function getSWERoadmapCompletedSteps() {
+  try {
+    const raw = localStorage.getItem('gt_swe_roadmap_completed_steps');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+window.toggleSWERoadmapStep = function(stepId, isModal = false) {
+  const completed = getSWERoadmapCompletedSteps();
+  const index = completed.indexOf(stepId);
+  if (index > -1) {
+    completed.splice(index, 1);
+  } else {
+    completed.push(stepId);
+  }
+  localStorage.setItem('gt_swe_roadmap_completed_steps', JSON.stringify(completed));
+  
+  // Re-render
+  const container = isModal 
+    ? document.getElementById('modal-swe-roadmap-container')
+    : document.getElementById('prepare-content-area');
+  if (container) {
+    renderSWERoadmap(container, isModal);
+  }
+
+  // Update modal progress badge if present
+  const modalBadge = document.getElementById('swe-modal-progress-badge');
+  if (modalBadge) {
+    modalBadge.textContent = `${completed.length} / 12 Completed`;
+  }
+
+  if (typeof showToast === 'function') {
+    const step = SWE_ROADMAP_STEPS.find(s => s.id === stepId);
+    const title = step ? step.title : `Step ${stepId}`;
+    if (completed.includes(stepId)) {
+      showToast(`🎉 Completed Step ${stepId}: ${title}`, 'success');
+    } else {
+      showToast(`Step ${stepId} marked as in progress.`, 'info');
+    }
+  }
+};
+
+window.filterSWERoadmapPhase = function(phase, isModal = false) {
+  currentSWERoadmapPhase = phase;
+  const container = isModal 
+    ? document.getElementById('modal-swe-roadmap-container')
+    : document.getElementById('prepare-content-area');
+  if (container) {
+    renderSWERoadmap(container, isModal);
+  }
+};
+
+window.openSWERoadmapStudio = function() {
+  const container = document.getElementById('modal-swe-roadmap-container');
+  if (container) {
+    renderSWERoadmap(container, true);
+  }
+  if (typeof window.openModal === 'function') {
+    window.openModal('swe-roadmap-modal');
+  }
+};
+
+function renderSWERoadmap(container, isModal = false) {
+  if (!container) return;
+  const completed = getSWERoadmapCompletedSteps();
+  const percent = Math.round((completed.length / 12) * 100);
+
+  const filteredSteps = currentSWERoadmapPhase === 'all'
+    ? SWE_ROADMAP_STEPS
+    : SWE_ROADMAP_STEPS.filter(s => s.phase === parseInt(currentSWERoadmapPhase, 10));
+
+  container.innerHTML = `
+    <!-- ROADMAP HERO HEADER -->
+    <div class="nd-card" style="padding:22px; margin-bottom:20px; border:1px solid rgba(139,92,246,0.35); background:radial-gradient(circle at top right, rgba(139,92,246,0.12), transparent 60%), var(--depth-2); position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; margin-bottom:14px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:800; color:#a78bfa; letter-spacing:0.8px; text-transform:uppercase; background:rgba(139,92,246,0.15); padding:3px 8px; border-radius:4px; border:1px solid rgba(139,92,246,0.3);">🚀 CAREER ROADMAP</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">Consistent Small Steps → Big Results</span>
+          </div>
+          <h2 style="font-size:1.45rem; font-weight:800; color:var(--text); margin:4px 0;">Software Engineer Roadmap</h2>
+          <p style="font-size:12px; color:var(--text-sub); margin:0;">
+            Learn &bull; Build &bull; Practice &bull; Grow &bull; <em>Become the Engineer You Want to Be</em>
+          </p>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; font-weight:800; color:var(--success); background:rgba(34,197,94,0.15); padding:4px 10px; border-radius:6px; display:inline-block; margin-bottom:4px;">
+            ${completed.length} / 12 Steps Completed (${percent}%)
+          </div>
+          <div style="font-size:10px; color:var(--text-muted);">Not just a job. A career to create impact.</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div style="width:100%; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; margin-bottom:16px;">
+        <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981); transition:width 0.4s ease;"></div>
+      </div>
+
+      <!-- Phase Filter Tabs & Fullscreen Button -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button onclick="filterSWERoadmapPhase('all', ${isModal})" class="tab-pill ${currentSWERoadmapPhase === 'all' ? 'active' : ''}" style="font-size:11px; padding:4px 12px;">All 12 Steps</button>
+          <button onclick="filterSWERoadmapPhase('1', ${isModal})" class="tab-pill ${currentSWERoadmapPhase === '1' ? 'active' : ''}" style="font-size:11px; padding:4px 12px;">Phase 1: Foundations (1–4)</button>
+          <button onclick="filterSWERoadmapPhase('2', ${isModal})" class="tab-pill ${currentSWERoadmapPhase === '2' ? 'active' : ''}" style="font-size:11px; padding:4px 12px;">Phase 2: Tools, Web &amp; Systems (5–8)</button>
+          <button onclick="filterSWERoadmapPhase('3', ${isModal})" class="tab-pill ${currentSWERoadmapPhase === '3' ? 'active' : ''}" style="font-size:11px; padding:4px 12px;">Phase 3: Projects &amp; Placements (9–12)</button>
+        </div>
+        ${!isModal ? `
+          <button onclick="openSWERoadmapStudio()" class="action-btn" style="font-size:11px; padding:4px 10px;">
+            ⛶ Fullscreen Studio
+          </button>
+        ` : ''}
+      </div>
+    </div>
+
+    <!-- 12-STEP ROADMAP GRID -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px; margin-bottom:24px;">
+      ${filteredSteps.map(s => {
+        const isDone = completed.includes(s.id);
+        return `
+          <div class="track-card" style="padding:16px; border:1px solid ${isDone ? 'rgba(34,197,94,0.45)' : s.border}; background:${isDone ? 'radial-gradient(circle at top right, rgba(34,197,94,0.08), transparent 60%), var(--depth-2)' : 'var(--depth-2)'}; display:flex; flex-direction:column; justify-content:space-between; position:relative; transition:all 0.25s ease;">
+            <div>
+              <!-- Step Header -->
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:${s.color}; color:#fff; font-weight:800; font-size:13px; box-shadow:0 2px 8px ${s.border};">
+                    ${s.number}
+                  </span>
+                  <div>
+                    <div style="font-size:13px; font-weight:800; color:var(--text); line-height:1.2;">${s.title}</div>
+                    <span style="font-size:10px; color:var(--text-muted);">${s.timeline}</span>
+                  </div>
+                </div>
+                ${s.badge ? `
+                  <span style="font-size:9px; font-weight:800; text-transform:uppercase; padding:2px 6px; border-radius:4px; background:rgba(255,255,255,0.06); color:${s.badgeColor}; border:1px solid ${s.badgeColor}40;">
+                    ${s.badge}
+                  </span>
+                ` : ''}
+              </div>
+
+              <!-- Step Checklist Items -->
+              <ul style="list-style:none; padding:0; margin:0 0 14px 0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+                ${s.items.map(item => `
+                  <li style="display:flex; align-items:flex-start; gap:6px; margin-bottom:4px;">
+                    <span style="color:${s.color}; font-size:11px;">•</span>
+                    <span>${item}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+
+            <!-- Footer Action & Completion Toggle -->
+            <div style="display:flex; justify-content:space-between; align-items:center; pt:8px; border-top:1px solid var(--border-subtle); gap:8px;">
+              <button onclick="toggleSWERoadmapStep(${s.id}, ${isModal})" class="action-btn" style="font-size:10px; padding:4px 8px; background:${isDone ? 'rgba(34,197,94,0.15)' : 'transparent'}; color:${isDone ? 'var(--success)' : 'var(--text-sub)'}; border-color:${isDone ? 'var(--success)' : 'var(--border-subtle)'};">
+                ${isDone ? '✓ Completed' : '○ Mark Done'}
+              </button>
+              <button onclick="${s.action.handler}" class="action-btn" style="font-size:10px; padding:4px 8px; color:${s.color}; border-color:${s.border};">
+                ${s.action.label}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <!-- 4 GUIDANCE PANELS (Useful Resources, Daily Habits, Remember Quote, Final Tip) -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:14px; margin-bottom:14px;">
+      <!-- Panel 1: Useful Resources -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(16,185,129,0.3); background:rgba(16,185,129,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">⭐</span>
+          <strong style="font-size:12px; color:var(--text);">Useful Resources</strong>
+        </div>
+        <div style="font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <div><strong>Practice:</strong> <a href="https://leetcode.com" target="_blank" rel="noopener" style="color:var(--primary-light);">LeetCode</a>, <a href="https://www.geeksforgeeks.org" target="_blank" rel="noopener" style="color:var(--success);">GeeksforGeeks</a>, <a href="https://codeforces.com" target="_blank" rel="noopener" style="color:#f59e0b;">Codeforces</a></div>
+          <div><strong>Learning:</strong> freeCodeCamp, NPTEL, CS50, YouTube</div>
+          <div><strong>Projects:</strong> GitHub, Dev.to, Hashnode</div>
+          <div><strong>System Design:</strong> <a href="https://github.com/donnemartin/system-design-primer" target="_blank" rel="noopener" style="color:#c084fc;">systemdesignprimer.com ↗</a></div>
+          <div><strong>Resume:</strong> Overleaf, FlowCV</div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Daily Habit Suggestion -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(59,130,246,0.3); background:rgba(59,130,246,0.04);">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">📊</span>
+          <strong style="font-size:12px; color:var(--text);">Daily Habit Suggestion</strong>
+        </div>
+        <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:var(--text-sub); line-height:1.6;">
+          <li>• 2–4 hours of focused deep learning</li>
+          <li>• Solve 2–5 DSA problems consistently</li>
+          <li>• Read technical blogs / documentation</li>
+          <li>• Work on a real project (even 30 mins)</li>
+          <li>• Track your daily progress with GT Mentor</li>
+        </ul>
+      </div>
+
+      <!-- Panel 3: Remember Quote -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(245,158,11,0.3); background:rgba(245,158,11,0.04); display:flex; flex-direction:column; justify-content:center;">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+          <span style="font-size:16px;">💬</span>
+          <strong style="font-size:12px; color:var(--text);">Remember</strong>
+        </div>
+        <blockquote style="font-size:12px; font-style:italic; color:var(--text); margin:0 0 6px 0; line-height:1.4;">
+          "Consistency beats talent when talent doesn't work hard."
+        </blockquote>
+        <div style="font-size:10px; color:var(--text-muted); text-align:right;">— Unknown</div>
+      </div>
+
+      <!-- Panel 4: Final Tip -->
+      <div class="nd-card" style="padding:16px; border:1px solid rgba(239,68,68,0.3); background:rgba(239,68,68,0.04); display:flex; flex-direction:column; justify-content:center;">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+          <span style="font-size:16px;">❤️</span>
+          <strong style="font-size:12px; color:var(--text);">Final Tip</strong>
+        </div>
+        <p style="font-size:11px; color:var(--text-sub); margin:0 0 6px; line-height:1.4;">
+          Don't compare your journey with others. Focus on progress, not perfection. Build, learn, and keep going!
+        </p>
+        <div style="font-size:11px; font-weight:800; color:#ef4444;">
+          🚀 YOU GOT THIS!
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderSWEPrepare(container) {
   if (!container) container = document.getElementById('prepare-content-area');
   if (!container) return;
-  container.innerHTML = `
-    <div class="track-card">
-      <h3 style="color:#fff; margin:0 0 8px;">💻 Striver A2Z 17 DSA Patterns</h3>
-      <p style="font-size:12px; color:var(--text-muted);">Two Pointers, Sliding Window, Fast/Slow Pointers, Merge Intervals, Cyclic Sort, In-place Reversal, BFS, DFS, Two Heaps, Subsets, Modified Binary Search, Top K Elements, K-way Merge, 0/1 Knapsack, Topological Sort.</p>
-      <button class="action-btn" onclick="navigateToView('practice', 'dsa')" style="margin-top:10px;">Launch DSA Tracker →</button>
-    </div>
-    <div class="track-card">
-      <h3 style="color:#fff; margin:0 0 8px;">🛠️ REST APIs, Databases &amp; System Design</h3>
-      <p style="font-size:12px; color:var(--text-muted);">HTTP Methods, Status Codes, JWT Authentication, Indexing, Normalization, Sharding, Redis Caching, Load Balancing, Horizontal Scaling.</p>
-      <button class="action-btn" onclick="openModal('sysdesign-modal')" style="margin-top:10px;">Launch System Design Studio →</button>
-    </div>
-  `;
+  renderSWERoadmap(container, false);
 }
 
 function renderInternshipPrepare(container) {

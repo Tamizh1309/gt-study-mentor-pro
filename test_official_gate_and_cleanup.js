@@ -203,6 +203,28 @@ async function runSuite() {
   assert(chatVideoRes.status === 200, 'POST /api/jarvis/chat for GATE videos returned 200');
   assert(chatVideoRes.body.action.params.url === 'https://youtube.com/playlist?list=PLmXKhU9FNesTaKDC-MKWt-rFuB8OwqrCY&si=z2TEtNMoBzPKHuls', 'Live action returns YouTube playlist URL');
 
+  // Test SWE Roadmap queries
+  const iSwe = classifyIntent('JARVIS show software engineer roadmap');
+  assert(iSwe.intent === 'OPEN_SWE_ROADMAP', 'Classifies SWE Roadmap query as OPEN_SWE_ROADMAP');
+
+  const actSwe = resolveAction('OPEN_SWE_ROADMAP');
+  assert(actSwe.type === 'open_swe_roadmap', 'Action type is open_swe_roadmap');
+  assert(actSwe.params.tab === 'swe', 'Action target tab is swe');
+
+  const chatSweRes = await request({
+    host: 'localhost',
+    port: 3000,
+    path: '/api/jarvis/chat',
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }, {
+    message: 'JARVIS open SWE roadmap',
+    mode: 'study'
+  });
+
+  assert(chatSweRes.status === 200, 'POST /api/jarvis/chat for SWE Roadmap returned 200');
+  assert(chatSweRes.body.action.type === 'open_swe_roadmap', 'Live action returns open_swe_roadmap');
+
   // ── 4. Codebase Cleanup & Resource Links Verification ──
   console.log('\n4. Testing Codebase Cleanliness & External Resource Links...');
   const appJs = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
@@ -214,12 +236,17 @@ async function runSuite() {
   assert(appJs.includes('https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/pyq-questions?q=68ecac7295474565f43ef40d'), 'app.js contains Knowledge Gate PYQ link');
   assert(appJs.includes('https://www.knowledgegate.ai/learn/GATE-GUIDANCE-BY-SANCHIT-SIR/practice-questions?q=6a1d2962cc6fe47e57ce7427'), 'app.js contains Knowledge Gate Practice link');
   assert(appJs.includes('https://youtube.com/playlist?list=PLmXKhU9FNesTaKDC-MKWt-rFuB8OwqrCY&si=z2TEtNMoBzPKHuls'), 'app.js contains YouTube GATE playlist link');
+  assert(appJs.includes('SWE_ROADMAP_STEPS'), 'app.js defines SWE_ROADMAP_STEPS');
+  assert(appJs.includes('Mindset & Preparation'), 'app.js contains Step 1: Mindset & Preparation');
+  assert(appJs.includes('Get Hired / Grow Further'), 'app.js contains Step 12: Get Hired / Grow Further');
+  assert(appJs.includes('Consistency beats talent when talent doesn\'t work hard.'), 'app.js contains Remember quote');
 
   const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   assert(indexHtml.includes('https://drive.google.com/drive/folders/1xUn7rGTzKlfvJDoo4SzCRi8jRlBD63ud'), 'index.html contains Google Drive question papers link');
+  assert(indexHtml.includes('swe-roadmap-modal'), 'index.html contains swe-roadmap-modal');
 
   console.log('\n======================================================');
-  console.log('✅ ALL RESOURCE & CLEANUP TESTS PASSED (100%)');
+  console.log('✅ ALL RESOURCE, ROADMAP & CLEANUP TESTS PASSED (100%)');
   console.log('======================================================\n');
 }
 
