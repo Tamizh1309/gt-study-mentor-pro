@@ -474,6 +474,27 @@
           break;
         }
 
+        case 'open_gate_official': {
+          const url = action.params?.url || 'https://gate2027.iitm.ac.in/';
+          const label = action.params?.label || 'Official Portal';
+          try {
+            window.open(url, '_blank', 'noopener,noreferrer');
+            if (typeof showToast === 'function') {
+              showToast(`🔗 Opened IIT Madras GATE 2027: ${label}`, 'success');
+            }
+          } catch(e) {
+            console.warn('[JARVIS] Error opening official link:', e);
+          }
+          break;
+        }
+
+        case 'open_gate_prepare': {
+          if (typeof window.navigateToView === 'function') {
+            window.navigateToView('prepare', 'gate');
+          }
+          break;
+        }
+
         default:
           console.log('[GT JARVIS] Unhandled action type:', action.type);
       }

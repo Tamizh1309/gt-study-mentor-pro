@@ -8,6 +8,9 @@
  *           Light/Dark Theme, Offline/Online Detection
  */
 
+// Configurable production API endpoint (Blueprint Section 44)
+const API_BASE_URL = window.GT_API_BASE_URL || '';
+
 // ══════════════════════════════════════════
 //  CONSTANTS — SCHEDULE
 // ══════════════════════════════════════════
@@ -498,7 +501,7 @@ async function submitDailyEvaluation() {
   };
 
   try {
-    const res = await fetch('http://localhost:3000/api/progress', {
+    const res = await fetch(`${API_BASE_URL}/api/progress`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -528,7 +531,7 @@ let doughnutChartInstance = null;
 
 async function loadEvaluationHistory() {
   try {
-    const res = await fetch('http://localhost:3000/api/history');
+    const res = await fetch(`${API_BASE_URL}/api/history`);
     let history = await res.json();
     
     // Sort history by date ascending for the chart (if backend sends DESC)
@@ -656,7 +659,7 @@ async function initTNMap() {
 
 async function loadMapData() {
   try {
-    const res = await fetch('http://localhost:3000/api/placements');
+    const res = await fetch(`${API_BASE_URL}/api/placements`);
     allPlacements = await res.json();
     renderMapMarkers(allPlacements);
   } catch(err) {
@@ -714,7 +717,7 @@ async function handleSyncDailyData() {
     btn.textContent = '⏳ Syncing...';
     btn.disabled = true;
     
-    const res = await fetch('http://localhost:3000/api/placements/sync', { method: 'POST' });
+    const res = await fetch(`${API_BASE_URL}/api/placements/sync`, { method: 'POST' });
     const data = await res.json();
     if (data.success) {
       await loadMapData();
@@ -749,7 +752,7 @@ async function submitMapPin() {
   const lng = document.getElementById('pin-lng').value;
   
   try {
-    const res = await fetch('http://localhost:3000/api/placements', {
+    const res = await fetch(`${API_BASE_URL}/api/placements`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ company: name, role: type, city, lat, lng, type })
@@ -6313,6 +6316,12 @@ async function initPrepHub() {
 window.initPrepHub = initPrepHub;
 
 function switchPrepTab(tabId) {
+  if (['gate', 'placement', 'swe', 'intern', 'internship'].includes(tabId)) {
+    if (typeof window.switchPrepareTab === 'function') {
+      return window.switchPrepareTab(tabId);
+    }
+  }
+
   currentPrepTab = tabId;
   document.querySelectorAll('.prep-tab-view').forEach(v => v.style.display = 'none');
   document.querySelectorAll('.prep-hub-dialog .tab-pill').forEach(b => b.classList.remove('active'));
@@ -8077,25 +8086,47 @@ function renderMockTestsArena(container) {
   `;
 }
 
-// ── PREPARE HUB TAB SWITCHER ──
+// ── PREPARE HUB TAB SWITCHER & OFFICIAL GATE 2027 INTEGRATION ──
 window.switchPrepareTab = function (tab) {
-  const tabs = ['gate', 'placement', 'swe', 'internship'];
-  tabs.forEach(t => {
-    const el = document.getElementById('subview-prep-' + t);
-    const btn = document.getElementById('btn-preptab-' + t);
-    if (el) el.style.display = (t === tab ? 'block' : 'none');
-    if (btn) btn.classList.toggle('active', t === tab);
+  const tabs = ['gate', 'placement', 'swe', 'intern', 'internship'];
+  const validTab = (tab === 'internship') ? 'intern' : tabs.includes(tab) ? tab : 'gate';
+
+  document.querySelectorAll('#prepare-tab-bar .tab-pill').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
   });
 
-  if (tab === 'gate') renderGATEPrepare();
-  if (tab === 'placement') renderPlacementPrepare();
-  if (tab === 'swe') renderSWEPrepare();
-  if (tab === 'internship') renderInternshipPrepare();
+  const idMap = {
+    'gate': 'ptab-gate',
+    'placement': 'ptab-placement',
+    'swe': 'ptab-swe',
+    'intern': 'ptab-intern'
+  };
+
+  const activeBtn = document.getElementById(idMap[validTab] || 'ptab-gate');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.setAttribute('aria-selected', 'true');
+  }
+
+  const container = document.getElementById('prepare-content-area');
+  if (!container) return;
+
+  if (validTab === 'gate') renderGATEPrepare(container);
+  else if (validTab === 'placement') renderPlacementPrepare(container);
+  else if (validTab === 'swe') renderSWEPrepare(container);
+  else if (validTab === 'intern') renderInternshipPrepare(container);
 };
 
-function renderGATEPrepare() {
-  const container = document.getElementById('prepare-gate-subjects-list');
+window.switchPrepTab = window.switchPrepareTab;
+
+function renderGATEPrepare(container) {
+  if (!container) container = document.getElementById('prepare-content-area');
   if (!container) return;
+
+  const now = new Date();
+  const timeStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 11:30 AM IST';
+
   const subjects = [
     { name: 'Operating Systems', progress: 84, accuracy: 64, pyqs: 48, weak: 'Deadlocks', next: 'Banker\'s Algorithm' },
     { name: 'Data Structures & Algorithms', progress: 92, accuracy: 78, pyqs: 86, weak: 'DP Trees', next: 'Segment Trees' },
@@ -8111,38 +8142,106 @@ function renderGATEPrepare() {
     { name: 'General Aptitude', progress: 90, accuracy: 84, pyqs: 70, weak: 'Spatial Aptitude', next: 'Data Interpretation' }
   ];
 
-  container.innerHTML = '';
-  subjects.forEach(s => {
-    const card = document.createElement('div');
-    card.className = 'track-card';
-    card.style.padding = '14px';
-    card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <strong style="color:#fff; font-size:14px;">${s.name}</strong>
-        <span class="score-pill ${s.accuracy >= 75 ? 'high' : s.accuracy >= 65 ? 'med' : 'low'}">${s.accuracy}% Acc</span>
-      </div>
-      <div style="margin:10px 0 6px;">
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
-          <span>Syllabus Covered</span><span>${s.progress}%</span>
+  container.innerHTML = `
+    <!-- OFFICIAL IIT MADRAS GATE 2027 MODULE (Blueprint Sections 1, 2, 3, 29, 32) -->
+    <div class="nd-card gate-official-card" style="padding:22px; margin-bottom:24px; border:1px solid rgba(245,158,11,0.35); background:radial-gradient(circle at top right, rgba(245,158,11,0.08), transparent 60%), var(--depth-2); position:relative; overflow:hidden;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <span style="font-size:11px; font-weight:800; color:var(--warning); letter-spacing:0.8px; text-transform:uppercase; background:rgba(245,158,11,0.15); padding:3px 8px; border-radius:4px; border:1px solid rgba(245,158,11,0.3);">🏛️ IIT MADRAS • GATE 2027</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:600;">Official Examination Authority</span>
+          </div>
+          <h2 style="font-size:1.35rem; font-weight:800; color:var(--text); margin:4px 0;">GATE 2027 — Official Resource Gateway</h2>
+          <p style="font-size:12px; color:var(--text-sub); margin:0;">Authoritative examination portal, schedules, syllabus specifications, and test patterns directly from IIT Madras.</p>
         </div>
-        <div style="width:100%; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; margin-top:3px;">
-          <div style="width:${s.progress}%; height:100%; background:var(--primary);"></div>
+        <div style="text-align:right;">
+          <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Authoritative Source</div>
+          <div style="font-size:12px; font-weight:700; color:var(--warning);">GATE 2027 — IIT Madras</div>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">Last verified: ${timeStr}</div>
         </div>
       </div>
-      <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">
-        Solved: <strong style="color:#fff;">${s.pyqs} PYQs</strong> • Weak: <span style="color:var(--danger);">${s.weak}</span>
+
+      <!-- Schedule Notice Alert -->
+      <div style="background:rgba(245,158,11,0.08); border-left:3px solid var(--warning); padding:10px 14px; border-radius:4px; margin-bottom:16px; font-size:12px; color:var(--text); line-height:1.5;">
+        ⚠️ <strong>Official Schedule Notice:</strong> Examination dates in February 2027 are published on the official portal and are liable to change per official announcements. Always verify through the links below.
       </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:8px; border-top:1px solid var(--border-subtle);">
-        <span style="font-size:10px; color:var(--warning);">Next: ${s.next}</span>
-        <button class="action-btn" onclick="navigateToView('practice', 'pyq')" style="font-size:10px; padding:3px 8px;">PYQs →</button>
+
+      <!-- 5 Official IIT Madras Action Links -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:16px;">
+        <a href="https://gate2027.iitm.ac.in/" target="_blank" rel="noopener noreferrer" class="gate-official-link-btn" style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text); text-decoration:none; font-size:12px; font-weight:700; transition:all 0.2s;">
+          <span style="display:flex; align-items:center; gap:8px;"><span>🌐</span> Official GATE 2027 Portal</span>
+          <span style="color:var(--text-muted); font-size:10px;">↗</span>
+        </a>
+        <a href="https://gate2027.iitm.ac.in/important_dates" target="_blank" rel="noopener noreferrer" class="gate-official-link-btn" style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text); text-decoration:none; font-size:12px; font-weight:700; transition:all 0.2s;">
+          <span style="display:flex; align-items:center; gap:8px;"><span>📅</span> Important Dates</span>
+          <span style="color:var(--text-muted); font-size:10px;">↗</span>
+        </a>
+        <a href="https://gate2027.iitm.ac.in/exam_papers_and_syllabus" target="_blank" rel="noopener noreferrer" class="gate-official-link-btn" style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text); text-decoration:none; font-size:12px; font-weight:700; transition:all 0.2s;">
+          <span style="display:flex; align-items:center; gap:8px;"><span>📚</span> Papers &amp; Syllabus</span>
+          <span style="color:var(--text-muted); font-size:10px;">↗</span>
+        </a>
+        <a href="https://gate2027.iitm.ac.in/question_paper_pattern" target="_blank" rel="noopener noreferrer" class="gate-official-link-btn" style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text); text-decoration:none; font-size:12px; font-weight:700; transition:all 0.2s;">
+          <span style="display:flex; align-items:center; gap:8px;"><span>📝</span> Question Paper Pattern</span>
+          <span style="color:var(--text-muted); font-size:10px;">↗</span>
+        </a>
+        <a href="https://gate2027.iitm.ac.in/download" target="_blank" rel="noopener noreferrer" class="gate-official-link-btn" style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text); text-decoration:none; font-size:12px; font-weight:700; transition:all 0.2s;">
+          <span style="display:flex; align-items:center; gap:8px;"><span>📥</span> Official Downloads</span>
+          <span style="color:var(--text-muted); font-size:10px;">↗</span>
+        </a>
       </div>
-    `;
-    container.appendChild(card);
-  });
+
+      <!-- Pattern Reference Bar -->
+      <div style="background:rgba(0,0,0,0.25); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; font-size:11px; color:var(--text-sub);">
+        <div>
+          <strong style="color:var(--text);">Pattern:</strong> Computer Based Test (CBT) &bull; 3 Hours &bull; 65 Questions (100 Marks)
+        </div>
+        <div>
+          <strong style="color:var(--text);">Marking Scheme:</strong> MCQ (-1/3, -2/3) &bull; MSQ &amp; NAT (No negative marking)
+        </div>
+        <button onclick="window.openJarvisModal?openJarvisModal():(window.toggleJarvisVoice&&toggleJarvisVoice())" class="action-btn" style="font-size:10px; padding:3px 10px;">🎙️ Ask JARVIS about GATE</button>
+      </div>
+    </div>
+
+    <!-- PREPARATION PROGRESS & SYLLABUS TRACKING -->
+    <div style="margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h3 style="font-size:1.1rem; font-weight:800; color:var(--text); margin:0;">GATE CS &amp; IT Syllabus Progress</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin:2px 0 0;">Personal preparation mastery across all 12 core subjects. Honest, evidence-backed tracking.</p>
+      </div>
+      <button class="action-btn" onclick="navigateToView('practice', 'gate-pyq')" style="font-size:11px; padding:5px 12px;">Practice PYQs →</button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+      ${subjects.map(s => `
+        <div class="track-card" style="padding:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong style="color:var(--text); font-size:13px;">${s.name}</strong>
+            <span class="score-pill ${s.accuracy >= 75 ? 'high' : s.accuracy >= 65 ? 'med' : 'low'}">${s.accuracy}% Acc</span>
+          </div>
+          <div style="margin:10px 0 6px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:4px;">
+              <span>Syllabus Covered</span>
+              <span>${s.progress}%</span>
+            </div>
+            <div style="width:100%; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden;">
+              <div style="width:${s.progress}%; height:100%; background:var(--primary);"></div>
+            </div>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:8px;">
+            Solved: <strong style="color:var(--text);">${s.pyqs} PYQs</strong> &bull; Weak Focus: <span style="color:var(--danger); font-weight:600;">${s.weak}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:8px; border-top:1px solid var(--border-subtle);">
+            <span style="font-size:10px; color:var(--warning); font-weight:600;">Next Target: ${s.next}</span>
+            <button class="action-btn" onclick="navigateToView('practice', 'gate-pyq')" style="font-size:10px; padding:3px 8px;">Solve PYQs →</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
-function renderPlacementPrepare() {
-  const container = document.getElementById('prepare-placement-sections-list');
+function renderPlacementPrepare(container) {
+  if (!container) container = document.getElementById('prepare-content-area');
   if (!container) return;
   container.innerHTML = `
     <div class="track-card">
@@ -8163,8 +8262,8 @@ function renderPlacementPrepare() {
   `;
 }
 
-function renderSWEPrepare() {
-  const container = document.getElementById('prepare-swe-sections-list');
+function renderSWEPrepare(container) {
+  if (!container) container = document.getElementById('prepare-content-area');
   if (!container) return;
   container.innerHTML = `
     <div class="track-card">
@@ -8180,8 +8279,8 @@ function renderSWEPrepare() {
   `;
 }
 
-function renderInternshipPrepare() {
-  const container = document.getElementById('prepare-internship-sections-list');
+function renderInternshipPrepare(container) {
+  if (!container) container = document.getElementById('prepare-content-area');
   if (!container) return;
   container.innerHTML = `
     <div class="track-card">
@@ -8665,7 +8764,7 @@ window.saveProfileField = function (key, value) {
   }
 };
 
-// ── COMMAND PALETTE ──
+// ── GLOBAL MODAL ESCAPE HANDLER ──
 // Global Escape handler for open modals
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') {
@@ -8772,7 +8871,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Boot: render home view
   setTimeout(() => {
     if (typeof renderHomeView === 'function') renderHomeView();
-    if (typeof CommandPalette !== 'undefined') CommandPalette.open && false; // don't auto-open
   }, 100);
 
   // Tab pill styles (add if not in style.css)

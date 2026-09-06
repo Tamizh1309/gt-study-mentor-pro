@@ -347,6 +347,21 @@
               <button onclick="document.getElementById('reschedule-alert').style.display='none'" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);font-size:12px;color:var(--text-muted);cursor:pointer;">Dismiss</button>
             </div>
           </div>
+
+          <!-- Official GATE 2027 Notice Card (IIT Madras Authority) -->
+          <div class="nd-card" style="padding:14px 16px;margin-top:14px;border:1px solid rgba(245,158,11,0.3);background:rgba(245,158,11,0.05);border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:22px;">🏛️</span>
+              <div>
+                <div style="font-size:11px;font-weight:800;color:var(--warning);text-transform:uppercase;letter-spacing:0.5px;">GATE 2027 &bull; IIT Madras Official Portal</div>
+                <div style="font-size:12px;color:var(--text);font-weight:600;">Exams in February 2027 &bull; Dates liable to change</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <a href="https://gate2027.iitm.ac.in/important_dates" target="_blank" rel="noopener noreferrer" class="action-btn" style="font-size:11px;padding:5px 10px;text-decoration:none;">Dates ↗</a>
+              <button onclick="navigateToView('prepare','gate')" class="cta-pill-primary" style="font-size:11px;padding:5px 12px;">Official Hub →</button>
+            </div>
+          </div>
         </div>
 
         <!-- Right column -->
@@ -2152,10 +2167,12 @@ WHERE p.package_lpa >= 10.0;</textarea>
     <button class="modal-close" data-close="gate-predictor-modal">&#x2715;</button>
     <div class="modal-title" style="display:flex; align-items:center; gap:10px;">
       <span>🎯</span> GATE 2027 Score &amp; Historical Cutoff Benchmark
-      <span class="badge-pill" style="font-size:10px; background:rgba(251,191,36,0.15); color:var(--warning); border:1px solid rgba(251,191,36,0.3);">Experimental Statistical Estimate</span>
+      <span class="badge-pill" style="font-size:10px; background:rgba(251,191,36,0.15); color:var(--warning); border:1px solid rgba(251,191,36,0.3);">Study Goal Calibration Only</span>
     </div>
-    <div class="modal-subtitle">Benchmark mock test marks against historical GATE CS cutoff ranges and statistical percentiles. Purely for study goal calibration.</div>
-    <div style="font-size:11px; line-height:1.4; color:var(--text-sub); background:rgba(251,191,36,0.08); border-left:3px solid var(--warning); padding:8px 12px; margin:10px 0; border-radius:4px;">⚠️ <strong>Statistical Reference Notice:</strong> Estimates are based on published historical cutoff distributions for study goal-setting. Not an official prediction or guarantee of admission.</div>
+    <div class="modal-subtitle">Benchmark mock test marks against historical GATE CS cutoff ranges. Purely for self-paced study goal calibration.</div>
+    <div style="font-size:11px; line-height:1.4; color:var(--text-sub); background:rgba(251,191,36,0.08); border-left:3px solid var(--warning); padding:8px 12px; margin:10px 0; border-radius:4px;">
+      ⚠️ <strong>Official Authority Notice:</strong> Per official IIT Madras GATE regulations, qualifying in GATE does not guarantee admission, scholarship, employment, or PSU recruitment. Benchmark percentiles are published historical statistics for personal goal calibration. For official guidelines, visit the <a href="https://gate2027.iitm.ac.in/" target="_blank" rel="noopener noreferrer" style="color:var(--warning); font-weight:700;">Official GATE 2027 Portal ↗</a>.
+    </div>
 
     <!-- Inputs Row -->
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin:16px 0; background:rgba(0,0,0,0.25); padding:16px; border-radius:10px; border:1px solid var(--border-subtle);">

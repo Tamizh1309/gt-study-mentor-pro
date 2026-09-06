@@ -133,6 +133,38 @@ const INTENT_RULES = [
     extractParams: () => ({ action: 'generate_plan' })
   },
   {
+    intent: 'OPEN_GATE_OFFICIAL',
+    category: 'application_command',
+    patterns: [
+      /(gate\s+)?important\s+dates/i,
+      /(show|view|open|check|what are)\s+(the\s+)?(gate\s+)?dates/i,
+      /(question\s+paper\s+)?pattern/i,
+      /(what('s| is)|show|view|open)\s+(the\s+)?(official\s+)?(gate\s+)?pattern/i,
+      /(official\s+)?(gate\s+)?(cs\s+|cse\s+)?syllabus/i,
+      /(where can i download|download|downloads)\s+(the\s+)?(gate\s+)?(official\s+)?(documents|papers|brochure)?/i,
+      /(open|show|launch|go to)\s+(the\s+)?(official\s+)?gate(\s+2027)?\s*(portal|website|iit madras)?/i,
+      /gate\s+portal/i
+    ],
+    extractParams: (text) => {
+      let target = 'portal';
+      if (/date/i.test(text)) target = 'dates';
+      else if (/pattern|marking/i.test(text)) target = 'pattern';
+      else if (/syllabus/i.test(text)) target = 'syllabus';
+      else if (/download|document|brochure/i.test(text)) target = 'downloads';
+      return { target, source: 'IIT Madras' };
+    }
+  },
+  {
+    intent: 'OPEN_GATE_PREPARE',
+    category: 'application_command',
+    patterns: [
+      /(open|go to|show|view)\s+gate(\s+2027)?\s*(prep|preparation)?/i,
+      /prepare\s+for\s+gate/i,
+      /gate\s+preparation/i
+    ],
+    extractParams: () => ({ view: 'prepare', tab: 'gate' })
+  },
+  {
     intent: 'START_QUIZ',
     category: 'application_command',
     patterns: [

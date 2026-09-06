@@ -32,7 +32,9 @@ const ALLOWED_ACTIONS = {
   OPEN_RESOURCES: 'open_resources',
   START_QUIZ: 'start_quiz',
   REVIEW_MISTAKES: 'review_mistakes',
-  RESET_JOURNEY: 'reset_journey'
+  RESET_JOURNEY: 'reset_journey',
+  OPEN_GATE_OFFICIAL: 'open_gate_official',
+  OPEN_GATE_PREPARE: 'open_gate_prepare'
 };
 
 /**
@@ -145,6 +147,43 @@ function resolveAction(intent, params = {}) {
         type: ALLOWED_ACTIONS.RESET_JOURNEY,
         params: { confirmationRequired: true },
         spokenConfirmation: "Resetting your preparation journey returns all progress to Day 0. Opening confirmation."
+      };
+    }
+
+    case 'OPEN_GATE_OFFICIAL': {
+      const target = params.target || 'portal';
+      const urls = {
+        portal: 'https://gate2027.iitm.ac.in/',
+        dates: 'https://gate2027.iitm.ac.in/important_dates',
+        syllabus: 'https://gate2027.iitm.ac.in/exam_papers_and_syllabus',
+        pattern: 'https://gate2027.iitm.ac.in/question_paper_pattern',
+        downloads: 'https://gate2027.iitm.ac.in/download'
+      };
+      const url = urls[target] || urls.portal;
+      const targetLabels = {
+        portal: 'Official Portal',
+        dates: 'Important Dates',
+        syllabus: 'Official Papers & Syllabus',
+        pattern: 'Question Paper Pattern',
+        downloads: 'Official Downloads'
+      };
+      return {
+        type: ALLOWED_ACTIONS.OPEN_GATE_OFFICIAL,
+        params: {
+          url,
+          target,
+          label: targetLabels[target] || 'Official Portal',
+          source: 'GATE 2027 — IIT Madras'
+        },
+        spokenConfirmation: `Opening the official GATE 2027 ${targetLabels[target] || 'Portal'} from IIT Madras.`
+      };
+    }
+
+    case 'OPEN_GATE_PREPARE': {
+      return {
+        type: ALLOWED_ACTIONS.OPEN_GATE_PREPARE,
+        params: { view: 'prepare', tab: 'gate' },
+        spokenConfirmation: "Opening your GATE 2027 preparation dashboard with official IIT Madras resources."
       };
     }
 
