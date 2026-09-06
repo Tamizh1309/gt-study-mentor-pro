@@ -8,6 +8,9 @@
  *           Light/Dark Theme, Offline/Online Detection
  */
 
+// Firebase SDK Module Imports (Modular Architecture)
+import { db, auth, provider, signInWithPopup, onAuthStateChanged, signOut, doc, getDoc, setDoc } from './firebase-config.js';
+
 // Configurable production API endpoint (Blueprint Section 44)
 const API_BASE_URL = window.GT_API_BASE_URL || '';
 
