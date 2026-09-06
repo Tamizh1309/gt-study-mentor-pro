@@ -12393,6 +12393,21 @@ window.submitGateMockExam = function (force = false) {
   const finalScore = Math.max(0, Math.min(100, Math.round(totalScore * 100) / 100));
   const rankData = window.GATEQuestionBank.calculateRankAndPercentile(finalScore);
 
+  // Sync exam result to Firebase Firestore cloud database (Project: linguastream-lzxdj)
+  if (typeof window !== 'undefined' && window.FirebaseService && typeof window.FirebaseService.saveMockExamResult === 'function') {
+    window.FirebaseService.saveMockExamResult({
+      finalScore,
+      predictedAIR: rankData.predictedAIR,
+      percentile: rankData.percentile,
+      category: rankData.category,
+      correctCount,
+      incorrectCount,
+      unattemptedCount,
+      mistakeCount: mistakeList.length,
+      examDate: new Date().toISOString()
+    });
+  }
+
   // Switch to Results Screen
   const examScreen = document.getElementById('gate-exam-screen');
   const resultsScreen = document.getElementById('gate-results-screen');
@@ -12646,6 +12661,28 @@ if (typeof document !== 'undefined') {
     window.initLiveDateTimeEngine();
   }
 }
+
+// ══════════════════════════════════════════════════════════════════════
+// 7. FIREBASE FIRESTORE CLOUD DATABASE CONTROLLER & HEALTH CHECK
+// ══════════════════════════════════════════════════════════════════════
+window.testFirebaseConnection = async function () {
+  if (!window.FirebaseService) {
+    alert('Firebase Cloud Database is initializing. Please try again in a second.');
+    return;
+  }
+  if (typeof showToast === 'function') {
+    showToast('Pinging Firebase Firestore Cloud DB...', 'info');
+  }
+  const res = await window.FirebaseService.testConnection();
+  if (res.connected) {
+    const msg = `✅ Firebase Cloud Database Connected!\n\n• Project ID: ${res.projectId}\n• Latency: ${res.latencyMs}ms\n• Firestore Sync: ACTIVE\n\nYour study blueprint, mistake bank, and mock exam results are backed up in the cloud.`;
+    alert(msg);
+    if (typeof showToast === 'function') showToast(`Firebase Active (${res.latencyMs}ms)`, 'success');
+  } else {
+    alert(`⚠️ Firebase Database Notice:\n\n${res.error || res.message || 'Firebase SDK running with local cache fallback.'}`);
+  }
+};
+
 
 
 

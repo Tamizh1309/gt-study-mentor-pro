@@ -479,6 +479,33 @@ async function runSuite() {
   console.log('\n======================================================');
   console.log('✅ ALL TESTS (OPTIONS 1, 2, 3 & DATE/TIME ENGINE) VERIFIED (100% PASS)');
   console.log('======================================================\n');
+
+  // ── 9. Testing Firebase Cloud Database Integration (linguastream-lzxdj) ──
+  console.log('9. Testing Firebase Cloud Database Service & Firestore Sync...');
+  const firebaseService = require('./firebaseService');
+  assert(firebaseService !== undefined, 'firebaseService exports FirebaseService module');
+  assert(firebaseService.config.projectId === 'linguastream-lzxdj', 'Firebase configured with project ID linguastream-lzxdj');
+  assert(firebaseService.config.apiKey === 'AIzaSyD1iAczyFw9fZDxS2wPSIKwoC18lzReFHg', 'Firebase configured with user API key');
+  assert(typeof firebaseService.saveUserOnboarding === 'function', 'firebaseService defines saveUserOnboarding');
+  assert(typeof firebaseService.syncMistakeToCloud === 'function', 'firebaseService defines syncMistakeToCloud');
+  assert(typeof firebaseService.saveMockExamResult === 'function', 'firebaseService defines saveMockExamResult');
+  assert(typeof firebaseService.seedQuestionBankToCloud === 'function', 'firebaseService defines seedQuestionBankToCloud');
+  assert(typeof firebaseService.testConnection === 'function', 'firebaseService defines testConnection');
+
+  // DOM checks
+  assert(indexHtml.includes('src="firebaseService.js"'), 'index.html loads firebaseService.js');
+  assert(indexHtml.includes('id="firebase-status-badge"'), 'index.html contains #firebase-status-badge in header');
+  assert(indexHtml.includes('firebase-firestore-compat.js'), 'index.html includes official Firebase Firestore SDK');
+
+  assert(updatedAppJs.includes('window.testFirebaseConnection'), 'app.js defines window.testFirebaseConnection');
+  assert(updatedAppJs.includes('saveMockExamResult'), 'app.js wires saveMockExamResult to GATE mock submissions');
+
+  const mistakeBookJs = fs.readFileSync(path.join(__dirname, 'mistakeBook.js'), 'utf8');
+  assert(mistakeBookJs.includes('syncMistakeToCloud'), 'mistakeBook.js triggers Firebase syncMistakeToCloud');
+
+  console.log('\n======================================================');
+  console.log('✅ ALL TESTS (INCLUDING FIREBASE DATABASE) VERIFIED (100% PASS)');
+  console.log('======================================================\n');
 }
 
 runSuite().catch(err => {

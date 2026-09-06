@@ -24,6 +24,11 @@
   <script src="prepIntelligence.js"></script>
   <script src="mistakeBook.js"></script>
   <script src="gateQuestionBankService.js"></script>
+  <!-- Firebase Cloud Database (Project: linguastream-lzxdj) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="firebaseService.js"></script>
 </head>
 <body>
 
@@ -238,6 +243,10 @@
           <button id="header-stopwatch-btn" onclick="toggleHeaderStopwatch()" style="font-size:11px;padding:3px 10px;font-weight:800;border-radius:6px;background:var(--primary);color:#fff;border:none;cursor:pointer;">&#x25B6; Focus</button>
         </div>
         <button onclick="window.openSetupWizard&&openSetupWizard()" id="header-setup-wizard-btn" style="display:flex;align-items:center;gap:6px;background:rgba(56,189,248,0.12);border:1px solid rgba(56,189,248,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light,#38BDF8);font-size:12px;cursor:pointer;font-weight:700;">⚙️ Setup Wizard</button>
+        <button type="button" onclick="window.testFirebaseConnection&&testFirebaseConnection()" id="firebase-status-badge" style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:var(--radius-full);padding:5px 12px;color:var(--success);font-size:11px;cursor:pointer;font-weight:700;" title="Firebase Cloud Database (Project: linguastream-lzxdj)">
+          <span style="width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block;"></span>
+          <span id="firebase-status-text">Cloud DB Active</span>
+        </button>
         <button onclick="window.openJarvisBriefingModal&&openJarvisBriefingModal()" id="header-briefing-btn" style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--success);font-size:12px;cursor:pointer;font-weight:700;">📋 JARVIS Briefing</button>
         <button onclick="navigateToView('jarvis')" style="display:flex;align-items:center;gap:6px;background:rgba(109,99,255,0.15);border:1px solid rgba(109,99,255,0.35);border-radius:var(--radius-full);padding:5px 14px;color:var(--primary-light);font-size:12px;cursor:pointer;font-weight:700;">🎙️ Ask JARVIS</button>
       </div>

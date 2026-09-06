@@ -155,7 +155,25 @@ const MistakeBookModule = (function () {
       });
 
       save();
+
+      // Cloud sync to Firebase Firestore (linguastream-lzxdj)
+      if (typeof window !== 'undefined' && window.FirebaseService && typeof window.FirebaseService.syncMistakeToCloud === 'function') {
+        window.FirebaseService.syncMistakeToCloud(newMistake);
+      }
+
       return newMistake;
+    },
+
+    addMistake: function (item) {
+      if (!item) return null;
+      const q = item.title || item.question || 'Flagged Question';
+      const subj = item.subject || 'General';
+      const topic = item.topic || 'General';
+      const wrong = item.userWrongAnswer || item.wrong || 'Incorrect';
+      const correct = item.correctAnswer || item.correct || 'Concept review';
+      const concept = item.notes || item.concept || 'Flagged for Spaced Repetition';
+      const cat = item.category || 'Concept gap';
+      return this.recordMistake(q, subj, topic, wrong, correct, concept, cat, item);
     },
 
     getMistakesBySeverity: function (sev) {
