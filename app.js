@@ -5277,35 +5277,6 @@ function switchPlacementTab(tabId) {
   }
 }
 
-function renderMasterCompanies() {
-  const container = document.getElementById('company-cards-grid');
-  const countLabel = document.getElementById('company-count-label');
-  const search = document.getElementById('company-search-input')?.value.toLowerCase().trim() || '';
-  const tier = document.getElementById('company-tier-filter')?.value || 'all';
-  const city = document.getElementById('company-city-filter')?.value || 'all';
-
-  if (!container) return;
-
-  const filtered = MASTER_100_COMPANIES.filter(c => {
-    const matchSearch = !search || c.name.toLowerCase().includes(search) || c.location.toLowerCase().includes(search) || c.tags.some(t => t.toLowerCase().includes(search));
-    const matchTier = tier === 'all' || c.category === tier;
-    const matchCity = city === 'all' || c.location.includes(city);
-    return matchSearch && matchTier && matchCity;
-  });
-
-  if (countLabel) countLabel.textContent = filtered.length;
-
-  if (filtered.length === 0) {
-    container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">No companies found matching criteria.</div>';
-    return;
-  }
-
-  container.innerHTML = filtered.map(c => {
-    const isBookmarked = companyApplications[c.id];
-    return '<div class="company-card-v7" onclick="openCompanyDetail(' + c.id + ')"><div class="company-card-top"><div><div class="company-card-title">' + c.name + '</div><div class="company-tier-badge">' + formatCategory(c.category) + '</div></div><div class="company-ctc-pill">' + c.salary + '</div></div><div class="company-meta-row"><span>📍 ' + c.location.split('/')[0].trim() + '</span><span>⭐ ' + c.rating + '</span><span>🎯 Cutoff: ' + c.cgpa + ' CGPA</span></div><div class="company-tags-wrap">' + c.tags.slice(0, 3).map(t => '<span class="company-tag-pill">' + t + '</span>').join('') + '</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:6px;border-top:1px solid var(--border-subtle);"><span style="font-size:11px;color:var(--accent);">🔍 View Details & Questions</span><span style="font-size:11px;color:' + (isBookmarked ? 'var(--success)' : 'var(--text-muted)') + ';">' + (isBookmarked ? '📌 ' + formatStatus(isBookmarked) : 'Click to explore') + '</span></div></div>';
-  }).join('');
-}
-
 function formatCategory(cat) {
   switch (cat) {
     case 'product_tier1': return 'Tier 1 Product';

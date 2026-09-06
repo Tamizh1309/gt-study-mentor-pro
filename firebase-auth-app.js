@@ -1,33 +1,52 @@
 // firebase-auth-app.js
-import { db, auth, provider, signInWithPopup, onAuthStateChanged, signOut, doc, getDoc, setDoc } from './firebase-config.js';
+import { db, auth, provider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, doc, getDoc, setDoc } from './firebase-config.js';
+
+// Check Redirect Result upon page load (handles redirect auth flow)
+if (typeof window !== 'undefined') {
+  try {
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result && result.user) {
+          console.log("✅ Redirect sign-in success:", result.user.displayName);
+          await saveUserToFirestore(result.user);
+          updateUIAfterLogin(result.user);
+        }
+      })
+      .catch((err) => {
+        if (err.code && err.code !== 'auth/credential-already-in-use') {
+          console.info("Redirect verification:", err.code);
+        }
+      });
+  } catch (redirectInitErr) {
+    console.info("Redirect init notice:", redirectInitErr);
+  }
+}
 
 // ========== GOOGLE SIGN-IN ==========
 window.signInWithGoogle = async function() {
   try {
+    // Attempt standard popup sign-in
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     console.log("✅ Logged in:", user.displayName);
     await saveUserToFirestore(user);
     updateUIAfterLogin(user);
   } catch (error) {
-    console.error("❌ Sign-in error:", error);
-    // Fallback for popup blocking or unconfigured origin
     if (error.code === 'auth/unauthorized-domain') {
-      alert("⚠️ Firebase Auth Notice:\n\nPlease add 'tamizh1309.github.io' to your Firebase Console under:\nAuthentication > Settings > Authorized domains.\n\nLogging in with Demo Student profile so your testing is not blocked!");
-    }
-    if (error.code === 'auth/popup-blocked' || error.code === 'auth/unauthorized-domain' || error.code === 'auth/cancelled-popup-request') {
-      console.info("ℹ️ Using student fallback session");
-      const fallbackUser = {
-        uid: "demo_student_" + Date.now(),
-        displayName: "GATE Aspirant",
-        email: "aspirant@gtmentor.pro",
-        photoURL: "https://api.dicebear.com/7.x/bottts/svg?seed=gate2027"
-      };
-      await saveUserToFirestore(fallbackUser);
-      updateUIAfterLogin(fallbackUser);
+      alert("⚠️ Firebase Auth Notice:\n\nPlease add 'tamizh1309.github.io' to your Firebase Console under:\nAuthentication > Settings > Authorized domains.");
       return;
     }
-    alert("Sign-in failed! Check console (F12).");
+    // If popup is blocked, cancelled, or restricted by COOP, trigger redirect sign-in seamlessly
+    if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+      console.info("ℹ️ Popup restricted by browser security policies. Transitioning to Google Redirect Sign-In...");
+      try {
+        await signInWithRedirect(auth, provider);
+        return;
+      } catch (redirectErr) {
+        console.warn("Redirect sign-in notice:", redirectErr);
+      }
+    }
+    console.warn("Sign-in notice:", error.message || error);
   }
 };
 
