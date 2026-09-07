@@ -7932,7 +7932,7 @@ window.setDynamicTimeBudget = function (minutes) {
 };
 
 // ── GLOBAL VIEW NAVIGATION (GT NeoDepth v3) ──
-window.navigateToView = function (viewName, subtab) {
+window._fullNavigateToView = function (viewName, subtab) {
   window.currentV2View = viewName;
   window.currentV2Subtab = subtab || null;
 
@@ -7983,6 +7983,15 @@ window.navigateToView = function (viewName, subtab) {
     if (viewName === 'settings') renderSettingsView();
   } catch (e) { console.warn('[navigate] Renderer error:', viewName, e); }
 };
+
+window.navigateToView = window._fullNavigateToView;
+
+// Fulfill any navigation queued by early clicks before module evaluation
+if (typeof window !== 'undefined' && window._pendingNavigation) {
+  const p = window._pendingNavigation;
+  window._pendingNavigation = null;
+  window.navigateToView(p.viewName, p.subtab);
+}
 
 window.renderHomeDashboard = function () { if (typeof renderHomeView === 'function') renderHomeView(); };
 
@@ -11211,14 +11220,14 @@ window.renderSettingsView = function () {
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
           <div>
             <div style="font-size:13px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:6px;">
-              <span>✨</span> Google Gemini 1.5 Flash &amp; JARVIS AI
+              <span>✨</span> Google Gemini Flash &amp; JARVIS AI
             </div>
             <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
-              Online generative reasoning with Google Gemini 1.5 Flash, or 100% offline semantic concept engine
+              Online generative reasoning with Google Gemini Flash (Latest), or 100% offline semantic concept engine
             </div>
           </div>
-          <span class="badge-pill" style="font-size:10px; font-weight:700; background:${(localStorage.getItem('gemini_api_key') && localStorage.getItem('gemini_api_key').startsWith('AIzaSy')) ? 'rgba(16,185,129,0.15)' : 'rgba(56,189,248,0.15)'}; color:${(localStorage.getItem('gemini_api_key') && localStorage.getItem('gemini_api_key').startsWith('AIzaSy')) ? 'var(--success)' : 'var(--primary-light)'}; border:1px solid currentColor;">
-            ${(localStorage.getItem('gemini_api_key') && localStorage.getItem('gemini_api_key').startsWith('AIzaSy')) ? '🟢 Gemini 1.5 Flash Active' : '🔵 Offline Semantic Engine Active'}
+          <span class="badge-pill" style="font-size:10px; font-weight:700; background:${((localStorage.getItem('gemini_api_key') || localStorage.getItem('gt_gemini_api_key')) && (localStorage.getItem('gemini_api_key') || localStorage.getItem('gt_gemini_api_key')).startsWith('AIzaSy')) ? 'rgba(16,185,129,0.15)' : 'rgba(56,189,248,0.15)'}; color:${((localStorage.getItem('gemini_api_key') || localStorage.getItem('gt_gemini_api_key')) && (localStorage.getItem('gemini_api_key') || localStorage.getItem('gt_gemini_api_key')).startsWith('AIzaSy')) ? 'var(--success)' : 'var(--primary-light)'}; border:1px solid currentColor;">
+            ${((localStorage.getItem('gemini_api_key') || localStorage.getItem('gt_gemini_api_key')) && (localStorage.getItem('gemini_api_key') || localStorage.getItem('gt_gemini_api_key')).startsWith('AIzaSy')) ? '🟢 Gemini Flash Active' : '🔵 Offline Semantic Engine Active'}
           </span>
         </div>
 
@@ -11309,6 +11318,7 @@ window.saveAndTestGeminiKey = async function() {
 
   if (!key) {
     localStorage.removeItem('gemini_api_key');
+    localStorage.removeItem('gt_gemini_api_key');
     if (statusEl) statusEl.innerHTML = '<span style="color:var(--text-muted);">✓ Cleared. Switched to offline concept engine.</span>';
     if (typeof showToast === 'function') showToast('API key removed. Running in 100% offline mode.', 'info');
     renderSettingsView();
@@ -11321,32 +11331,51 @@ window.saveAndTestGeminiKey = async function() {
     return;
   }
 
-  if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent);">Testing connection with Gemini 1.5 Flash...</span>';
-  try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(key)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping test' }] }] })
-    });
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent);">Testing connection with Google Gemini Flash...</span>';
+  const modelsToTry = ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+  let connected = false;
+  let activeModel = '';
+  let lastErrMsg = '';
 
-    if (res.ok) {
-      localStorage.setItem('gemini_api_key', key);
-      if (statusEl) statusEl.innerHTML = '<span style="color:var(--success);font-weight:700;">✓ Connected to Google Gemini 1.5 Flash successfully!</span>';
-      if (typeof showToast === 'function') showToast('Gemini API key saved & verified! ✨', 'success');
-      setTimeout(renderSettingsView, 1000);
-    } else {
-      const errData = await res.json().catch(() => ({}));
-      const msg = errData.error?.message || `HTTP ${res.status}`;
-      if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger);">Verification failed (${res.status}): ${msg}</span>`;
-      if (typeof showToast === 'function') showToast('Gemini verification failed', 'danger');
+  for (const model of modelsToTry) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping test' }] }] })
+      });
+
+      if (res.ok) {
+        connected = true;
+        activeModel = model;
+        break;
+      } else if (res.status === 404) {
+        // Model identifier not supported on this endpoint, try next candidate
+        continue;
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        lastErrMsg = errData.error?.message || `HTTP ${res.status}`;
+      }
+    } catch (err) {
+      lastErrMsg = err.message;
     }
-  } catch (err) {
-    if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger);">Connection error: ${err.message}</span>`;
+  }
+
+  if (connected) {
+    localStorage.setItem('gemini_api_key', key);
+    localStorage.setItem('gt_gemini_api_key', key);
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--success);font-weight:700;">✓ Connected to Google ${activeModel} successfully!</span>`;
+    if (typeof showToast === 'function') showToast(`Gemini verified (${activeModel})! ✨`, 'success');
+    setTimeout(renderSettingsView, 1000);
+  } else {
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger);">Verification failed: ${lastErrMsg || 'Unable to connect to Gemini models.'}</span>`;
+    if (typeof showToast === 'function') showToast('Gemini verification failed', 'danger');
   }
 };
 
 window.clearGeminiKey = function() {
   localStorage.removeItem('gemini_api_key');
+  localStorage.removeItem('gt_gemini_api_key');
   if (typeof showToast === 'function') showToast('Using 100% offline knowledge engine', 'info');
   renderSettingsView();
 };

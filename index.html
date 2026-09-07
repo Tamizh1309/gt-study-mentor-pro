@@ -23,6 +23,35 @@
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // Early Route Dispatcher & Pre-bootstrap (Prevents ReferenceError on early clicks)
+    window.navigateToView = function (viewName, subtab) {
+      if (window._fullNavigateToView) {
+        return window._fullNavigateToView(viewName, subtab);
+      }
+      window.currentV2View = viewName;
+      window.currentV2Subtab = subtab || null;
+      const viewMap = {
+        'home': 'view-home',
+        'prepare': 'view-prepare',
+        'practice': 'view-practice',
+        'career': 'view-career',
+        'progress': 'view-progress',
+        'cselabs': 'view-cselabs',
+        'resources': 'view-resources',
+        'jarvis': 'view-chat',
+        'mentor': 'view-chat',
+        'chat': 'view-chat',
+        'settings': 'view-settings'
+      };
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-nav-item').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
+      document.querySelectorAll('.mob-nav-btn').forEach(b => b.classList.remove('active'));
+      const targetPanel = document.getElementById(viewMap[viewName] || ('view-' + viewName));
+      if (targetPanel) targetPanel.classList.add('active');
+      window._pendingNavigation = { viewName, subtab };
+    };
+  </script>
   <script src="prepIntelligence.js"></script>
   <script src="mistakeBook.js"></script>
   <script src="gateQuestionBankService.js"></script>
