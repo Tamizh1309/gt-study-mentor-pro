@@ -489,32 +489,6 @@
           </div>
         </div>
 
-        <!-- 3D Skill Graph Section -->
-        <div class="home-skillgraph-row" style="grid-column: 1 / -1; margin-top: 8px;">
-          <div class="section-header mb-12">
-            <div>
-              <div class="section-title">&#x2728; 3D Skill Stack &amp; Knowledge Graph</div>
-              <div class="section-title-sub">Interactive spatial map &mdash; click any node to inspect mastery, mistakes, and next action</div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <span class="skill-legend-pill status-mastered">&#x25CF; Mastered</span>
-              <span class="skill-legend-pill status-strong">&#x25CF; Strong</span>
-              <span class="skill-legend-pill status-developing">&#x25CF; Developing</span>
-              <span class="skill-legend-pill status-weak">&#x25CF; Weak</span>
-            </div>
-          </div>
-          <div class="skill-graph-card neo-card" id="skill-graph-container">
-            <div class="skill-graph-canvas-wrap">
-              <div class="skill-graph-nodes" id="skill-graph-nodes">
-                <!-- Dynamically populated by render3DSkillGraph() -->
-              </div>
-            </div>
-            <div class="skill-inspector-card" id="skill-inspector-card" style="display:none;">
-              <!-- Populated when user clicks any skill node -->
-            </div>
-          </div>
-        </div>
-
         <!-- Weak area alert -->
         <div class="home-weak-row">
           <div class="section-header mb-12">
@@ -533,22 +507,63 @@
           </div>
         </div>
 
-        <!-- Career Sync Matrix Row (Signature Experience 2.5) -->
-        <div class="home-careersync-row" style="grid-column: 1 / -1; margin-top: 14px;">
-          <div class="section-header mb-12">
-            <div>
-              <div class="section-title">🔗 Career Sync Matrix</div>
-              <div class="section-title-sub">Learning Progress + Career Target = Today's Preparation</div>
-            </div>
-            <button onclick="navigateToView('career')" style="background:none;border:none;color:var(--primary-light);font-size:11px;cursor:pointer;">Open Career Pipeline &rarr;</button>
-          </div>
-          <div class="career-sync-grid" id="career-sync-grid-home">
-            <!-- Populated dynamically by renderCareerSyncMatrix() in app.js -->
-          </div>
-        </div>
-
         <!-- Sunday Mistake Bank Repetition Banner (Option 3) -->
         <div id="sunday-mistake-banner" style="grid-column: 1 / -1; margin-top: 14px; display:none;"></div>
+
+        <!-- Collapsible Studio Hub: 3D Knowledge Graph & Career Sync Matrix -->
+        <details class="studio-hub-details" id="studio-hub-drawer" style="grid-column: 1 / -1; margin-top: 18px;">
+          <summary class="studio-hub-summary">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="font-size:20px;">🛠️</span>
+              <div>
+                <strong style="font-size:13px;color:var(--text);display:block;">Deep Exploration Tools &bull; 3D Skill Graph &amp; Career Sync</strong>
+                <span style="font-size:11px;color:var(--text-sub);">Interactive spatial knowledge map, skill dependencies, and company pipeline matrix</span>
+              </div>
+            </div>
+            <span class="studio-hub-chevron">Explore Deep Tools ▾</span>
+          </summary>
+          <div class="studio-hub-content" style="padding:18px;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:20px;">
+            <!-- 3D Skill Graph Section -->
+            <div class="home-skillgraph-row">
+              <div class="section-header mb-12">
+                <div>
+                  <div class="section-title">&#x2728; 3D Skill Stack &amp; Knowledge Graph</div>
+                  <div class="section-title-sub">Interactive spatial map &mdash; click any node to inspect mastery, mistakes, and next action</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <span class="skill-legend-pill status-mastered">&#x25CF; Mastered</span>
+                  <span class="skill-legend-pill status-strong">&#x25CF; Strong</span>
+                  <span class="skill-legend-pill status-developing">&#x25CF; Developing</span>
+                  <span class="skill-legend-pill status-weak">&#x25CF; Weak</span>
+                </div>
+              </div>
+              <div class="skill-graph-card neo-card" id="skill-graph-container">
+                <div class="skill-graph-canvas-wrap">
+                  <div class="skill-graph-nodes" id="skill-graph-nodes">
+                    <!-- Dynamically populated by render3DSkillGraph() -->
+                  </div>
+                </div>
+                <div class="skill-inspector-card" id="skill-inspector-card" style="display:none;">
+                  <!-- Populated when user clicks any skill node -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Career Sync Matrix Row (Signature Experience 2.5) -->
+            <div class="home-careersync-row">
+              <div class="section-header mb-12">
+                <div>
+                  <div class="section-title">🔗 Career Sync Matrix</div>
+                  <div class="section-title-sub">Learning Progress + Career Target = Today's Preparation</div>
+                </div>
+                <button onclick="navigateToView('career')" style="background:none;border:none;color:var(--primary-light);font-size:11px;cursor:pointer;">Open Career Pipeline &rarr;</button>
+              </div>
+              <div class="career-sync-grid" id="career-sync-grid-home">
+                <!-- Populated dynamically by renderCareerSyncMatrix() in app.js -->
+              </div>
+            </div>
+          </div>
+        </details>
       </div>
     </section>
 
@@ -1134,6 +1149,91 @@
         </div>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Daily Shutdown Review Modal -->
+<div class="modal-overlay" id="shutdown-review-modal" role="dialog" aria-modal="true" aria-label="Daily Evening Shutdown Review">
+  <div class="modal" style="max-width:580px; width:94%; max-height:90vh; overflow-y:auto; border:1px solid rgba(16,185,129,0.3); background:var(--depth-2);">
+    <button class="modal-close" data-close="shutdown-review-modal" aria-label="Close">&#x2715;</button>
+    
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border-subtle);">
+      <span style="font-size:24px;">🌅</span>
+      <div>
+        <div class="modal-title" style="font-size:18px;margin-bottom:2px;">Daily Evening Shutdown Review</div>
+        <div class="modal-subtitle" style="font-size:12px;color:var(--text-sub);">Review what you crushed today, log your momentum, and close Day cleanly.</div>
+      </div>
+    </div>
+
+    <!-- Stats summary grid -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+      <div style="background:var(--depth-3);padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);text-align:center;">
+        <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Tasks Done</div>
+        <div id="shutdown-tasks-stat" style="font-size:18px;font-weight:800;color:var(--success);margin-top:2px;">0 / 0</div>
+      </div>
+      <div style="background:var(--depth-3);padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);text-align:center;">
+        <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Focus Time</div>
+        <div id="shutdown-time-stat" style="font-size:18px;font-weight:800;color:var(--accent);margin-top:2px;">0 min</div>
+      </div>
+      <div style="background:var(--depth-3);padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);text-align:center;">
+        <div style="font-size:10px;text-transform:uppercase;color:var(--text-muted);font-weight:700;">Current Streak</div>
+        <div id="shutdown-streak-stat" style="font-size:18px;font-weight:800;color:var(--warning);margin-top:2px;">🔥 Day 1</div>
+      </div>
+    </div>
+
+    <!-- Tasks Checklist -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">
+        Today's Task Verification (Check what you completed)
+      </div>
+      <div id="shutdown-task-checklist" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;padding-right:4px;">
+        <!-- Populated dynamically by openDailyShutdownReview() -->
+      </div>
+    </div>
+
+    <!-- Daily Reflection Pulse -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">
+        How did today's preparation feel?
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="shutdown-mood-selector">
+        <button type="button" class="shutdown-mood-btn active" data-mood="crushed" onclick="window.selectShutdownMood&&selectShutdownMood('crushed', this)" style="padding:10px 8px;background:rgba(16,185,129,0.12);border:1px solid var(--success);border-radius:var(--radius-sm);color:var(--text);font-size:11px;cursor:pointer;font-weight:600;text-align:center;">
+          🚀 High Momentum<br><span style="font-size:10px;color:var(--text-sub);">High clarity</span>
+        </button>
+        <button type="button" class="shutdown-mood-btn" data-mood="moderate" onclick="window.selectShutdownMood&&selectShutdownMood('moderate', this)" style="padding:10px 8px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:11px;cursor:pointer;font-weight:600;text-align:center;">
+          ⚖️ Moderate<br><span style="font-size:10px;color:var(--text-sub);">Some tough topics</span>
+        </button>
+        <button type="button" class="shutdown-mood-btn" data-mood="struggled" onclick="window.selectShutdownMood&&selectShutdownMood('struggled', this)" style="padding:10px 8px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:11px;cursor:pointer;font-weight:600;text-align:center;">
+          🌧️ Challenging<br><span style="font-size:10px;color:var(--text-sub);">Needs revision</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Optional Mistake / Note Logger -->
+    <div style="margin-bottom:16px;">
+      <label for="shutdown-notes" style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;">
+        💡 Any concept confusion or formula trap to remember? (Optional)
+      </label>
+      <input type="text" id="shutdown-notes" placeholder="e.g. Remember Round Robin average turnaround time calculation trap..." style="width:100%;padding:9px 12px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text);font-size:12px;" />
+    </div>
+
+    <!-- Rollover Guarantee Box -->
+    <div style="padding:10px 12px;border-radius:6px;background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:16px;">🔄</span>
+      <div style="font-size:11px;color:var(--text-sub);line-height:1.4;">
+        <strong style="color:var(--accent);">Zero Guilt Rollover:</strong> Any uncompleted task will automatically roll over to tomorrow's schedule without breaking your streak!
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;border-top:1px solid var(--border-subtle);padding-top:12px;">
+      <button type="button" class="modal-close" data-close="shutdown-review-modal" style="padding:8px 14px;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);color:var(--text-muted);font-size:12px;cursor:pointer;">
+        Keep Studying
+      </button>
+      <button type="button" onclick="window.completeDailyShutdown&&completeDailyShutdown()" style="padding:9px 20px;background:linear-gradient(135deg,var(--success),#059669);border:none;border-radius:var(--radius-sm);color:#fff;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;">
+        <span>🔒</span> <span>Lock Streak &amp; Close Day</span>
+      </button>
+    </div>
   </div>
 </div>
 

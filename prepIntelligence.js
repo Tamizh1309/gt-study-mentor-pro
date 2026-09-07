@@ -440,6 +440,7 @@ int shortestPathGrid(vector<vector<int>>& grid) {
     getNextBestAction: function () {
       if (state.currentDay === 0 || state.status === 'NOT_STARTED') {
         return {
+          title: 'Complete Day 0 Setup & Orientation',
           action: 'Complete Day 0 Setup & Orientation',
           subject: 'Orientation',
           why: 'Configure your career targets, daily study hours, and preferred focus intervals to generate your Day 1 plan.',
@@ -449,22 +450,309 @@ int shortestPathGrid(vector<vector<int>>& grid) {
           estMinutes: 10,
           accuracy: 0,
           pendingMistakes: 0,
-          supports: 'GATE + SWE + Career'
+          supports: 'GATE + SWE + Career',
+          load: 'Low Load'
         };
       }
+
+      // If we have an uncompleted task in today's plan, prioritize it!
+      const uncompletedTask = state.todayTasks ? state.todayTasks.find(t => !t.completed) : null;
       const topWeak = state.weakTopics && state.weakTopics.length ? state.weakTopics[0] : null;
+
+      if (uncompletedTask) {
+        return {
+          id: uncompletedTask.id,
+          title: uncompletedTask.topic,
+          action: uncompletedTask.topic,
+          subject: uncompletedTask.subject,
+          why: uncompletedTask.why || 'Critical daily milestone for your calibrated curriculum.',
+          cta: uncompletedTask.cta || 'Start Focus Session',
+          track: uncompletedTask.track || state.target || 'GATE 2027',
+          type: uncompletedTask.type || 'THEORY',
+          isDay0: false,
+          estMinutes: uncompletedTask.estMinutes || 45,
+          accuracy: topWeak ? topWeak.accuracy : 85,
+          pendingMistakes: 0,
+          supports: uncompletedTask.highLeverageNote || 'High Leverage Milestone',
+          load: (uncompletedTask.estMinutes >= 45) ? 'Deep Focus' : 'Speed Sprint'
+        };
+      }
+
+      if (topWeak) {
+        return {
+          title: 'Smart Revision: ' + topWeak.topic,
+          action: 'Smart Revision: ' + topWeak.topic,
+          subject: topWeak.subject,
+          why: topWeak.reason || 'Accuracy in this topic fell below 65%. Spaced revision needed to lock concept retention.',
+          cta: 'Revise & Retest',
+          track: topWeak.track || 'REVISION',
+          isDay0: false,
+          estMinutes: 30,
+          accuracy: topWeak.accuracy || 45,
+          pendingMistakes: 1,
+          supports: 'Concept Retention',
+          load: 'Targeted Review'
+        };
+      }
+
       return {
-        action: topWeak ? 'Revise ' + topWeak.topic : (state.todayTasks.length ? 'Focus: ' + state.todayTasks[0].topic : 'Start Practice Session'),
-        subject: topWeak ? topWeak.subject : (state.todayTasks.length ? state.todayTasks[0].subject : 'General'),
-        why: topWeak ? topWeak.reason : 'Maintains your consistent daily study velocity and builds active evidence.',
-        cta: topWeak ? topWeak.action : 'Start Today\'s Plan',
-        track: topWeak ? topWeak.track : 'Preparation OS',
+        title: 'All Daily Tasks Completed! Review or Rest',
+        action: 'All Daily Tasks Completed! Review or Rest',
+        subject: 'Daily Milestone Reached',
+        why: 'You have crushed today\'s planned study sessions! Complete your Daily Shutdown Review to lock your streak.',
+        cta: 'Open Daily Shutdown',
+        track: 'VICTORY',
         isDay0: false,
-        estMinutes: topWeak ? 45 : (state.todayTasks.length ? state.todayTasks[0].estMinutes : 30),
-        accuracy: topWeak ? topWeak.accuracy : 0,
+        estMinutes: 5,
+        accuracy: 100,
         pendingMistakes: 0,
-        supports: 'Career Goals'
+        supports: 'Daily Streak Locked',
+        load: 'Zero Load'
       };
+    },
+
+    generateCalibratedDayPlan: function (targetTrack, dailyHours, currentDay = 1) {
+      const track = targetTrack || state.target || 'GATE + Placement';
+      const day = Math.max(1, currentDay || 1);
+      state.currentDay = day;
+      state.status = 'ACTIVE';
+      state.target = track;
+
+      let templateTasks = [];
+
+      if (track.includes('GATE 2027')) {
+        templateTasks = [
+          {
+            id: 'task-gate-1',
+            track: 'GATE 2027',
+            subject: 'Engineering Mathematics',
+            topic: 'Linear Algebra: Eigenvalues & Cayley-Hamilton Theorem',
+            why: 'Guaranteed 2-3 marks in GATE CS; fundamental for Machine Learning & Graphics.',
+            cta: 'Read Concept & Solve 3 PYQs',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'THEORY',
+            highLeverageNote: 'IIT Madras favorite topic.'
+          },
+          {
+            id: 'task-gate-2',
+            track: 'GATE 2027',
+            subject: 'Operating Systems',
+            topic: 'Process Scheduling: Round Robin & SRTF Mechanics',
+            why: 'High-frequency GATE numerical topic. Critical for solving timing Gantt charts.',
+            cta: 'Practice 5 PYQ Problems',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'PRACTICE',
+            highLeverageNote: 'Averaging turnaround & waiting time.'
+          },
+          {
+            id: 'task-gate-3',
+            track: 'GATE 2027',
+            subject: 'Computer Networks',
+            topic: 'Subnet Masking & CIDR IP Addressing',
+            why: 'Formula verification and avoiding 1-mark negative calculation traps.',
+            cta: 'Take 5-Question Diagnostic',
+            estMinutes: 30,
+            completed: false,
+            priority: 'MEDIUM',
+            type: 'QUIZ',
+            highLeverageNote: 'Network prefix & host bits calculation.'
+          }
+        ];
+      } else if (track.includes('Placement')) {
+        templateTasks = [
+          {
+            id: 'task-place-1',
+            track: 'PLACEMENTS',
+            subject: 'Data Structures & Algorithms',
+            topic: 'Two Pointers & Sliding Window Patterns',
+            why: 'Top patterns asked in Zoho, Amazon, and product screening rounds.',
+            cta: 'Solve in Code Studio',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'PRACTICE',
+            highLeverageNote: 'O(N) space-time optimization.'
+          },
+          {
+            id: 'task-place-2',
+            track: 'PLACEMENTS',
+            subject: 'Quantitative Aptitude',
+            topic: 'Time, Speed, Distance & Work Equivalence',
+            why: 'Aptitude screening filter eliminates 60% of candidates in Round 1.',
+            cta: 'Practice 10 Speed Drills',
+            estMinutes: 30,
+            completed: false,
+            priority: 'HIGH',
+            type: 'APTITUDE',
+            highLeverageNote: 'Relative speed & ratio shortcuts.'
+          },
+          {
+            id: 'task-place-3',
+            track: 'PLACEMENTS',
+            subject: 'DBMS',
+            topic: 'Indexing (B+ Trees) vs Hash Indexing in Production',
+            why: 'Direct technical interview discussion point for high-concurrency systems.',
+            cta: 'Review 5 Interview Q&As',
+            estMinutes: 30,
+            completed: false,
+            priority: 'MEDIUM',
+            type: 'THEORY',
+            highLeverageNote: 'Range query optimization.'
+          }
+        ];
+      } else if (track.includes('Internship')) {
+        templateTasks = [
+          {
+            id: 'task-intern-1',
+            track: 'INTERNSHIP',
+            subject: 'Web Engineering',
+            topic: 'REST API Design, JWT Authentication & CORS',
+            why: 'Backend interviews test token security and HTTP status codes immediately.',
+            cta: 'Implement Auth Middleware',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'PROJECT',
+            highLeverageNote: 'Stateless session handling.'
+          },
+          {
+            id: 'task-intern-2',
+            track: 'INTERNSHIP',
+            subject: 'DSA',
+            topic: 'HashMap & Frequency Array Optimizations',
+            why: 'Solves 70% of medium-tier internship online assessments.',
+            cta: 'Solve LeetCode Top 50',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'PRACTICE',
+            highLeverageNote: 'Subarray sum equals K pattern.'
+          },
+          {
+            id: 'task-intern-3',
+            track: 'INTERNSHIP',
+            subject: 'Career & Resume',
+            topic: 'Project README, Live Demo Link & System Architecture Diagram',
+            why: 'Recruiters reject applications without deployed links in <30 seconds.',
+            cta: 'Audit GitHub Repo',
+            estMinutes: 30,
+            completed: false,
+            priority: 'MEDIUM',
+            type: 'PORTFOLIO',
+            highLeverageNote: 'Professional open-source presentation.'
+          }
+        ];
+      } else if (track.includes('Software Engineering')) {
+        templateTasks = [
+          {
+            id: 'task-swe-1',
+            track: 'SWE MASTER',
+            subject: 'Software Architecture',
+            topic: 'SOLID Principles & Strategy Design Patterns',
+            why: 'Differentiates junior coders from production-grade engineers.',
+            cta: 'Refactor Clean Code Sample',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'THEORY',
+            highLeverageNote: 'Coupling and cohesion mastery.'
+          },
+          {
+            id: 'task-swe-2',
+            track: 'SWE MASTER',
+            subject: 'Distributed Systems',
+            topic: 'Database Sharding, Replication & CAP Theorem Tradeoffs',
+            why: 'Standard System Design interview question at Tier-1 companies.',
+            cta: 'Sketch Architecture Blueprint',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'SYSTEM_DESIGN',
+            highLeverageNote: 'Master-slave vs Multi-master.'
+          },
+          {
+            id: 'task-swe-3',
+            track: 'SWE MASTER',
+            subject: 'DSA & Concurrency',
+            topic: 'Thread Safety & Producer-Consumer Queues',
+            why: 'Evaluated in product concurrency rounds.',
+            cta: 'Simulate Mutex Locks',
+            estMinutes: 30,
+            completed: false,
+            priority: 'MEDIUM',
+            type: 'PRACTICE',
+            highLeverageNote: 'Deadlock avoidance & condition variables.'
+          }
+        ];
+      } else {
+        // Dual Master Track (GATE + Placement)
+        templateTasks = [
+          {
+            id: 'task-dual-1',
+            track: 'GATE 2027',
+            subject: 'Engineering Mathematics',
+            topic: 'Linear Algebra: Eigenvalues & Systems of Linear Equations',
+            why: 'High-yield scoring foundation for GATE CS 2027.',
+            cta: 'Master Core Proofs & PYQs',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'THEORY',
+            highLeverageNote: 'Rank of matrix & consistent systems.'
+          },
+          {
+            id: 'task-dual-2',
+            track: 'PLACEMENTS',
+            subject: 'Data Structures & Algorithms',
+            topic: 'Two Pointers & Fast-Slow Pointers on Linked Lists',
+            why: 'Core coding interview filter problem asked by Amazon and Zoho.',
+            cta: 'Solve in Code Studio',
+            estMinutes: 45,
+            completed: false,
+            priority: 'HIGH',
+            type: 'PRACTICE',
+            highLeverageNote: 'Cycle detection & middle node.'
+          },
+          {
+            id: 'task-dual-3',
+            track: 'SYNERGY',
+            subject: 'Operating Systems',
+            topic: 'Process Synchronization: Semaphores & Critical Section',
+            why: 'Crucial for both GATE exam marks and technical round deep-dives.',
+            cta: 'Review Classic Synchronization Traps',
+            estMinutes: 30,
+            completed: false,
+            priority: 'MEDIUM',
+            type: 'THEORY',
+            highLeverageNote: 'Peterson solution & Binary semaphores.'
+          }
+        ];
+      }
+
+      state.todayTasks = templateTasks;
+      state.completedMinutes = 0;
+      save();
+      return state.todayTasks;
+    },
+
+    advanceToNextDay: function () {
+      state.currentDay += 1;
+      const uncompleted = state.todayTasks ? state.todayTasks.filter(t => !t.completed) : [];
+      // Generate fresh tasks for the new day
+      this.generateCalibratedDayPlan(state.target, 2.0, state.currentDay);
+      // Prepend any rolled over tasks from yesterday
+      if (uncompleted.length > 0) {
+        uncompleted.forEach(t => {
+          t.highLeverageNote = '🔄 Rolled over from yesterday (zero guilt!)';
+          state.todayTasks.unshift(t);
+        });
+      }
+      save();
+      return state;
     },
 
     syncWithServer: async function () {
@@ -1241,6 +1529,9 @@ if (typeof window !== 'undefined') {
       showToast('Code Studio reset successfully! ↺', 'info');
     }
   };
+
+  PrepIntelligenceEngine.resetCodeStudio = window.resetCodeStudio;
+  PrepIntelligenceEngine.runCodeStudioSimulation = window.runCodeStudioSimulation;
 
   // 90-Day Gantt Roadmap
   window.renderGanttRoadmap = function () {

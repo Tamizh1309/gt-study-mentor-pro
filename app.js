@@ -11839,7 +11839,7 @@ window.renderHomeView = function () {
     if (goalsEl) goalsEl.textContent = nba.supports || 'Core Goals';
     if (startBtn) {
       startBtn.innerHTML = `<span>▶️</span> <span>Start Focus Session</span>`;
-      startBtn.onclick = function () { window.FocusSession && FocusSession.startNBA(); };
+      startBtn.onclick = function () { window.startNextBestAction && window.startNextBestAction(); };
     }
   }
 
@@ -11872,22 +11872,28 @@ window.renderHomeView = function () {
       timelineContainer.innerHTML = tasks.map((t, idx) => {
         const isDone = t.completed;
         const isActive = !isDone && (t.active || idx === doneCount);
+        const typeEmoji = t.type === 'PRACTICE' ? '⚡' : (t.type === 'APTITUDE' ? '🧠' : (t.type === 'PROJECT' ? '🛠️' : '📖'));
         return `
-          <div class="timeline-item ${isDone ? 'done' : ''} ${isActive ? 'active' : ''}" style="${isActive ? 'background:rgba(91,91,214,0.06);padding:8px 10px;border-radius:var(--radius-sm);margin:4px 0;' : ''}">
-            <div class="timeline-dot" style="${isDone ? 'background:var(--success);border-color:var(--success);' : isActive ? 'background:var(--primary);border-color:var(--primary);' : 'background:transparent;border-color:var(--text-muted);'}"></div>
+          <div class="timeline-item ${isDone ? 'done' : ''} ${isActive ? 'active' : ''}" style="${isActive ? 'background:rgba(91,91,214,0.08);border:1px solid rgba(91,91,214,0.3);padding:10px 12px;border-radius:var(--radius-sm);margin:6px 0;' : 'padding:6px 4px;'}">
+            <div class="timeline-dot" style="${isDone ? 'background:var(--success);border-color:var(--success);' : isActive ? 'background:var(--primary);border-color:var(--primary);box-shadow:0 0 8px var(--primary);' : 'background:transparent;border-color:var(--text-muted);'}"></div>
             <div style="flex:1;">
               <div style="display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:11px;font-weight:700;color:${isActive ? 'var(--primary-light)' : 'var(--text-muted)'};font-family:var(--font-mono);">${t.time || ('0' + (7 + idx * 3) + ':00')}</span>
-                <span style="font-size:10px;padding:1px 6px;border-radius:var(--radius-full);background:rgba(255,255,255,0.05);color:var(--text-muted);">${t.estMinutes ? t.estMinutes + 'm' : (t.duration || '45m')}</span>
+                <span style="font-size:11px;font-weight:700;color:${isActive ? 'var(--primary-light)' : 'var(--text-muted)'};font-family:var(--font-mono);">${typeEmoji} ${t.subject || 'Task ' + (idx + 1)}</span>
+                <span style="font-size:10px;padding:1px 6px;border-radius:var(--radius-full);background:rgba(255,255,255,0.05);color:var(--accent);">${t.estMinutes ? t.estMinutes + 'm' : '45m'}</span>
               </div>
-              <div style="font-size:13px;font-weight:${isActive ? '700' : '500'};color:${isDone ? 'var(--text-muted)' : 'var(--text)'};text-decoration:${isDone ? 'line-through' : 'none'};margin-top:2px;">
-                ${t.topic || (t.subject + ': ' + t.topic)}
+              <div style="font-size:13px;font-weight:${isActive ? '700' : '500'};color:${isDone ? 'var(--text-muted)' : 'var(--text)'};text-decoration:${isDone ? 'line-through' : 'none'};margin:3px 0 2px;">
+                ${t.topic}
               </div>
-              ${isActive ? `
-                <div style="display:flex;gap:6px;margin-top:8px;">
-                  <button onclick="window.FocusSession&&FocusSession.startNBA()" style="font-size:10px;padding:3px 10px;border-radius:4px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:700;">▶ Focus</button>
-                  <button onclick="toggleHomeTimelineTask('${t.id}')" style="font-size:10px;padding:3px 8px;border-radius:4px;background:var(--surface-mid);color:var(--text-sub);border:1px solid var(--border-subtle);cursor:pointer;">✓ Done</button>
-                </div>` : ''}
+              ${t.why ? `<div style="font-size:11px;color:var(--text-sub);line-height:1.35;margin-bottom:6px;">${t.why}</div>` : ''}
+              <div style="display:flex;gap:6px;margin-top:6px;">
+                ${!isDone ? `
+                  <button onclick="window.startTimelineTask&&startTimelineTask('${t.id}')" style="font-size:11px;padding:3px 10px;border-radius:4px;background:var(--primary);color:#fff;border:none;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:4px;">
+                    <span>▶</span> <span>Focus</span>
+                  </button>` : ''}
+                <button onclick="toggleHomeTimelineTask('${t.id}')" style="font-size:11px;padding:3px 8px;border-radius:4px;background:var(--surface-mid);color:${isDone ? 'var(--text-muted)' : 'var(--success)'};border:1px solid var(--border-subtle);cursor:pointer;font-weight:600;">
+                  ${isDone ? '↩ Re-open' : '✓ Mark Done'}
+                </button>
+              </div>
             </div>
           </div>`;
       }).join('');
@@ -12304,10 +12310,14 @@ window.submitDay0Onboarding = async function (e) {
     if (typeof closeModal === 'function') closeModal('day0-onboarding-modal');
     if (typeof showToast === 'function') showToast(`Mentor calibrated for ${payload.target}!`, 'info');
     if (window.PrepIntelligenceEngine) {
-      const st = PrepIntelligenceEngine.getState();
-      st.currentDay = 1;
-      st.status = 'ACTIVE';
-      st.target = payload.target;
+      if (typeof PrepIntelligenceEngine.generateCalibratedDayPlan === 'function') {
+        PrepIntelligenceEngine.generateCalibratedDayPlan(payload.target, payload.dailyHours, 1);
+      } else {
+        const st = PrepIntelligenceEngine.getState();
+        st.currentDay = 1;
+        st.status = 'ACTIVE';
+        st.target = payload.target;
+      }
     }
     window.applyCustomizedDashboard(payload);
 };
@@ -12394,8 +12404,171 @@ window.resetPreparationJourney = async function () {
 };
 
 window.toggleHomeTimelineTask = function (id) {
-  if (typeof showToast === 'function') showToast('Task marked as completed! 🎉', 'success');
+  if (window.PrepIntelligenceEngine) {
+    const updated = PrepIntelligenceEngine.toggleTask(id);
+    if (updated) {
+      if (updated.completed) {
+        if (typeof showToast === 'function') showToast(`✓ Completed: ${updated.topic}! (+${updated.estMinutes}m focus)`, 'success');
+      } else {
+        if (typeof showToast === 'function') showToast(`Marked ${updated.topic} as pending`, 'info');
+      }
+    }
+  }
   if (typeof renderHomeView === 'function') renderHomeView();
+};
+
+window.startTimelineTask = function (taskId) {
+  const prep = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getState() : null;
+  const task = prep && prep.todayTasks ? prep.todayTasks.find(t => t.id === taskId) : null;
+  if (!task) return;
+
+  // Activate Focus Stopwatch if available
+  if (typeof window.toggleHeaderStopwatch === 'function') {
+    if (!window._stopwatchRunning) window.toggleHeaderStopwatch();
+  }
+
+  // Route to the dedicated studio or module
+  if (task.type === 'PRACTICE' && (task.subject.includes('DSA') || task.topic.includes('Window') || task.topic.includes('Pointers'))) {
+    if (typeof navigateToView === 'function') navigateToView('practice', 'dsa');
+    if (typeof showToast === 'function') showToast(`⚡ Code Studio: ${task.topic} loaded!`, 'info');
+  } else if (task.track.includes('GATE') || task.type === 'THEORY' || task.type === 'QUIZ') {
+    if (typeof navigateToView === 'function') navigateToView('prepare', 'gate');
+    if (typeof showToast === 'function') showToast(`📖 Focus Mode: ${task.subject} — ${task.topic}`, 'info');
+  } else if (task.type === 'APTITUDE') {
+    if (typeof navigateToView === 'function') navigateToView('practice', 'aptitude');
+    if (typeof showToast === 'function') showToast(`🧠 Aptitude Arena: ${task.topic}`, 'info');
+  } else {
+    if (typeof navigateToView === 'function') navigateToView('practice');
+    if (typeof showToast === 'function') showToast(`⚡ Starting: ${task.topic}`, 'info');
+  }
+};
+
+window.startNextBestAction = function () {
+  const prep = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getState() : null;
+  const isDay0 = !prep || prep.currentDay === 0 || prep.status === 'NOT_STARTED';
+  if (isDay0) {
+    if (typeof window.openSetupWizard === 'function') window.openSetupWizard();
+    return;
+  }
+  const next = PrepIntelligenceEngine.getNextBestAction();
+  if (next && next.id) {
+    window.startTimelineTask(next.id);
+  } else if (next && next.action && next.action.includes('Daily Tasks Completed')) {
+    window.openDailyShutdownReview();
+  } else {
+    if (typeof navigateToView === 'function') navigateToView('prepare', 'gate');
+  }
+};
+
+// ── DAILY EVENING SHUTDOWN REVIEW CONTROLLER ──
+window._shutdownMood = 'crushed';
+
+window.openDailyShutdownReview = function () {
+  const prep = (typeof PrepIntelligenceEngine !== 'undefined') ? PrepIntelligenceEngine.getState() : null;
+  const tasks = prep?.todayTasks || [];
+  const doneCount = tasks.filter(t => t.completed).length;
+  const totalMinutes = prep?.completedMinutes || (doneCount * 45);
+
+  const tasksStat = document.getElementById('shutdown-tasks-stat');
+  const timeStat = document.getElementById('shutdown-time-stat');
+  const streakStat = document.getElementById('shutdown-streak-stat');
+  const checklist = document.getElementById('shutdown-task-checklist');
+
+  if (tasksStat) tasksStat.textContent = `${doneCount} / ${tasks.length}`;
+  if (timeStat) timeStat.textContent = `${totalMinutes} min`;
+  if (streakStat) streakStat.textContent = `🔥 Day ${prep?.currentDay || 1}`;
+
+  if (checklist) {
+    if (tasks.length === 0) {
+      checklist.innerHTML = `<div style="color:var(--text-muted);font-size:12px;">No active tasks scheduled for today. Complete Day 0 setup to begin!</div>`;
+    } else {
+      checklist.innerHTML = tasks.map(t => `
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);cursor:pointer;">
+          <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="window.toggleHomeTimelineTask('${t.id}');window.openDailyShutdownReview();" style="width:16px;height:16px;accent-color:var(--success);" />
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:600;color:${t.completed ? 'var(--text-muted)' : 'var(--text)'};text-decoration:${t.completed ? 'line-through' : 'none'};">
+              ${t.topic}
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);">${t.subject} &bull; ${t.estMinutes}m</div>
+          </div>
+        </label>
+      `).join('');
+    }
+  }
+
+  if (typeof openModal === 'function') {
+    openModal('shutdown-review-modal');
+  } else {
+    const modal = document.getElementById('shutdown-review-modal');
+    if (modal) modal.classList.add('active');
+  }
+};
+
+window.generateShutdownReview = function () {
+  window.openDailyShutdownReview();
+};
+
+window.selectShutdownMood = function (mood, btn) {
+  window._shutdownMood = mood;
+  document.querySelectorAll('.shutdown-mood-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderColor = 'var(--border-subtle)';
+    b.style.background = 'var(--surface)';
+  });
+  if (btn) {
+    btn.classList.add('active');
+    btn.style.borderColor = 'var(--success)';
+    btn.style.background = 'rgba(16,185,129,0.15)';
+  }
+};
+
+window.completeDailyShutdown = function () {
+  const notesInput = document.getElementById('shutdown-notes');
+  const note = notesInput?.value?.trim();
+
+  // If student entered a concept confusion or mistake note, log it into Mistake Book
+  if (note && window.MistakeBookModule && typeof MistakeBookModule.addMistake === 'function') {
+    MistakeBookModule.addMistake({
+      subject: 'Daily Reflection',
+      topic: note.slice(0, 40),
+      questionText: note,
+      mistakeType: 'Concept Gap / Daily Note',
+      userAttempt: 'Recorded during daily shutdown',
+      correctMethod: 'Review during Sunday Spaced Revision',
+      severity: 'MEDIUM'
+    });
+  }
+
+  // Advance day and roll over any pending tasks
+  if (window.PrepIntelligenceEngine && typeof PrepIntelligenceEngine.advanceToNextDay === 'function') {
+    PrepIntelligenceEngine.advanceToNextDay();
+  }
+
+  // Save log entry to gt_daily_logs in localStorage
+  try {
+    const existingLogs = JSON.parse(localStorage.getItem('gt_daily_logs') || '[]');
+    existingLogs.push({
+      date: new Date().toISOString(),
+      mood: window._shutdownMood || 'crushed',
+      note: note || '',
+      day: window.PrepIntelligenceEngine?.getState()?.currentDay || 1
+    });
+    localStorage.setItem('gt_daily_logs', JSON.stringify(existingLogs));
+  } catch (e) {}
+
+  if (typeof closeModal === 'function') closeModal('shutdown-review-modal');
+  else {
+    const modal = document.getElementById('shutdown-review-modal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  if (typeof showToast === 'function') {
+    showToast('🌅 Day closed cleanly! Unfinished tasks rolled over to tomorrow. Great work today!', 'success');
+  }
+
+  if (typeof renderHomeView === 'function') {
+    renderHomeView();
+  }
 };
 
 // ── AUTOMATIC STARTUP ROUTE VALIDATION & SETUP WIZARD CHECK ──
