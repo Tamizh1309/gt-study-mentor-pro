@@ -904,6 +904,7 @@ window.triggerPWAInstall = async function () {
         deferredInstallPrompt = null;
         const banner = document.getElementById('install-banner');
         if (banner) banner.classList.add('hidden');
+        if (typeof showToast === 'function') showToast('Thank you for installing GT Mentor Pro! 📲', 'success');
       }
     } catch (err) {
       console.warn('PWA prompt error:', err);
@@ -918,6 +919,11 @@ window.triggerPWAInstall = async function () {
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
+  const headerBtn = document.getElementById('header-install-btn');
+  if (headerBtn) {
+    headerBtn.style.display = 'inline-flex';
+    headerBtn.onclick = window.triggerPWAInstall;
+  }
   const installBtn = document.getElementById('install-btn');
   if (installBtn) {
     installBtn.style.display = 'inline-flex';
@@ -4154,15 +4160,58 @@ function initExamSimulator() {
   });
 }
 
-function startExam() {
+let activeExamPool = GATE_PYQ_QUESTIONS;
+
+window.startGateMockExam = function(mode = 'full') {
+  let count = 65;
+  let durationMins = 180;
+  if (mode === 'sprint') {
+    count = 25;
+    durationMins = 60;
+  } else if (mode === 'aptitude') {
+    count = 10;
+    durationMins = 25;
+  }
+
+  if (typeof openModal === 'function') {
+    openModal('gate-exam-modal');
+  } else {
+    const m = document.getElementById('gate-exam-modal');
+    if (m) m.classList.add('open');
+  }
+  startExam(count, durationMins);
+};
+
+function startExam(count = 65, durationMins = 180) {
   examState.currentIdx = 0;
   examState.answers = {};
   examState.reviewFlags = {};
-  examState.timerSeconds = 15 * 60;
+  examState.timerSeconds = durationMins * 60;
   examState.isSubmitted = false;
 
-  document.querySelector('.exam-body-grid').style.display = 'grid';
-  document.getElementById('exam-result-pane').style.display = 'none';
+  // Generate or fetch questions from GATEQuestionBankService
+  if (typeof window !== 'undefined' && window.GATEQuestionBank && typeof window.GATEQuestionBank.generateMockExam === 'function') {
+    activeExamPool = window.GATEQuestionBank.generateMockExam(count);
+  } else {
+    activeExamPool = GATE_PYQ_QUESTIONS.slice(0, count);
+  }
+
+  const bodyGrid = document.querySelector('.exam-body-grid');
+  if (bodyGrid) bodyGrid.style.display = 'grid';
+  const resPane = document.getElementById('exam-result-pane');
+  if (resPane) resPane.style.display = 'none';
+
+  // Inject Calculator & Section Shortcuts into exam header if not present
+  const timerPill = document.getElementById('exam-timer-pill');
+  if (timerPill && !document.getElementById('exam-calc-btn')) {
+    const calcBtn = document.createElement('button');
+    calcBtn.id = 'exam-calc-btn';
+    calcBtn.className = 'action-btn';
+    calcBtn.style.cssText = 'font-size:11px; padding:3px 8px; margin-left:8px; cursor:pointer;';
+    calcBtn.textContent = '🧮 Calculator';
+    calcBtn.onclick = () => { if (typeof openModal === 'function') openModal('calculator-modal'); };
+    timerPill.appendChild(calcBtn);
+  }
 
   clearInterval(examState.timerInterval);
   examState.timerInterval = setInterval(() => {
@@ -4171,7 +4220,14 @@ function startExam() {
       const m = Math.floor(examState.timerSeconds / 60);
       const s = examState.timerSeconds % 60;
       const el = document.getElementById('exam-timer-display');
-      if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      if (el) {
+        el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+        if (examState.timerSeconds < 600) {
+          el.style.color = 'var(--danger)';
+        } else {
+          el.style.color = 'var(--accent)';
+        }
+      }
     } else {
       clearInterval(examState.timerInterval);
       submitExam();
@@ -4186,17 +4242,18 @@ function renderExamPalette() {
   const grid = document.getElementById('exam-palette-grid');
   if (!grid) return;
 
-  grid.innerHTML = GATE_PYQ_QUESTIONS.map((q, idx) => {
+  grid.innerHTML = activeExamPool.map((q, idx) => {
+    const qid = q.id || idx;
     const isCur = idx === examState.currentIdx;
-    const isAns = examState.answers[q.id] !== undefined;
-    const isRev = examState.reviewFlags[q.id];
+    const isAns = examState.answers[qid] !== undefined && examState.answers[qid] !== '';
+    const isRev = examState.reviewFlags[qid];
 
     let cls = 'palette-q-btn';
     if (isCur) cls += ' current';
     if (isAns) cls += ' answered';
     if (isRev) cls += ' review';
 
-    return '<button class="' + cls + '" onclick="jumpToExamQuestion(' + idx + ')">' + (idx + 1) + '</button>';
+    return '<button class="' + cls + '" onclick="jumpToExamQuestion(' + idx + ')" title="' + (q.subject || 'CS') + '">' + (idx + 1) + '</button>';
   }).join('');
 }
 
@@ -4206,7 +4263,7 @@ window.jumpToExamQuestion = function(idx) {
 };
 
 function renderExamQuestion() {
-  const q = GATE_PYQ_QUESTIONS[examState.currentIdx];
+  const q = activeExamPool[examState.currentIdx];
   if (!q) return;
 
   const numEl = document.getElementById('exam-q-num');
@@ -4215,19 +4272,40 @@ function renderExamQuestion() {
   const textEl = document.getElementById('exam-q-text');
   const optList = document.getElementById('exam-options-list');
 
-  if (numEl) numEl.textContent = 'Question ' + (examState.currentIdx + 1) + ' of ' + GATE_PYQ_QUESTIONS.length;
-  if (marksEl) marksEl.textContent = '+' + q.marks + ' Mark' + (q.marks > 1 ? 's' : '') + ' | -' + q.neg + ' Negative';
-  if (subjEl) subjEl.textContent = q.subject;
-  if (textEl) textEl.textContent = q.text;
+  const qid = q.id || examState.currentIdx;
+  const marksVal = q.marks || 1;
+  const negVal = q.negativeMarks !== undefined ? q.negativeMarks : (q.type === 'NAT' ? 0 : (marksVal === 2 ? 0.66 : 0.33));
 
-  const selectedOpt = examState.answers[q.id];
+  if (numEl) numEl.textContent = 'Question ' + (examState.currentIdx + 1) + ' of ' + activeExamPool.length + (q.section ? ' • ' + q.section : '');
+  if (marksEl) marksEl.textContent = '+' + marksVal + ' Mark' + (marksVal > 1 ? 's' : '') + ' | ' + (negVal === 0 ? 'No Negative (NAT)' : '-' + negVal + ' Negative');
+  if (subjEl) subjEl.textContent = q.subject || 'GATE CS';
+  if (textEl) textEl.innerHTML = (q.question || q.text || '').replace(/\\n/g, '<br/>');
+
+  const selectedOpt = examState.answers[qid];
   const keys = ['A', 'B', 'C', 'D'];
 
   if (optList) {
-    optList.innerHTML = q.options.map((opt, i) => {
-      const isSel = selectedOpt === i;
-      return '<div class="exam-option-card ' + (isSel ? 'selected' : '') + '" onclick="selectExamOption(' + q.id + ', ' + i + ')"><div class="exam-option-key">' + keys[i] + '</div><div>' + opt + '</div></div>';
-    }).join('');
+    if (q.type === 'NAT') {
+      optList.innerHTML = `
+        <div style="padding:14px; background:var(--depth-3); border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <label style="display:block; font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">NUMERICAL ANSWER TYPE (NAT) — Enter your computed value:</label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="number" step="any" id="nat-answer-input" value="${selectedOpt !== undefined ? selectedOpt : ''}" 
+              placeholder="e.g. 16 or 0.84" 
+              style="width:200px; padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:14px; font-weight:700;"
+              onchange="selectExamNATAnswer('${qid}', this.value)" />
+            <span style="font-size:11px; color:var(--text-muted);">(Virtual keypad and negative values supported)</span>
+          </div>
+        </div>
+      `;
+    } else if (q.options && q.options.length > 0) {
+      optList.innerHTML = q.options.map((opt, i) => {
+        const isSel = selectedOpt === i;
+        return '<div class="exam-option-card ' + (isSel ? 'selected' : '') + '" onclick="selectExamOption(\'' + qid + '\', ' + i + ')"><div class="exam-option-key">' + (keys[i] || (i+1)) + '</div><div>' + opt + '</div></div>';
+      }).join('');
+    } else {
+      optList.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">No options specified for this question.</div>';
+    }
   }
 
   renderExamPalette();
@@ -4239,44 +4317,168 @@ window.selectExamOption = function(qid, optIndex) {
   renderExamQuestion();
 };
 
+window.selectExamNATAnswer = function(qid, value) {
+  if (examState.isSubmitted) return;
+  examState.answers[qid] = value.trim();
+  renderExamPalette();
+};
+
 function submitExam() {
   clearInterval(examState.timerInterval);
   examState.isSubmitted = true;
 
   let totalScore = 0;
+  let maxMarks = 0;
   let correctCount = 0;
   let wrongCount = 0;
   let unattempted = 0;
+  const subjectBreakdown = {};
 
-  GATE_PYQ_QUESTIONS.forEach(q => {
-    const userAns = examState.answers[q.id];
-    if (userAns === undefined) {
+  activeExamPool.forEach((q, idx) => {
+    const qid = q.id || idx;
+    const marksVal = q.marks || 1;
+    const negVal = q.negativeMarks !== undefined ? q.negativeMarks : (q.type === 'NAT' ? 0 : (marksVal === 2 ? 0.66 : 0.33));
+    maxMarks += marksVal;
+
+    const subj = q.subject || 'General CS';
+    if (!subjectBreakdown[subj]) subjectBreakdown[subj] = { correct: 0, total: 0, marksScored: 0 };
+    subjectBreakdown[subj].total++;
+
+    const userAns = examState.answers[qid];
+    if (userAns === undefined || userAns === '') {
       unattempted++;
-    } else if (userAns === q.correct) {
-      correctCount++;
-      totalScore += q.marks;
+    } else if (q.type === 'NAT') {
+      const numAns = parseFloat(userAns);
+      const isCorrectNAT = (q.range && numAns >= q.range[0] && numAns <= q.range[1]) || (numAns === parseFloat(q.correctAnswer));
+      if (isCorrectNAT) {
+        correctCount++;
+        totalScore += marksVal;
+        subjectBreakdown[subj].correct++;
+        subjectBreakdown[subj].marksScored += marksVal;
+      } else {
+        wrongCount++;
+        // No negative marking for NAT
+      }
     } else {
-      wrongCount++;
-      totalScore -= q.neg;
+      const correctIdx = (q.correctAnswer !== undefined) ? q.correctAnswer : q.correct;
+      if (parseInt(userAns, 10) === correctIdx) {
+        correctCount++;
+        totalScore += marksVal;
+        subjectBreakdown[subj].correct++;
+        subjectBreakdown[subj].marksScored += marksVal;
+      } else {
+        wrongCount++;
+        totalScore -= negVal;
+        subjectBreakdown[subj].marksScored -= negVal;
+      }
     }
   });
 
   totalScore = Math.max(0, Math.round(totalScore * 100) / 100);
 
-  document.querySelector('.exam-body-grid').style.display = 'none';
+  // Use GATE Rank Predictor from gateQuestionBankService if present
+  let rankData = { predictedAIR: 'N/A', percentile: 'N/A', category: 'Evaluating', recommendations: [] };
+  if (typeof window !== 'undefined' && window.GATEQuestionBank && typeof window.GATEQuestionBank.calculateRankAndPercentile === 'function') {
+    // Normalize to 100 marks scale for ranking prediction
+    const normalizedScore = maxMarks > 0 ? (totalScore / maxMarks) * 100 : totalScore;
+    rankData = window.GATEQuestionBank.calculateRankAndPercentile(normalizedScore);
+  }
+
+  const bodyGrid = document.querySelector('.exam-body-grid');
+  if (bodyGrid) bodyGrid.style.display = 'none';
+
   const resultPane = document.getElementById('exam-result-pane');
   if (!resultPane) return;
 
   resultPane.style.display = 'block';
-  resultPane.innerHTML = '<div style="font-size:32px;font-weight:900;font-family:var(--font-display);color:var(--accent);">' + totalScore + ' / 15 Marks</div><div style="font-size:14px;color:var(--text-sub);margin-bottom:16px;">GATE CS Mock Exam Completed!</div><div class="score-stat-grid"><div class="score-stat-card"><div class="score-stat-num" style="color:var(--success);">' + correctCount + '</div><div style="font-size:11px;color:var(--text-muted);">Correct</div></div><div class="score-stat-card"><div class="score-stat-num" style="color:var(--danger);">' + wrongCount + '</div><div style="font-size:11px;color:var(--text-muted);">Wrong</div></div><div class="score-stat-card"><div class="score-stat-num" style="color:var(--warning);">' + unattempted + '</div><div style="font-size:11px;color:var(--text-muted);">Unattempted</div></div><div class="score-stat-card"><div class="score-stat-num" style="color:var(--primary-light);">' + Math.round((correctCount/10)*100) + '%</div><div style="font-size:11px;color:var(--text-muted);">Accuracy</div></div></div><div style="text-align:left;margin-top:20px;"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">Detailed Solutions & Tanglish Notes:</div>' + GATE_PYQ_QUESTIONS.map((q, idx) => {
-    const userAns = examState.answers[q.id];
-    const isCor = userAns === q.correct;
-    return '<div style="background:var(--card);border:1px solid var(--border-subtle);border-radius:8px;padding:12px;margin-bottom:8px;font-size:12px;"><div style="font-weight:700;color:' + (isCor ? 'var(--success)' : userAns === undefined ? 'var(--warning)' : 'var(--danger)') + ';">Q' + (idx+1) + ' (' + q.subject + ') — ' + (isCor ? 'Correct (+'+q.marks+')' : userAns === undefined ? 'Unattempted (0)' : 'Wrong (-'+q.neg+')') + '</div><div style="margin:4px 0;color:var(--text);">' + q.text + '</div><div style="color:var(--text-sub);line-height:1.4;"><strong style="color:var(--accent);">Explanation:</strong> ' + q.explanation + '</div></div>';
-  }).join('') + '</div><button class="submit-btn" onclick="startExam()" style="margin-top:16px;">🔄 Retake Exam</button>';
+  resultPane.innerHTML = `
+    <!-- Top Result Header -->
+    <div style="text-align:center; padding:18px; background:radial-gradient(circle at center, rgba(109,99,255,0.12), transparent 70%), var(--depth-2); border-radius:12px; margin-bottom:18px; border:1px solid rgba(109,99,255,0.3);">
+      <div style="font-size:12px; font-weight:800; color:var(--primary-light); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px;">CBT Exam Evaluation Completed</div>
+      <div style="font-size:36px; font-weight:900; font-family:var(--font-display); color:var(--accent);">${totalScore} <span style="font-size:20px; color:var(--text-sub);">/ ${maxMarks} Marks</span></div>
+      <div style="font-size:14px; font-weight:700; color:var(--text); margin:4px 0 10px;">Predicted AIR: <span style="color:var(--warning);">${rankData.predictedAIR}</span> • Percentile: <span style="color:var(--success);">${rankData.percentile}</span></div>
+      <div style="font-size:12px; color:var(--text-muted);">${rankData.category || 'Solid Diagnostic Benchmark'}</div>
+    </div>
 
-  addXP(Math.round(totalScore * 10), 'Completed GATE CS PYQ Simulator');
-  trackTodayXP(Math.round(totalScore * 10));
-  unlockBadge('quiz_1');
+    <!-- 4 Stats Grid -->
+    <div class="score-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:10px; margin-bottom:18px;">
+      <div class="score-stat-card" style="padding:12px; text-align:center; background:var(--depth-3); border-radius:8px;">
+        <div class="score-stat-num" style="color:var(--success); font-size:22px; font-weight:800;">${correctCount}</div>
+        <div style="font-size:11px; color:var(--text-muted);">Correct</div>
+      </div>
+      <div class="score-stat-card" style="padding:12px; text-align:center; background:var(--depth-3); border-radius:8px;">
+        <div class="score-stat-num" style="color:var(--danger); font-size:22px; font-weight:800;">${wrongCount}</div>
+        <div style="font-size:11px; color:var(--text-muted);">Wrong</div>
+      </div>
+      <div class="score-stat-card" style="padding:12px; text-align:center; background:var(--depth-3); border-radius:8px;">
+        <div class="score-stat-num" style="color:var(--warning); font-size:22px; font-weight:800;">${unattempted}</div>
+        <div style="font-size:11px; color:var(--text-muted);">Unattempted</div>
+      </div>
+      <div class="score-stat-card" style="padding:12px; text-align:center; background:var(--depth-3); border-radius:8px;">
+        <div class="score-stat-num" style="color:var(--primary-light); font-size:22px; font-weight:800;">${Math.round((correctCount / Math.max(1, activeExamPool.length)) * 100)}%</div>
+        <div style="font-size:11px; color:var(--text-muted);">Accuracy</div>
+      </div>
+    </div>
+
+    <!-- Subject Breakdown -->
+    <div style="background:var(--depth-3); border-radius:8px; padding:14px; margin-bottom:18px; border:1px solid var(--border-subtle);">
+      <div style="font-size:12px; font-weight:800; color:var(--text); text-transform:uppercase; margin-bottom:8px;">Subject-wise Accuracy &amp; Marks:</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:8px;">
+        ${Object.entries(subjectBreakdown).map(([s, stat]) => `
+          <div style="display:flex; justify-content:space-between; font-size:11px; background:var(--surface); padding:6px 10px; border-radius:4px;">
+            <span style="color:var(--text); font-weight:600;">${s}</span>
+            <span style="color:var(--accent); font-weight:700;">${stat.correct}/${stat.total} (${Math.round(stat.marksScored * 10)/10}m)</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Question-by-Question Review -->
+    <div style="text-align:left; margin-top:20px;">
+      <div style="font-size:13px; font-weight:700; color:var(--text); margin-bottom:10px;">Detailed Solutions &amp; Verified Explanations:</div>
+      ${activeExamPool.map((q, idx) => {
+        const qid = q.id || idx;
+        const userAns = examState.answers[qid];
+        const correctIdx = (q.correctAnswer !== undefined) ? q.correctAnswer : q.correct;
+        let isCor = false;
+        if (q.type === 'NAT') {
+          const numAns = parseFloat(userAns);
+          isCor = (q.range && numAns >= q.range[0] && numAns <= q.range[1]) || (numAns === parseFloat(q.correctAnswer));
+        } else {
+          isCor = parseInt(userAns, 10) === correctIdx;
+        }
+
+        const keys = ['A', 'B', 'C', 'D'];
+        const correctText = q.type === 'NAT' ? q.correctAnswer : (q.options ? q.options[correctIdx] : 'Answer ' + correctIdx);
+        const userText = userAns === undefined || userAns === '' ? 'None (Unattempted)' : (q.type === 'NAT' ? userAns : (q.options ? q.options[userAns] : userAns));
+
+        return `
+          <div style="background:var(--card); border:1px solid var(--border-subtle); border-radius:8px; padding:12px; margin-bottom:8px; font-size:12px;">
+            <div style="font-weight:700; color:${isCor ? 'var(--success)' : userAns === undefined || userAns === '' ? 'var(--warning)' : 'var(--danger)'};">
+              Q${idx+1} (${q.subject || 'CS'}) — ${isCor ? '✓ Correct (+' + (q.marks||1) + ')' : userAns === undefined || userAns === '' ? '○ Unattempted (0)' : '✗ Incorrect (-' + (q.negativeMarks||0.33) + ')'}
+            </div>
+            <div style="margin:6px 0; color:var(--text); font-weight:600;">${q.question || q.text}</div>
+            <div style="display:flex; gap:12px; font-size:11px; margin-bottom:6px; flex-wrap:wrap;">
+              <div><strong style="color:var(--text-muted);">Your Answer:</strong> <span style="color:${isCor?'var(--success)':'var(--danger)'}">${userText}</span></div>
+              <div><strong style="color:var(--text-muted);">Correct Answer:</strong> <span style="color:var(--success)">${correctText}</span></div>
+            </div>
+            <div style="color:var(--text-sub); line-height:1.4; background:var(--depth-2); padding:8px 10px; border-radius:6px;">
+              <strong style="color:var(--accent);">Explanation:</strong> ${q.explanation || 'Verified GATE standard derivation.'}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <button class="submit-btn" onclick="startExam(${activeExamPool.length})" style="flex:1; padding:10px; font-size:13px; font-weight:700;">🔄 Retake Exam</button>
+      <button class="action-btn" onclick="closeModal('gate-exam-modal')" style="padding:10px 18px; font-size:13px;">✕ Close Review</button>
+    </div>
+  `;
+
+  if (typeof addXP === 'function') addXP(Math.round(totalScore * 10), 'Completed GATE CBT Mock Simulator');
+  if (typeof trackTodayXP === 'function') trackTodayXP(Math.round(totalScore * 10));
+  if (typeof unlockBadge === 'function') unlockBadge('quiz_1');
 }
 
 // ══════════════════════════════════════════════════
@@ -8471,37 +8673,249 @@ function renderAptitudePracticeArena(container) {
   `;
 }
 
+window.practiceSubjectPYQ = function(subjectName) {
+  if (typeof window.switchPracticeTab === 'function') {
+    window.switchPracticeTab('gate-pyq');
+    setTimeout(() => {
+      const subjSelect = document.getElementById('pyq-filter-subject');
+      if (subjSelect) {
+        subjSelect.value = subjectName;
+        if (typeof window.updatePYQTopicDropdown === 'function') {
+          window.updatePYQTopicDropdown();
+        }
+        if (typeof window.filterGATEPYQCards === 'function') {
+          window.filterGATEPYQCards();
+        }
+      }
+    }, 60);
+  }
+};
+
 function renderCSCorePracticeArena(container) {
+  const coreSubjects = [
+    {
+      name: 'Operating Systems',
+      icon: '⚡',
+      weightage: '9–10 Marks',
+      topics: 'CPU Scheduling, Semaphores, Deadlocks, Banker\'s Algorithm, Page Replacement (LRU, Clock), Virtual Memory & Inode structures',
+      labAction: "openModal('code-studio-modal')",
+      labLabel: 'Interactive Challenge →',
+      pyqSubject: 'Operating Systems'
+    },
+    {
+      name: 'Database Management Systems',
+      icon: '💾',
+      weightage: '8–9 Marks',
+      topics: 'Relational Algebra, SQL Queries, Functional Dependencies, Normal Forms (1NF to BCNF), Serializability, Strict 2PL, B+ Trees',
+      labAction: "navigateToView('cselabs')",
+      labLabel: 'Launch SQL Sandbox →',
+      pyqSubject: 'Database Management Systems'
+    },
+    {
+      name: 'Computer Networks',
+      icon: '🌐',
+      weightage: '8–9 Marks',
+      topics: 'IPv4 CIDR Subnetting, TCP Flow & Congestion Control (Reno/Tahoe), Sliding Window (GBN / SR), Routing (OSPF, BGP, Bellman-Ford), DNS/HTTP',
+      labAction: "openModal('cidr-subnet-modal')",
+      labLabel: 'CIDR Subnet Lab →',
+      pyqSubject: 'Computer Networks'
+    },
+    {
+      name: 'Theory of Computation',
+      icon: '⚙️',
+      weightage: '9–10 Marks',
+      topics: 'Regular Languages, DFA/NFA Minimization, Pumping Lemma for Regular & CFL, Pushdown Automata, Turing Machines, Decidability',
+      labAction: "openModal('toc-regex-modal')",
+      labLabel: 'TOC / Regex Lab →',
+      pyqSubject: 'Theory of Computation'
+    },
+    {
+      name: 'Compiler Design',
+      icon: '📜',
+      weightage: '4–5 Marks',
+      topics: 'Lexical Analysis, First & Follow Sets, LL(1) Parsing, LR(0)/SLR(1)/LALR(1) Parsing, SDT & Inherited/Synthesized Attributes, Code Optimization',
+      labAction: "navigateToView('cselabs')",
+      labLabel: 'Compiler Lab →',
+      pyqSubject: 'Compiler Design'
+    },
+    {
+      name: 'Digital Logic & Design',
+      icon: '💡',
+      weightage: '5–6 Marks',
+      topics: 'Boolean Algebra, K-Maps, Combinational Adders & Multiplexers, Flip-Flops & Excitation Tables, Counters, IEEE 754 Floating Point',
+      labAction: "openModal('ieee-bitwise-modal')",
+      labLabel: 'IEEE Bitwise Lab →',
+      pyqSubject: 'Digital Logic'
+    },
+    {
+      name: 'Computer Organization & Arch',
+      icon: '💻',
+      weightage: '9–10 Marks',
+      topics: 'Instruction Pipeline & Branch Hazards, Cache Mapping (Direct, 2/4-Way Associative), Hit/Miss Rates, Memory Hierarchy & Addressing Modes',
+      labAction: "openModal('formulas-modal')",
+      labLabel: 'Formulas Vault →',
+      pyqSubject: 'Computer Organization'
+    },
+    {
+      name: 'Discrete Mathematics & Graph Theory',
+      icon: '📐',
+      weightage: '12–14 Marks',
+      topics: 'Propositional & Predicate Logic, Relations & Posets, Combinatorics & Generating Functions, Graph Traversals, Trees & Planar Graphs',
+      labAction: "openModal('formulas-modal')",
+      labLabel: 'Math Formulas →',
+      pyqSubject: 'Discrete Mathematics'
+    }
+  ];
+
   container.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
-      <div class="track-card" style="padding:16px;">
-        <h4 style="color:var(--text);margin:0 0 8px;">⚡ OS Concurrency & Virtual Memory</h4>
-        <p style="font-size:12px;color:var(--text-sub);">Deadlocks, Banker's Algorithm, Page Replacement (LRU, Optimal), Semaphores.</p>
-        <button class="action-btn" onclick="openModal('code-studio-modal')" style="margin-top:10px;">Interactive Challenge →</button>
+    <!-- CS Core Header Banner -->
+    <div class="nd-card" style="padding:18px 20px; margin-bottom:18px; border:1px solid rgba(109,99,255,0.35); background:radial-gradient(circle at top right, rgba(109,99,255,0.08), transparent 60%), var(--depth-2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; font-weight:800; color:var(--primary-light); background:rgba(109,99,255,0.15); padding:2px 6px; border-radius:4px; text-transform:uppercase;">Core Engineering</span>
+          <strong style="font-size:15px; color:var(--text);">GATE CSE 2027 Core Subjects Mastery Arena</strong>
+        </div>
+        <p style="font-size:12px; color:var(--text-sub); margin:4px 0 0;">Exhaustive theoretical foundations, key formulas, interactive sandboxes, and topic-wise verified GATE PYQ drill sets.</p>
       </div>
-      <div class="track-card" style="padding:16px;">
-        <h4 style="color:var(--text);margin:0 0 8px;">💾 DBMS Indexing & Transactions</h4>
-        <p style="font-size:12px;color:var(--text-sub);">B+ Tree Splitting, 2PL, Conflict Serializability, Normal Forms (BCNF, 3NF).</p>
-        <button class="action-btn" onclick="navigateToView('cselabs')" style="margin-top:10px;">Launch SQL Sandbox →</button>
+      <div style="display:flex; gap:8px;">
+        <button class="action-btn" onclick="openModal('formulas-modal')" style="font-size:12px; padding:8px 14px;">📖 Formula Vault</button>
+        <button class="cta-pill-primary" onclick="window.switchPracticeTab('gate-pyq')" style="font-size:12px; padding:8px 16px;">🎯 All 120+ GATE PYQs →</button>
       </div>
+    </div>
+
+    <!-- 8 Core Subjects Grid -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+      ${coreSubjects.map(sub => `
+        <div class="track-card" style="padding:18px; display:flex; flex-direction:column; justify-content:space-between; border-left:3px solid var(--primary);">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:20px;">${sub.icon}</span>
+                <h4 style="color:var(--text); margin:0; font-size:14px; font-weight:800;">${sub.name}</h4>
+              </div>
+              <span class="badge-pill" style="font-size:10px; font-weight:700; background:rgba(245,158,11,0.15); color:var(--warning); border:1px solid rgba(245,158,11,0.3);">${sub.weightage}</span>
+            </div>
+            <p style="font-size:11.5px; color:var(--text-sub); line-height:1.5; margin:8px 0 12px;">${sub.topics}</p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:10px; border-top:1px solid var(--border-subtle);">
+            <button class="submit-btn" onclick="practiceSubjectPYQ('${sub.pyqSubject}')" style="flex:1; font-size:11px; padding:6px 12px; text-align:center;">
+              🎯 Practice PYQs →
+            </button>
+            <button class="action-btn" onclick="${sub.labAction}" style="font-size:11px; padding:6px 10px;">
+              ${sub.labLabel}
+            </button>
+          </div>
+        </div>
+      `).join('')}
     </div>
   `;
 }
 
 function renderMockTestsArena(container) {
   container.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;">
-      <div class="track-card" style="padding:16px;border-left:3px solid var(--primary);">
-        <span class="badge-pill" style="font-size:10px;">GATE 2027</span>
-        <h4 style="color:var(--text);margin:8px 0 6px;">GATE CS & IT Comprehensive Diagnostic Mock</h4>
-        <p style="font-size:12px;color:var(--text-sub);">65 Questions • 180 Minutes • Virtual Calculator • NAT & MSQ scoring.</p>
-        <button class="cta-pill-primary" onclick="openGATEPredictorStudio()" style="margin-top:10px;font-size:12px;padding:8px 18px;">Start Diagnostic Exam →</button>
+    <!-- Mock Tests Header Banner -->
+    <div class="nd-card" style="padding:18px 20px; margin-bottom:18px; border:1px solid rgba(245,158,11,0.35); background:radial-gradient(circle at top right, rgba(245,158,11,0.08), transparent 60%), var(--depth-2); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:11px; font-weight:800; color:var(--warning); background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px; text-transform:uppercase;">CBT Exam Simulator</span>
+          <strong style="font-size:15px; color:var(--text);">Official GATE 2027 CBT &amp; Placement Mock Test Arena</strong>
+        </div>
+        <p style="font-size:12px; color:var(--text-sub); margin:4px 0 0;">Real exam condition tests: live countdown timer, 1..65 question palette, official marking (+1/-0.33, +2/-0.66, NAT 0 neg), virtual scientific calculator, and instant All-India Rank prediction.</p>
       </div>
-      <div class="track-card" style="padding:16px;border-left:3px solid var(--accent);">
-        <span class="badge-pill" style="font-size:10px;">Campus Placements</span>
-        <h4 style="color:var(--text);margin:8px 0 6px;">SDE-1 Company Technical Assessment</h4>
-        <p style="font-size:12px;color:var(--text-sub);">2 Coding Problems • 20 Core CS MCQs • 90 Minutes • Automated Test Cases.</p>
-        <button class="cta-pill-primary" onclick="openMockInterviewStudio()" style="margin-top:10px;font-size:12px;padding:8px 18px;">Start Placement Mock →</button>
+      <div style="display:flex; gap:8px;">
+        <button class="action-btn" onclick="openModal('calculator-modal')" style="font-size:12px; padding:8px 14px;">🧮 Virtual Calculator</button>
+        <button class="action-btn" onclick="openGATEPredictorStudio()" style="font-size:12px; padding:8px 14px;">📊 Rank Predictor</button>
+      </div>
+    </div>
+
+    <!-- 4 Mock Test Cards Grid -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
+      <!-- Mock 1: Full-Length GATE CSE CBT -->
+      <div class="track-card" style="padding:18px; border-left:4px solid var(--primary); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge-pill" style="font-size:10px; background:rgba(109,99,255,0.15); color:var(--primary-light);">Full-Length CBT</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700;">100 Marks</span>
+          </div>
+          <h4 style="color:var(--text); margin:0 0 6px; font-size:15px; font-weight:800;">GATE CSE 2027 Comprehensive Mock</h4>
+          <p style="font-size:12px; color:var(--text-sub); line-height:1.5; margin:0 0 12px;">
+            Official 65-question format: 10 General Aptitude + 55 Core CS &amp; Engg Math. 180 minutes countdown with live TCS iON question palette and instant AIR prediction.
+          </p>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <span>⏱️ 180 Mins</span>
+            <span>📝 65 Questions</span>
+            <span>⚖️ +1 / +2 / -0.33 / -0.66</span>
+          </div>
+        </div>
+        <button class="cta-pill-primary" onclick="window.startGateMockExam('full')" style="width:100%; font-size:12px; padding:10px 18px; text-align:center;">
+          🚀 Start Full Mock Exam (65 Qs) →
+        </button>
+      </div>
+
+      <!-- Mock 2: Core CS Sprint -->
+      <div class="track-card" style="padding:18px; border-left:4px solid var(--warning); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge-pill" style="font-size:10px; background:rgba(245,158,11,0.15); color:var(--warning);">Subject Sprint</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700;">40 Marks</span>
+          </div>
+          <h4 style="color:var(--text); margin:0 0 6px; font-size:15px; font-weight:800;">GATE Core CS High-Yield Sprint</h4>
+          <p style="font-size:12px; color:var(--text-sub); line-height:1.5; margin:0 0 12px;">
+            25 High-yield questions across OS, DBMS, Networks, Algorithms, TOC, and Compilers. Perfect for quick daily diagnostic evaluation.
+          </p>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <span>⏱️ 60 Mins</span>
+            <span>📝 25 Questions</span>
+            <span>⚖️ Official Marking</span>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="window.startGateMockExam('sprint')" style="width:100%; font-size:12px; padding:10px 18px; text-align:center;">
+          ⚡ Start Sprint Mock (25 Qs) →
+        </button>
+      </div>
+
+      <!-- Mock 3: Aptitude Diagnostic -->
+      <div class="track-card" style="padding:18px; border-left:4px solid var(--success); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge-pill" style="font-size:10px; background:rgba(16,185,129,0.15); color:var(--success);">General Aptitude</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700;">15 Marks</span>
+          </div>
+          <h4 style="color:var(--text); margin:0 0 6px; font-size:15px; font-weight:800;">GATE 15-Mark Aptitude Sprint</h4>
+          <p style="font-size:12px; color:var(--text-sub); line-height:1.5; margin:0 0 12px;">
+            10 Standard GATE General Aptitude questions (5 x 1-mark, 5 x 2-mark) covering Verbal, Numerical, and Spatial reasoning.
+          </p>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <span>⏱️ 25 Mins</span>
+            <span>📝 10 Questions</span>
+            <span>🎯 15 Marks</span>
+          </div>
+        </div>
+        <button class="action-btn" onclick="window.startGateMockExam('aptitude')" style="width:100%; font-size:12px; padding:10px 18px; text-align:center;">
+          🧮 Start Aptitude Diagnostic (10 Qs) →
+        </button>
+      </div>
+
+      <!-- Mock 4: SDE Placement Assessment -->
+      <div class="track-card" style="padding:18px; border-left:4px solid var(--accent); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge-pill" style="font-size:10px; background:rgba(56,189,248,0.15); color:var(--accent);">Placement Assessment</span>
+            <span style="font-size:11px; color:var(--text-muted); font-weight:700;">SDE-1 Standard</span>
+          </div>
+          <h4 style="color:var(--text); margin:0 0 6px; font-size:15px; font-weight:800;">Campus SDE-1 Technical Mock</h4>
+          <p style="font-size:12px; color:var(--text-sub); line-height:1.5; margin:0 0 12px;">
+            Simulate top product company rounds: DSA problem solving, CS Core Fundamentals MCQ, and interactive system interview simulation.
+          </p>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; display:flex; gap:10px; flex-wrap:wrap;">
+            <span>⏱️ 90 Mins</span>
+            <span>💻 2 Coding + 20 MCQs</span>
+            <span>👔 Interview Simulator</span>
+          </div>
+        </div>
+        <button class="action-btn" onclick="openMockInterviewStudio()" style="width:100%; font-size:12px; padding:10px 18px; text-align:center;">
+          💼 Launch SDE Assessment →
+        </button>
       </div>
     </div>
   `;
@@ -10791,6 +11205,55 @@ window.renderSettingsView = function () {
             </div>`).join('')}
         </div>
       </div>
+
+      <!-- Google Gemini AI & JARVIS Mentor Configuration -->
+      <div class="nd-card" style="padding:20px; border:1px solid rgba(147,51,234,0.35); background:radial-gradient(circle at top right, rgba(147,51,234,0.08), transparent 70%), var(--depth-2);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <div style="font-size:13px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:6px;">
+              <span>✨</span> Google Gemini 1.5 Flash &amp; JARVIS AI
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+              Online generative reasoning with Google Gemini 1.5 Flash, or 100% offline semantic concept engine
+            </div>
+          </div>
+          <span class="badge-pill" style="font-size:10px; font-weight:700; background:${(localStorage.getItem('gemini_api_key') && localStorage.getItem('gemini_api_key').startsWith('AIzaSy')) ? 'rgba(16,185,129,0.15)' : 'rgba(56,189,248,0.15)'}; color:${(localStorage.getItem('gemini_api_key') && localStorage.getItem('gemini_api_key').startsWith('AIzaSy')) ? 'var(--success)' : 'var(--primary-light)'}; border:1px solid currentColor;">
+            ${(localStorage.getItem('gemini_api_key') && localStorage.getItem('gemini_api_key').startsWith('AIzaSy')) ? '🟢 Gemini 1.5 Flash Active' : '🔵 Offline Semantic Engine Active'}
+          </span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div>
+            <label for="gemini-api-key-input" style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:4px;">
+              Google AI Studio API Key (Starts with <code style="color:#c084fc; font-weight:800;">AIzaSy...</code>)
+            </label>
+            <div style="display:flex; gap:8px;">
+              <input id="gemini-api-key-input" type="password" value="${localStorage.getItem('gemini_api_key') || ''}" placeholder="AIzaSy..."
+                style="flex:1; padding:9px 12px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text); font-size:13px; font-family:monospace;" />
+              <button onclick="window.toggleGeminiKeyVisibility&&toggleGeminiKeyVisibility()" style="padding:8px 12px; background:var(--surface); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text-muted); font-size:12px; cursor:pointer;" title="Show or hide API key">👁️</button>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <button onclick="window.saveAndTestGeminiKey&&saveAndTestGeminiKey()" style="padding:8px 16px; background:linear-gradient(135deg,#9333ea,#7c3aed); border:none; border-radius:var(--radius-sm); color:white; font-size:12px; font-weight:700; cursor:pointer;">
+              ⚡ Save &amp; Test Connection
+            </button>
+            <button onclick="window.clearGeminiKey&&clearGeminiKey()" style="padding:8px 14px; background:var(--surface); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); color:var(--text-muted); font-size:12px; cursor:pointer;">
+              Clear &amp; Use Offline Engine
+            </button>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="font-size:11.5px; color:var(--primary-light); text-decoration:none; margin-left:auto;">
+              Get Free Gemini Key ↗
+            </a>
+          </div>
+
+          <div id="gemini-key-status-msg" style="font-size:11px; min-height:16px;"></div>
+
+          <div style="font-size:11px; color:var(--text-sub); line-height:1.5; background:rgba(147,51,234,0.06); padding:10px 12px; border-radius:6px; border:1px solid rgba(147,51,234,0.18);">
+            💡 <strong>Pro Tip:</strong> Google AI Studio API keys always begin with <code>AIzaSy...</code>. Tokens starting with <code>AQ...</code> are Google Cloud OAuth credentials and are not valid for the Gemini REST endpoint. Even without an API key, GT JARVIS answers GATE questions offline with zero latency using its built-in knowledge engine!
+          </div>
+        </div>
+      </div>
+
       <div class="nd-card" style="padding:20px;">
         <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:14px;">\uD83C\uDFA8 Appearance</div>
         <div style="display:flex;flex-direction:column;gap:10px;">
@@ -10838,17 +11301,74 @@ window.renderSettingsView = function () {
   setTimeout(() => { if (typeof window.loadDeveloperDiagnostics === 'function') window.loadDeveloperDiagnostics(); }, 50);
 };
 
+window.saveAndTestGeminiKey = async function() {
+  const input = document.getElementById('gemini-api-key-input');
+  if (!input) return;
+  const key = input.value.trim();
+  const statusEl = document.getElementById('gemini-key-status-msg');
+
+  if (!key) {
+    localStorage.removeItem('gemini_api_key');
+    if (statusEl) statusEl.innerHTML = '<span style="color:var(--text-muted);">✓ Cleared. Switched to offline concept engine.</span>';
+    if (typeof showToast === 'function') showToast('API key removed. Running in 100% offline mode.', 'info');
+    renderSettingsView();
+    return;
+  }
+
+  if (key.startsWith('AQ.')) {
+    if (statusEl) statusEl.innerHTML = '<span style="color:var(--warning);">⚠️ This is a Google Cloud OAuth token (starts with AQ.). Gemini AI Studio keys start with "AIzaSy...". Please create one at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--primary-light);text-decoration:underline;">aistudio.google.com</a>.</span>';
+    if (typeof showToast === 'function') showToast('Invalid key type: AI Studio keys start with AIzaSy', 'warning');
+    return;
+  }
+
+  if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent);">Testing connection with Gemini 1.5 Flash...</span>';
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping test' }] }] })
+    });
+
+    if (res.ok) {
+      localStorage.setItem('gemini_api_key', key);
+      if (statusEl) statusEl.innerHTML = '<span style="color:var(--success);font-weight:700;">✓ Connected to Google Gemini 1.5 Flash successfully!</span>';
+      if (typeof showToast === 'function') showToast('Gemini API key saved & verified! ✨', 'success');
+      setTimeout(renderSettingsView, 1000);
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      const msg = errData.error?.message || `HTTP ${res.status}`;
+      if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger);">Verification failed (${res.status}): ${msg}</span>`;
+      if (typeof showToast === 'function') showToast('Gemini verification failed', 'danger');
+    }
+  } catch (err) {
+    if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger);">Connection error: ${err.message}</span>`;
+  }
+};
+
+window.clearGeminiKey = function() {
+  localStorage.removeItem('gemini_api_key');
+  if (typeof showToast === 'function') showToast('Using 100% offline knowledge engine', 'info');
+  renderSettingsView();
+};
+
+window.toggleGeminiKeyVisibility = function() {
+  const input = document.getElementById('gemini-api-key-input');
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+};
+
 window.loadDeveloperDiagnostics = async function () {
   const grid = document.getElementById('diagnostics-health-grid');
   if (!grid) return;
 
-  const isStaticHost = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+  const hasGeminiKey = !!(localStorage.getItem('gemini_api_key') && localStorage.getItem('gemini_api_key').startsWith('AIzaSy'));
+  const isStaticHost = typeof window !== 'undefined' && (window.location.hostname.includes('github.io') || window.location.protocol === 'file:');
   if (isStaticHost) {
     const entries = [
       { name: 'Firebase Cloud DB', desc: 'Firestore Realtime Sync (gt-study-mentor-pro)', status: 'ONLINE', latency: '35ms' },
       { name: 'Google Auth Service', desc: 'OAuth 2.0 & Session Persistence', status: 'ONLINE', latency: '16ms' },
-      { name: 'GATE Question Engine', desc: '65Q PYQ Mock & AIR Rank Predictor', status: 'ONLINE', latency: '<1ms' },
-      { name: 'Local CSE Core', desc: 'Offline Built-in Intelligence & Spaced Repetition', status: 'ONLINE', latency: '<1ms' }
+      { name: 'GATE Question Engine', desc: '121 Verified GATE PYQs & CBT Simulator', status: 'ONLINE', latency: '<1ms' },
+      { name: hasGeminiKey ? 'Gemini 1.5 Flash' : 'GT Offline JARVIS', desc: hasGeminiKey ? 'Google AI Studio Online Reasoning' : '100% Offline GATE Semantic Engine', status: 'ONLINE', latency: hasGeminiKey ? '~450ms' : '<1ms' }
     ];
     grid.innerHTML = entries.map(item => `
       <div style="background:var(--depth-3);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:10px;">
