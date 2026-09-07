@@ -1201,9 +1201,9 @@ if (typeof window !== 'undefined') {
     const tpls = PrepIntelligenceEngine.getCodeTemplates();
     const tpl = tpls[tplId] || tpls['sliding-window'];
     if (!tpl) return;
-    const editor = document.getElementById('code-editor-area');
+    const editor = document.getElementById('code-studio-input') || document.getElementById('code-editor-area');
     const complexity = document.getElementById('code-complexity-badge');
-    const tanglish = document.getElementById('code-tanglish-box');
+    const tanglish = document.getElementById('code-studio-tanglish') || document.getElementById('code-tanglish-box');
 
     if (editor) editor.value = tpl.cpp;
     if (complexity) complexity.textContent = tpl.complexity;
@@ -1211,9 +1211,34 @@ if (typeof window !== 'undefined') {
   };
 
   window.runCodeStudioSimulation = function () {
-    const outBox = document.getElementById('code-terminal-output');
+    const outBox = document.getElementById('code-studio-output') || document.getElementById('code-terminal-output');
     if (outBox) {
       outBox.innerHTML = '<span style="color:var(--success);">[Process exited with status 0]</span>\nOutput:\nMax Sum Subarray: 9\nVerification: O(N) single-pass completed.';
+    }
+    if (typeof showToast === 'function') {
+      showToast('Simulation executed successfully! 🚀', 'success');
+    }
+  };
+
+  window.resetCodeStudio = function () {
+    console.log('🔄 Resetting CSE Code Studio...');
+    const editor = document.getElementById('code-studio-input') || document.getElementById('code-editor-area');
+    const outBox = document.getElementById('code-studio-output') || document.getElementById('code-terminal-output');
+    const tanglish = document.getElementById('code-studio-tanglish') || document.getElementById('code-tanglish-box');
+
+    if (typeof window.loadCodeStudioTemplate === 'function') {
+      window.loadCodeStudioTemplate('sliding-window');
+    } else if (editor) {
+      editor.value = `// Welcome to CSE Code Studio & Algorithmic Sandbox\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Ready for simulation!" << endl;\n    return 0;\n}`;
+    }
+    if (outBox) {
+      outBox.innerHTML = '<span style="color:var(--text-sub);">Console reset. Click "Run Code Simulation" to execute.</span>';
+    }
+    if (tanglish) {
+      tanglish.textContent = 'Editor reset to Sliding Window baseline pattern.';
+    }
+    if (typeof showToast === 'function') {
+      showToast('Code Studio reset successfully! ↺', 'info');
     }
   };
 

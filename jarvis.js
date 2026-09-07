@@ -100,17 +100,24 @@
       };
 
       rec.onerror = (event) => {
-        console.warn('[GT JARVIS] Recognition error:', event.error);
         state.isListening = false;
 
-        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-          setStatus('ERROR', 'Microphone access blocked. Please allow microphone permission in your browser.');
-        } else if (event.error === 'no-speech') {
+        if (event.error === 'no-speech') {
+          // Expected browser timeout when silence is detected
+          console.log('[GT JARVIS] 🎤 No speech detected. Listening timed out.');
           setStatus('IDLE');
-        } else {
-          setStatus('ERROR', `Recognition note: ${event.error}`);
-          setTimeout(() => setStatus('IDLE'), 2500);
+          return;
         }
+
+        if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+          console.warn('[GT JARVIS] Microphone access blocked:', event.error);
+          setStatus('ERROR', 'Microphone access blocked. Please allow microphone permission in your browser.');
+          return;
+        }
+
+        console.warn('[GT JARVIS] Recognition event note:', event.error);
+        setStatus('ERROR', `Recognition note: ${event.error}`);
+        setTimeout(() => setStatus('IDLE'), 2500);
       };
 
       rec.onend = () => {
@@ -370,7 +377,7 @@
           return;
         }
       } catch (geminiErr) {
-        console.warn('[GT JARVIS] Gemini API call failed, falling back to local knowledge engine:', geminiErr);
+        console.log('[GT JARVIS] Gemini API notice (using local offline engine):', geminiErr.message);
       }
     }
 
@@ -383,9 +390,16 @@
   }
 
   async function callGeminiAPI(cleanText, studentContext, apiKey) {
+    const trimmedKey = apiKey.trim();
+    // Validate key format: Google AI Studio keys typically start with "AIzaSy"
+    if (trimmedKey.startsWith('AQ.') || !trimmedKey.startsWith('AIzaSy')) {
+      console.warn('[GT JARVIS] Note: Google AI Studio Gemini API keys begin with "AIzaSy...". Keys starting with "AQ..." are Google Cloud OAuth tokens. Obtain a free API key at: https://aistudio.google.com');
+      throw new Error('Key format mismatch (AI Studio keys begin with "AIzaSy...")');
+    }
+
     const systemPrompt = `You are GT JARVIS, the supreme AI Mentor for GATE CSE 2027, DSA, Campus Placements, and Software Engineering. Student Context: Day ${studentContext.day}, Track: ${studentContext.activeTrack || 'GATE + Placement'}, Mode: ${state.mode}. Answer with technical precision, intuitive analogies, formulas, ASCII diagrams or code snippets where helpful, and clear next steps. Keep formatting clean with standard markdown.`;
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(trimmedKey)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -402,7 +416,13 @@
       })
     });
 
-    if (!res.ok) throw new Error(`Gemini API HTTP ${res.status}`);
+    if (!res.ok) {
+      if (res.status === 404 || res.status === 400) {
+        throw new Error(`Invalid API key or model (HTTP ${res.status}). Verify key at aistudio.google.com`);
+      }
+      throw new Error(`Gemini API HTTP ${res.status}`);
+    }
+
     const json = await res.json();
     const replyText = json.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!replyText) throw new Error('Empty response from Gemini');

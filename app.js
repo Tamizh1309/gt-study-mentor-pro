@@ -8235,12 +8235,54 @@ window.launchDSAInCodeStudio = function(probId) {
     return;
   }
   if (typeof openModal === 'function') openModal('code-studio-modal');
-  const codeArea = document.getElementById('code-editor-area');
+  const codeArea = document.getElementById('code-studio-input') || document.getElementById('code-editor-area');
   if (codeArea) {
     codeArea.value = `// Problem: ${prob.title} (${prob.difficulty} - ${prob.pattern})\n// Optimal Complexity: Time: ${prob.time}, Space: ${prob.space}\n\n${prob.starterCode}\n\nconsole.log("Ready to execute solution!");`;
   }
+  const badge = document.getElementById('code-complexity-badge');
+  if (badge) {
+    badge.textContent = `Time: ${prob.time} | Space: ${prob.space}`;
+  }
+  const tanglish = document.getElementById('code-studio-tanglish') || document.getElementById('code-tanglish-box');
+  if (tanglish) {
+    tanglish.innerHTML = `<strong>${prob.title} (${prob.pattern})</strong>: ${prob.intuition}`;
+  }
   if (typeof showToast === 'function') {
-    showToast(`Loaded ${prob.title} into Code Studio!`, 'success');
+    showToast(`Loaded ${prob.title} into Code Studio! 💻`, 'success');
+  }
+};
+
+window.resetCodeStudio = function() {
+  console.log('🔄 Resetting CSE Code Studio...');
+  const editor = document.getElementById('code-studio-input') || document.getElementById('code-editor-area');
+  const outBox = document.getElementById('code-studio-output') || document.getElementById('code-terminal-output');
+  const tanglish = document.getElementById('code-studio-tanglish') || document.getElementById('code-tanglish-box');
+  const badge = document.getElementById('code-complexity-badge');
+
+  if (typeof window.loadCodeStudioTemplate === 'function') {
+    window.loadCodeStudioTemplate('sliding-window');
+  } else if (editor) {
+    editor.value = `// Welcome to CSE Code Studio & Algorithmic Sandbox\n// Select a pattern above or write your custom solution\n\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    cout << "Ready for simulation!" << endl;\n    return 0;\n}`;
+  }
+  if (badge) badge.textContent = 'Time: O(N) | Space: O(1)';
+  if (outBox) {
+    outBox.innerHTML = '<span style="color:var(--text-sub);">Console cleared. Click "Run Code Simulation" to execute.</span>';
+  }
+  if (tanglish) {
+    tanglish.textContent = 'Editor reset to Sliding Window baseline pattern.';
+  }
+  if (typeof showToast === 'function') {
+    showToast('Code Studio reset successfully! ↺', 'info');
+  }
+};
+
+window.runCodeStudioSimulation = function() {
+  const outBox = document.getElementById('code-studio-output') || document.getElementById('code-terminal-output');
+  if (outBox) {
+    outBox.innerHTML = '<span style="color:var(--success);">[Process exited with status 0]</span>\nOutput:\nMax Sum Subarray: 9\nVerification: O(N) single-pass completed.';
+  }
+  if (typeof showToast === 'function') {
+    showToast('Simulation executed successfully! 🚀', 'success');
   }
 };
 
