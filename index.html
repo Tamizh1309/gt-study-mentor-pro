@@ -44,16 +44,16 @@
 <body>
 
 <!-- PWA Install Banner -->
-<div class="install-banner hidden" id="install-banner" style="display:none !important;" aria-hidden="true">
+<div class="install-banner hidden" id="install-banner">
   <div class="install-banner-content">
     <span class="install-icon">&#x1F4F1;</span>
     <div>
       <div class="install-title">Install GT Mentor Pro</div>
-      <div class="install-sub">Works fully offline on all devices!</div>
+      <div class="install-sub">Works 100% offline on mobile &amp; desktop!</div>
     </div>
   </div>
   <div class="install-banner-btns">
-    <button class="install-btn" id="install-btn">Install Free</button>
+    <button class="install-btn" id="install-btn" onclick="window.triggerPWAInstall&&triggerPWAInstall()">Install Free</button>
     <button class="install-dismiss" id="install-dismiss-btn" aria-label="Dismiss">&#x2715;</button>
   </div>
 </div>
@@ -722,6 +722,7 @@
             <button class="tab-pill" id="mentor-mode-resume" onclick="setMentorMode('resume')">&#x1F4C4; Resume</button>
             <button class="tab-pill" id="mentor-mode-focus" onclick="setMentorMode('focus')">&#x26A1; Focus</button>
             <button class="tab-pill" id="jarvis-voice-toggle" style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);color:var(--success);font-weight:700;">&#x1F50A; Voice On</button>
+            <button class="tab-pill" id="jarvis-ai-key-btn" onclick="openJarvisKeyModal&&openJarvisKeyModal()" style="background:rgba(56,189,248,0.12);border-color:rgba(56,189,248,0.3);color:var(--accent);font-weight:700;" title="Configure Google Gemini 1.5 Flash Key">&#x2728; AI Key</button>
           </div>
         </div>
 
@@ -750,13 +751,15 @@
           <div class="welcome-banner">
             <h1 style="font-size:1.4rem;font-weight:900;font-family:var(--font-display);color:var(--text);margin-bottom:6px;">Personal Study &amp; Career Intelligence</h1>
             <p style="color:var(--text-sub);font-size:13px;line-height:1.6;max-width:520px;margin:0 auto 14px;">I know your 90-day progress, your weak areas, and your career milestones. Ask me any technical question, plan your study blocks, or execute focus sessions.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:620px;margin:0 auto;" role="list">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:640px;margin:0 auto;" role="list">
               <button class="action-chip" onclick="openChatWithContext('What should I study today based on my 90-day preparation goals?')" role="listitem">&#x1F4C5; What should I study today?</button>
+              <button class="action-chip" onclick="openChatWithContext('Explain SCS (Shortest Common Supersequence) with formula and example')" role="listitem">&#x1F3AF; Explain SCS</button>
+              <button class="action-chip" onclick="openChatWithContext('Explain 2PL (Two Phase Locking) and Strict 2PL in DBMS')" role="listitem">&#x1F512; Explain 2PL</button>
               <button class="action-chip" onclick="openChatWithContext('Explain deadlock in operating systems and how Banker\'s algorithm avoids it.')" role="listitem">&#x1F4A1; Explain Deadlocks</button>
+              <button class="action-chip" onclick="openChatWithContext('Explain Subnetting and how to calculate host addresses in CIDR')" role="listitem">&#x1F310; Explain Subnetting</button>
               <button class="action-chip" onclick="openChatWithContext('Start a 45-minute focus session on DSA Tree Traversal')" role="listitem">&#x26A1; Start 45m Focus Session</button>
-              <button class="action-chip" onclick="openChatWithContext('Give me a Socratic hint for finding cycle in a directed graph')" role="listitem">&#x1F4BB; Socratic DSA Hint</button>
+              <button class="action-chip" onclick="openChatWithContext('Launch official 65-question GATE CSE Mock Exam Simulator')" role="listitem">&#x1F680; Launch 65Q Mock Exam</button>
               <button class="action-chip" onclick="openChatWithContext('Check my resume ATS score and suggest quantifiable impact metrics')" role="listitem">&#x1F4C4; ATS Resume Check</button>
-              <button class="action-chip" onclick="openChatWithContext('How should I prepare for a technical interview at Zoho?')" role="listitem">&#x1F3E2; Zoho Prep Sprint</button>
             </div>
           </div>
         </div>
@@ -894,6 +897,33 @@
     <div class="modal-title">&#x1F4CA; Weekly Mentor Report</div>
     <div class="modal-subtitle">Generated from your actual study activity</div>
     <div id="weekly-report-content" style="margin-top:16px;"><div style="color:var(--text-sub);font-size:13px;padding:16px;background:var(--depth-1);border-radius:8px;border:1px solid var(--border-subtle);">Weekly progress report is generated dynamically based on completed study tasks and practice scores.</div></div>
+  </div>
+</div>
+
+<!-- PWA Install Guide Modal -->
+<div class="modal-overlay" id="pwa-install-guide-modal" role="dialog" aria-modal="true" aria-label="How to Install GT Mentor Pro">
+  <div class="modal" style="max-width:480px; width:92%; padding:24px; text-align:center;">
+    <button class="modal-close" data-close="pwa-install-guide-modal" aria-label="Close">&#x2715;</button>
+    <div style="font-size:36px; margin-bottom:8px;">📲</div>
+    <h3 style="font-size:18px; font-weight:800; color:var(--text); margin-bottom:8px;">Install GT Study Mentor Pro</h3>
+    <p style="font-size:13px; color:var(--text-sub); line-height:1.6; margin-bottom:16px;">Enjoy instantaneous launch, 100% offline study access, and fullscreen focus without browser address bars.</p>
+    
+    <div style="background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:8px; padding:14px; text-align:left; font-size:12px; color:var(--text-sub); display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
+      <div style="display:flex; align-items:flex-start; gap:10px;">
+        <span style="font-size:16px;">💻</span>
+        <div><strong style="color:var(--text);">Chrome / Edge on Desktop:</strong> Click the <strong>Install</strong> icon in the address bar (or menu ⋮ &rarr; <em>"Install GT Study Mentor Pro"</em>).</div>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:10px;">
+        <span style="font-size:16px;">🍏</span>
+        <div><strong style="color:var(--text);">iPhone / iPad (Safari):</strong> Tap the <strong>Share</strong> button (⎋) at the bottom, then tap <strong>"Add to Home Screen"</strong>.</div>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:10px;">
+        <span style="font-size:16px;">🤖</span>
+        <div><strong style="color:var(--text);">Android (Chrome):</strong> Tap menu (⋮) at top-right &rarr; select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</div>
+      </div>
+    </div>
+    
+    <button type="button" class="cta-pill-primary" onclick="closeModal&&closeModal('pwa-install-guide-modal')" style="width:100%; padding:10px; font-size:13px;">Got it, thanks!</button>
   </div>
 </div>
 

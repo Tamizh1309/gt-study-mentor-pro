@@ -20,4 +20,5 @@ nohup.out
 .DS_Store
 Thumbs.db
 .vscode/
+scratch/
 .idea/

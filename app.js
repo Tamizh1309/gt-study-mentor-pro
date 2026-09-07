@@ -893,22 +893,35 @@ function registerSW() {
   }
 }
 
-// PWA Install Prompt (Android/Desktop)
+// PWA Install Prompt & Fallback Guidance (Android/iOS/Desktop)
+window.triggerPWAInstall = async function () {
+  if (deferredInstallPrompt) {
+    try {
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      console.log('PWA install choice:', choice?.outcome);
+      if (choice?.outcome === 'accepted') {
+        deferredInstallPrompt = null;
+        const banner = document.getElementById('install-banner');
+        if (banner) banner.classList.add('hidden');
+      }
+    } catch (err) {
+      console.warn('PWA prompt error:', err);
+      if (typeof openModal === 'function') openModal('pwa-install-guide-modal');
+    }
+  } else {
+    // Show polite guide modal explaining how to install
+    if (typeof openModal === 'function') openModal('pwa-install-guide-modal');
+  }
+};
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
   const installBtn = document.getElementById('install-btn');
   if (installBtn) {
     installBtn.style.display = 'inline-flex';
-    installBtn.onclick = async () => {
-      if (deferredInstallPrompt) {
-        deferredInstallPrompt.prompt();
-        const choice = await deferredInstallPrompt.userChoice;
-        console.log('PWA install choice:', choice.outcome);
-        deferredInstallPrompt = null;
-        installBtn.style.display = 'none';
-      }
-    };
+    installBtn.onclick = window.triggerPWAInstall;
   }
   const banner = document.getElementById('install-banner');
   if (banner && !getStorage('installDismissed', false)) {
@@ -916,8 +929,19 @@ window.addEventListener('beforeinstallprompt', (e) => {
   }
 });
 
+// Dismiss button listener
+const dismissBtn = document.getElementById('install-dismiss-btn');
+if (dismissBtn) {
+  dismissBtn.onclick = () => {
+    const banner = document.getElementById('install-banner');
+    if (banner) banner.classList.add('hidden');
+    setStorage('installDismissed', true);
+  };
+}
+
 window.addEventListener('appinstalled', () => {
-  document.getElementById('install-banner').classList.add('hidden');
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.classList.add('hidden');
   showToast('App installed! Use offline da! 📲', 'success', '📲');
   setStorage('installDismissed', true);
 });
@@ -7953,29 +7977,272 @@ function renderDSAPracticeArena(container) {
     { name: 'Tries & Disjoint Set Union (DSU)', solved: 8, total: 15, acc: 65, difficulty: 'Hard' }
   ];
 
+  const dsaProblems = [
+    {
+      id: 'dsa_1',
+      title: 'Trapping Rain Water',
+      pattern: 'Two Pointers',
+      difficulty: 'Hard',
+      companies: ['Google', 'Amazon', 'Meta'],
+      time: 'O(N)',
+      space: 'O(1)',
+      desc: 'Given n non-negative integers representing an elevation map where width of each bar is 1, compute how much water it can trap after raining.',
+      intuition: 'Maintain left and right pointers with maxLeft and maxRight. The water trapped above index i is determined by min(maxLeft, maxRight) - height[i]. Move the pointer with the smaller maximum.',
+      starterCode: `function trap(height) {
+  let left = 0, right = height.length - 1;
+  let maxLeft = 0, maxRight = 0, water = 0;
+  while (left < right) {
+    if (height[left] <= height[right]) {
+      if (height[left] >= maxLeft) maxLeft = height[left];
+      else water += maxLeft - height[left];
+      left++;
+    } else {
+      if (height[right] >= maxRight) maxRight = height[right];
+      else water += maxRight - height[right];
+      right--;
+    }
+  }
+  return water;
+}`
+    },
+    {
+      id: 'dsa_2',
+      title: 'Longest Substring Without Repeating Characters',
+      pattern: 'Sliding Window',
+      difficulty: 'Medium',
+      companies: ['Amazon', 'Microsoft', 'Bloomberg'],
+      time: 'O(N)',
+      space: 'O(min(N, M))',
+      desc: 'Given a string s, find the length of the longest substring without repeating characters.',
+      intuition: 'Use a dynamic sliding window [left, right] and a hash map of last seen indices. If a duplicate character s[right] is encountered, advance left to max(left, lastSeen[s[right]] + 1).',
+      starterCode: `function lengthOfLongestSubstring(s) {
+  const map = new Map();
+  let left = 0, maxLen = 0;
+  for (let right = 0; right < s.length; right++) {
+    const ch = s[right];
+    if (map.has(ch)) {
+      left = Math.max(left, map.get(ch) + 1);
+    }
+    map.set(ch, right);
+    maxLen = Math.max(maxLen, right - left + 1);
+  }
+  return maxLen;
+}`
+    },
+    {
+      id: 'dsa_3',
+      title: 'Course Schedule II (Topological Sort)',
+      pattern: 'Graphs',
+      difficulty: 'Medium',
+      companies: ['Google', 'Meta', 'Amazon'],
+      time: 'O(V + E)',
+      space: 'O(V + E)',
+      desc: 'Return the ordering of courses you should take to finish all courses given prerequisite pairs [ai, bi]. If impossible, return an empty array.',
+      intuition: 'Kahn algorithm using in-degree array and queue. Decrement in-degrees of neighbors. If processed count equals numCourses, ordering is valid (DAG); otherwise a cycle exists.',
+      starterCode: `function findOrder(numCourses, prerequisites) {
+  const inDegree = new Array(numCourses).fill(0);
+  const adj = Array.from({ length: numCourses }, () => []);
+  for (const [course, pre] of prerequisites) {
+    adj[pre].push(course);
+    inDegree[course]++;
+  }
+  const queue = [];
+  for (let i = 0; i < numCourses; i++) {
+    if (inDegree[i] === 0) queue.push(i);
+  }
+  const order = [];
+  while (queue.length > 0) {
+    const curr = queue.shift();
+    order.push(curr);
+    for (const next of adj[curr]) {
+      inDegree[next]--;
+      if (inDegree[next] === 0) queue.push(next);
+    }
+  }
+  return order.length === numCourses ? order : [];
+}`
+    },
+    {
+      id: 'dsa_4',
+      title: 'Coin Change (Fewest Coins)',
+      pattern: 'Dynamic Programming',
+      difficulty: 'Medium',
+      companies: ['Amazon', 'Microsoft', 'Apple'],
+      time: 'O(amount * n)',
+      space: 'O(amount)',
+      desc: 'You are given an integer array coins and an integer amount. Return the fewest number of coins needed to make up that amount, or -1 if impossible.',
+      intuition: '1D DP state dp[i] = minimum coins to make amount i. Transition: dp[i] = min(dp[i], dp[i - coin] + 1) for all coins <= i.',
+      starterCode: `function coinChange(coins, amount) {
+  const dp = new Array(amount + 1).fill(Infinity);
+  dp[0] = 0;
+  for (let i = 1; i <= amount; i++) {
+    for (const coin of coins) {
+      if (i >= coin && dp[i - coin] !== Infinity) {
+        dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+      }
+    }
+  }
+  return dp[amount] === Infinity ? -1 : dp[amount];
+}`
+    },
+    {
+      id: 'dsa_5',
+      title: 'LRU Cache Design',
+      pattern: 'Arrays & Two Pointers',
+      difficulty: 'Medium',
+      companies: ['Amazon', 'Google', 'Microsoft'],
+      time: 'O(1) get & put',
+      space: 'O(capacity)',
+      desc: 'Design a data structure that follows the constraints of a Least Recently Used (LRU) cache with get(key) and put(key, value) in O(1) time.',
+      intuition: 'Combine a Hash Map with a Doubly Linked List (with dummy head and tail). Map stores key -> node reference. Moving a node to head and evicting from tail runs in O(1).',
+      starterCode: `class LRUCache {
+  constructor(capacity) {
+    this.capacity = capacity;
+    this.map = new Map(); // In JS, Map retains insertion order!
+  }
+  get(key) {
+    if (!this.map.has(key)) return -1;
+    const val = this.map.get(key);
+    this.map.delete(key);
+    this.map.set(key, val);
+    return val;
+  }
+  put(key, value) {
+    if (this.map.has(key)) this.map.delete(key);
+    this.map.set(key, value);
+    if (this.map.size > this.capacity) {
+      this.map.delete(this.map.keys().next().value);
+    }
+  }
+}`
+    },
+    {
+      id: 'dsa_6',
+      title: 'Median of Two Sorted Arrays',
+      pattern: 'Binary Search On Answers',
+      difficulty: 'Hard',
+      companies: ['Google', 'Amazon', 'Goldman Sachs'],
+      time: 'O(log(min(M, N)))',
+      space: 'O(1)',
+      desc: 'Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays in O(log(m + n)) time.',
+      intuition: 'Binary search on the partition of the smaller array. Ensure left partition has (m + n + 1) / 2 elements such that maxLeft1 <= minRight2 and maxLeft2 <= minRight1.',
+      starterCode: `function findMedianSortedArrays(nums1, nums2) {
+  if (nums1.length > nums2.length) return findMedianSortedArrays(nums2, nums1);
+  const m = nums1.length, n = nums2.length;
+  let low = 0, high = m;
+  while (low <= high) {
+    const cut1 = Math.floor((low + high) / 2);
+    const cut2 = Math.floor((m + n + 1) / 2) - cut1;
+    const l1 = cut1 === 0 ? -Infinity : nums1[cut1 - 1];
+    const l2 = cut2 === 0 ? -Infinity : nums2[cut2 - 1];
+    const r1 = cut1 === m ? Infinity : nums1[cut1];
+    const r2 = cut2 === n ? Infinity : nums2[cut2];
+    if (l1 <= r2 && l2 <= r1) {
+      if ((m + n) % 2 === 0) return (Math.max(l1, l2) + Math.min(r1, r2)) / 2;
+      return Math.max(l1, l2);
+    } else if (l1 > r2) high = cut1 - 1;
+    else low = cut1 + 1;
+  }
+  return 0.0;
+}`
+    }
+  ];
+
+  window._dsaProblems = dsaProblems;
+
   container.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px;">
+    <!-- Top Pattern Summary Cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:20px;">
       ${patterns.map(p => `
-        <div class="track-card" style="padding:16px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="track-card" style="padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
             <strong style="color:var(--text);font-size:13px;">${p.name}</strong>
             <span class="badge-pill" style="font-size:10px;">${p.difficulty}</span>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
             <span>Mastery: ${p.solved}/${p.total} Solved</span>
-            <span style="color:${p.acc >= 75 ? 'var(--success)' : p.acc >= 60 ? 'var(--warning)' : 'var(--danger)'};font-weight:700;">${p.acc}% Accuracy</span>
+            <span style="color:${p.acc >= 75 ? 'var(--success)' : p.acc >= 60 ? 'var(--warning)' : 'var(--danger)'};font-weight:700;">${p.acc}% Acc</span>
           </div>
-          <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
+          <div style="width:100%;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
             <div style="width:${Math.round((p.solved/p.total)*100)}%;height:100%;background:var(--accent);"></div>
-          </div>
-          <div style="margin-top:12px;display:flex;justify-content:flex-end;">
-            <button class="action-btn" onclick="openModal('code-studio-modal')" style="font-size:11px;padding:4px 10px;">Practice Pattern →</button>
           </div>
         </div>
       `).join('')}
     </div>
+
+    <!-- Curated Interview Problem Arena Header -->
+    <div class="nd-card" style="padding:16px 20px; margin-bottom:16px; border:1px solid var(--border-subtle); background:var(--depth-2);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <div>
+          <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--accent);">Top Tech Interview Challenges</div>
+          <strong style="font-size:15px; color:var(--text);">FAANG / Tier-1 SDE Curated Problems with Socratic Hints</strong>
+        </div>
+        <div style="font-size:11px; color:var(--text-muted);">
+          <span>Showing ${dsaProblems.length} High-Yield Patterns</span>
+        </div>
+      </div>
+
+      <!-- Problem List Grid -->
+      <div style="display:flex; flex-direction:column; gap:12px;" id="dsa-problem-cards-list">
+        ${dsaProblems.map(prob => `
+          <div class="track-card" style="padding:16px; background:var(--depth-3); border:1px solid var(--border-subtle); border-radius:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+              <div>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                  <strong style="font-size:14px; color:var(--text);">${prob.title}</strong>
+                  <span class="badge-pill" style="font-size:10px; background:${prob.difficulty === 'Hard' ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)'}; color:${prob.difficulty === 'Hard' ? 'var(--danger)' : 'var(--warning)'};">${prob.difficulty}</span>
+                  <span class="badge-pill" style="font-size:10px; background:rgba(56,189,248,0.12); color:var(--accent);">${prob.pattern}</span>
+                </div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  ${prob.companies.map(c => `<span style="font-size:10px; color:var(--text-muted); background:var(--surface); padding:2px 6px; border-radius:4px;">🏢 ${c}</span>`).join('')}
+                  <span style="font-size:10px; color:var(--success); background:rgba(16,185,129,0.1); padding:2px 6px; border-radius:4px;">⏱️ ${prob.time}</span>
+                  <span style="font-size:10px; color:var(--primary-light); background:rgba(99,216,255,0.1); padding:2px 6px; border-radius:4px;">💾 ${prob.space}</span>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="action-btn" onclick="toggleDSAIntuition('${prob.id}')" style="font-size:11px; padding:6px 12px;">💡 Intuition</button>
+                <button type="button" class="cta-pill-primary" onclick="launchDSAInCodeStudio('${prob.id}')" style="font-size:11px; padding:6px 14px;">🚀 Code Studio →</button>
+              </div>
+            </div>
+
+            <p style="font-size:12px; color:var(--text-sub); line-height:1.5; margin:0 0 10px;">${prob.desc}</p>
+
+            <!-- Collapsible Intuition / Code Block -->
+            <div id="dsa-intuition-${prob.id}" style="display:none; padding:12px; background:var(--depth-4); border:1px solid var(--border-subtle); border-radius:6px; margin-top:8px;">
+              <div style="font-size:11px; font-weight:700; color:var(--accent); margin-bottom:4px;">🧠 Key Algorithmic Intuition:</div>
+              <div style="font-size:12px; color:var(--text); line-height:1.5; margin-bottom:10px;">${prob.intuition}</div>
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">💻 Reference Solution:</div>
+              <pre style="margin:0; padding:10px; background:#0b101b; border-radius:4px; font-size:11px; font-family:var(--font-mono); color:#38bdf8; overflow-x:auto;">${prob.starterCode.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
   `;
 }
+
+window.toggleDSAIntuition = function(probId) {
+  const el = document.getElementById(`dsa-intuition-${probId}`);
+  if (el) {
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+};
+
+window.launchDSAInCodeStudio = function(probId) {
+  const prob = (window._dsaProblems || []).find(p => p.id === probId);
+  if (!prob) {
+    if (typeof openModal === 'function') openModal('code-studio-modal');
+    return;
+  }
+  if (typeof openModal === 'function') openModal('code-studio-modal');
+  const codeArea = document.getElementById('code-editor-area');
+  if (codeArea) {
+    codeArea.value = `// Problem: ${prob.title} (${prob.difficulty} - ${prob.pattern})\n// Optimal Complexity: Time: ${prob.time}, Space: ${prob.space}\n\n${prob.starterCode}\n\nconsole.log("Ready to execute solution!");`;
+  }
+  if (typeof showToast === 'function') {
+    showToast(`Loaded ${prob.title} into Code Studio!`, 'success');
+  }
+};
 
 function renderGATEPYQPracticeArena(container) {
   const gateSubjects = [

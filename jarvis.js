@@ -309,8 +309,8 @@
     const studentContext = collectLocalStudentContext();
 
     // If hosted statically (e.g. GitHub Pages), directly run resilient client fallback without generating HTTP 405
-    if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
-      handleOfflineFallback(cleanText, studentContext);
+    if (typeof window !== 'undefined' && (window.location.hostname.includes('github.io') || window.location.protocol === 'file:')) {
+      await handleOfflineFallback(cleanText, studentContext);
       return;
     }
 
@@ -348,14 +348,75 @@
       }
 
     } catch (err) {
-      console.warn('[GT JARVIS] Offline or server error, using resilient client fallback:', err);
-      // Resilient client fallback
-      const fallbackReply = generateClientFallback(cleanText, state.mode);
-      appendChatMessage('assistant', fallbackReply.text, fallbackReply.action, null, true);
-      if (state.voiceEnabled) speak(fallbackReply.spoken);
-      if (fallbackReply.action) executeSafeAction(fallbackReply.action);
-      setStatus('IDLE');
+      console.warn('[GT JARVIS] Server unreachable or static host, using client intelligence:', err);
+      await handleOfflineFallback(cleanText, studentContext);
     }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // 5.1 Client-Side Intelligence & Gemini AI Bridge
+  // ──────────────────────────────────────────────────────────────────────────
+  async function handleOfflineFallback(cleanText, studentContext) {
+    // 1. Check if user configured Google Gemini API Key
+    const geminiKey = (typeof localStorage !== 'undefined') ? localStorage.getItem('gt_gemini_api_key') : null;
+    if (geminiKey && geminiKey.trim()) {
+      try {
+        const geminiReply = await callGeminiAPI(cleanText, studentContext, geminiKey.trim());
+        if (geminiReply && geminiReply.text) {
+          appendChatMessage('assistant', geminiReply.text, geminiReply.action, 'GEMINI_AI');
+          if (state.voiceEnabled && geminiReply.spoken) speak(geminiReply.spoken);
+          if (geminiReply.action) executeSafeAction(geminiReply.action);
+          setStatus('IDLE');
+          return;
+        }
+      } catch (geminiErr) {
+        console.warn('[GT JARVIS] Gemini API call failed, falling back to local knowledge engine:', geminiErr);
+      }
+    }
+
+    // 2. Comprehensive Local Semantic Concept Engine
+    const fallbackReply = generateClientFallback(cleanText, state.mode);
+    appendChatMessage('assistant', fallbackReply.text, fallbackReply.action, fallbackReply.intent || null, true);
+    if (state.voiceEnabled && fallbackReply.spoken) speak(fallbackReply.spoken);
+    if (fallbackReply.action) executeSafeAction(fallbackReply.action);
+    setStatus('IDLE');
+  }
+
+  async function callGeminiAPI(cleanText, studentContext, apiKey) {
+    const systemPrompt = `You are GT JARVIS, the supreme AI Mentor for GATE CSE 2027, DSA, Campus Placements, and Software Engineering. Student Context: Day ${studentContext.day}, Track: ${studentContext.activeTrack || 'GATE + Placement'}, Mode: ${state.mode}. Answer with technical precision, intuitive analogies, formulas, ASCII diagrams or code snippets where helpful, and clear next steps. Keep formatting clean with standard markdown.`;
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: `${systemPrompt}\n\nStudent: "${cleanText}"` }]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 1000
+        }
+      })
+    });
+
+    if (!res.ok) throw new Error(`Gemini API HTTP ${res.status}`);
+    const json = await res.json();
+    const replyText = json.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!replyText) throw new Error('Empty response from Gemini');
+
+    let action = null;
+    const lower = cleanText.toLowerCase();
+    if (/mock|65/i.test(lower)) action = { type: 'open_mock_exam' };
+    else if (/setup wizard|onboarding/i.test(lower)) action = { type: 'open_setup_wizard' };
+    else if (/focus/i.test(lower)) action = { type: 'start_focus', params: { duration: 45, topic: 'Deep Focus Block' } };
+    else if (/dsa/i.test(lower)) action = { type: 'open_dsa' };
+    else if (/pyq|gate question/i.test(lower)) action = { type: 'open_pyq' };
+
+    const spoken = replyText.replace(/[*#`_\[\]()]/g, '').substring(0, 160);
+    return { text: replyText, spoken, action };
   }
 
   // ──────────────────────────────────────────────────────────────────────────
@@ -557,6 +618,18 @@
           break;
         }
 
+        case 'open_mock_exam': {
+          if (typeof window.openGATEPredictorStudio === 'function') {
+            window.openGATEPredictorStudio();
+          } else if (typeof window.navigateToView === 'function') {
+            window.navigateToView('practice', 'gate-pyq');
+          }
+          if (typeof showToast === 'function') {
+            showToast('⚡ Launching 65-Question GATE Mock Exam', 'info');
+          }
+          break;
+        }
+
         default:
           console.log('[GT JARVIS] Unhandled action type:', action.type);
       }
@@ -612,11 +685,180 @@
   }
 
   // ──────────────────────────────────────────────────────────────────────────
-  // 8. Resilient Client Fallback (Zero Downtime & Bilingual Tanglish)
+  // 8. Resilient Client Fallback (Deep Semantic Concept Engine & Tanglish)
   // ──────────────────────────────────────────────────────────────────────────
   function generateClientFallback(prompt, mode) {
     const lower = prompt.toLowerCase();
     const ctx = collectLocalStudentContext();
+
+    // ── Direct App Trigger Queries ──
+    if (/(setup\s*wizard|onboarding|calibration|re-?run|change\s*goal)/i.test(lower)) {
+      return {
+        text: "Opening your Setup Wizard & Mentor Calibration now. You can reconfigure your target track, time horizon, and daily study budget at any time!",
+        spoken: "Opening your Setup Wizard and Mentor Calibration now.",
+        action: { type: 'open_setup_wizard' }
+      };
+    }
+
+    if (/(mock\s*exam|65\s*questions?|full\s*mock|gate\s*simulator)/i.test(lower)) {
+      return {
+        text: "Launching the official 65-Question GATE CSE Mock Exam Simulator with NAT/MCQ pattern, live timer, virtual calculator, and instant All India Rank prediction!",
+        spoken: "Launching the official 65 question GATE CSE mock exam now.",
+        action: { type: 'open_mock_exam' }
+      };
+    }
+
+    // ── Deep Technical Concept Explanations ──
+    // 1. SCS (Shortest Common Supersequence)
+    if (/(scs|shortest\s*common\s*supersequence)/i.test(lower)) {
+      return {
+        text: `### 🎯 Shortest Common Supersequence (SCS)
+**Definition**: The shortest sequence that contains both strings $X$ (length $m$) and $Y$ (length $n$) as subsequences.
+
+- **Fundamental Formula**:
+  $$\\text{Length}(SCS(X, Y)) = m + n - \\text{Length}(LCS(X, Y))$$
+- **Core Intuition**: To construct the shortest string containing both, find their **Longest Common Subsequence (LCS)** and include the shared characters once, inserting non-shared characters in relative order.
+- **Example**:
+  - $X = \\text{"AGGTAB"}$ ($m = 6$), $Y = \\text{"GXTXAYB"}$ ($n = 7$)
+  - $LCS(X, Y) = \\text{"GTAB"}$ (length 4)
+  - $\\text{Length}(SCS) = 6 + 7 - 4 = 9$
+  - Result: $\\text{"AGGXTXAYB"}$
+- **Time Complexity**: $O(m \\times n)$ via 2D Dynamic Programming table.`,
+        spoken: "Shortest Common Supersequence length equals length of X plus length of Y minus the length of their Longest Common Subsequence.",
+        action: null
+      };
+    }
+
+    // 2. 2PL (Two-Phase Locking)
+    if (/(2pl|two[- ]phase\s*locking)/i.test(lower)) {
+      return {
+        text: `### 🔒 Two-Phase Locking (2PL) Protocol
+2PL is a concurrency control protocol guaranteeing **Conflict Serializability**.
+
+- **Phase 1: Growing (Expanding) Phase**:
+  - Transactions may acquire Shared (S) or Exclusive (X) locks.
+  - **No locks can be released** during this phase.
+  - **Lock Point**: The moment the transaction acquires its final lock.
+- **Phase 2: Shrinking Phase**:
+  - Transactions may release locks.
+  - **No new locks can be acquired**.
+- **Important Variations**:
+  - **Strict 2PL**: Holds all **Exclusive (X) locks** until COMMIT/ABORT. Guarantees **Strict Schedules** & eliminates Cascading Aborts.
+  - **Rigorous 2PL**: Holds **ALL locks** (S and X) until COMMIT/ABORT. Serial order equals commit order.
+  - **Conservative 2PL**: Pre-declares all required locks upfront. Prevents deadlocks completely.`,
+        spoken: "Two Phase Locking ensures conflict serializability with a growing phase that acquires locks and a shrinking phase that releases them.",
+        action: null
+      };
+    }
+
+    // 3. Deadlocks & Banker's Algorithm
+    if (/(deadlock|banker'?s\s*algorithm|coffman)/i.test(lower)) {
+      return {
+        text: `### 🛑 Deadlocks & Banker's Algorithm
+A deadlock occurs when a set of processes are permanently blocked waiting for resources held by each other.
+
+- **4 Necessary Coffman Conditions**:
+  1. **Mutual Exclusion**: Non-shareable resource mode.
+  2. **Hold and Wait**: Process holds at least one resource while waiting for more.
+  3. **No Preemption**: Resources cannot be forcibly revoked.
+  4. **Circular Wait**: $P_0 \\to P_1 \\to \\dots \\to P_n \\to P_0$.
+- **Banker's Safety Algorithm**:
+  - Matrix calculation: $\\text{Need}[i] = \\text{Max}[i] - \\text{Allocation}[i]$.
+  - If $\\text{Need}[i] \\le \\text{Available}$, simulate process $i$ executing to completion:
+    $$\\text{Available} = \\text{Available} + \\text{Allocation}[i]$$
+  - If all processes can complete, the system is in a **Safe State** (free of deadlock).`,
+        spoken: "Deadlock requires four Coffman conditions. Banker's algorithm checks whether a safe execution sequence exists.",
+        action: null
+      };
+    }
+
+    // 4. Subnetting & CIDR
+    if (/(subnet|cidr|sub-netting|subnet\s*mask)/i.test(lower)) {
+      return {
+        text: `### 🌐 Subnetting & CIDR (Classless Inter-Domain Routing)
+Subnetting divides a contiguous IP network into smaller logical broadcast domains.
+
+- **Key Formulas**:
+  - **Subnets created** borrowing $k$ bits from host portion $= 2^k$.
+  - **Usable hosts per subnet** with $h$ host bits $= 2^h - 2$ (excluding Network ID and Directed Broadcast Address).
+  - **New Subnet Mask**: Original Prefix $+ k$ bits (e.g. $/24 + 2 = /26$ is $255.255.255.192$).
+- **Worked Example**:
+  - Block $192.168.1.0/24$. Need 4 subnets.
+  - Borrow $k = 2$ bits ($2^2 = 4$). New prefix is $/26$.
+  - Host bits remaining $h = 32 - 26 = 6$.
+  - Usable hosts per subnet $= 2^6 - 2 = 62$ hosts.`,
+        spoken: "In subnetting, borrowing k bits creates 2 to the power k subnets, and h host bits yield 2 to the power h minus 2 usable hosts.",
+        action: null
+      };
+    }
+
+    // 5. B-Trees & B+ Trees
+    if (/(b\+?\s*tree|fanout|b-tree)/i.test(lower)) {
+      return {
+        text: `### 🌲 B-Trees vs B+ Trees in Databases
+B+ Trees are balanced search trees optimized for high-throughput secondary storage I/O.
+
+- **B-Tree vs B+ Tree**:
+  - In a **B-Tree**, search keys and actual data record pointers are stored in both internal and leaf nodes.
+  - In a **B+ Tree**, data record pointers reside **exclusively in the leaf nodes**. Internal nodes contain only router keys and child pointers, maximizing node **fanout (order)**.
+  - Leaves in a B+ Tree are linked via a **doubly linked list**, allowing range queries ($K_1 \\le \\text{key} \\le K_2$) in $O(\\log N + \\text{results})$.
+- **Internal Node Order Formula**:
+  $$p \\times \\text{pointer\\_size} + (p - 1) \\times \\text{key\\_size} \\le \\text{Block Size}$$
+  Solve for maximum integer $p$ (order).`,
+        spoken: "In B+ trees, internal nodes store only router keys to maximize fanout, while leaves store all data pointers in a doubly linked list.",
+        action: null
+      };
+    }
+
+    // 6. P vs NP & NP-Complete
+    if (/(p\s*vs\s*np|np-?complete|np-?hard)/i.test(lower)) {
+      return {
+        text: `### ⚡ P vs NP & Computational Complexity
+- **P**: Problems solvable in polynomial time $O(n^k)$ by a **Deterministic Turing Machine**.
+- **NP**: Decision problems verifiable in polynomial time by a Deterministic Turing Machine (or solvable in polynomial time by a Non-deterministic TM).
+- **NP-Hard**: At least as hard as every problem in NP. (For all $L' \\in \\text{NP}, L' \\le_P L$).
+- **NP-Complete**: Both $\\in \\text{NP}$ and $\\in \\text{NP-Hard}$ (e.g. 3-SAT, Vertex Cover, Clique, Traveling Salesperson, Hamiltonian Cycle).
+- **Millennium Rule**: If any single NP-Complete problem is proven solvable in polynomial time, then $P = NP$.`,
+        spoken: "P contains problems solvable in polynomial time, while NP problems can be verified in polynomial time. NP-Complete problems are the hardest in NP.",
+        action: null
+      };
+    }
+
+    // 7. Virtual Memory & Inverted Page Tables
+    if (/(virtual\s*memory|paging|inverted\s*page\s*table|tlb)/i.test(lower)) {
+      return {
+        text: `### 🧠 Virtual Memory & Inverted Page Tables
+- **Two-Level Paging**:
+  - Virtual Address: $[ \\text{Page Directory (Outer)} \\mid \\text{Page Table (Inner)} \\mid \\text{Page Offset} ]$.
+  - Permits sparse allocation without holding the entire page table in physical RAM.
+- **Inverted Page Table**:
+  - Has exactly **one entry per physical page frame** rather than per virtual page.
+  - Drastically reduces memory footprint on 64-bit systems. Uses hashing on $\\langle \\text{PID}, \\text{Page\\#}\\rangle$.
+- **Effective Memory Access Time (EMAT)**:
+  $$\\text{EMAT} = h \\times (t_{TLB} + t_{mem}) + (1 - h) \\times (t_{TLB} + 2 \\times t_{mem})$$
+  where $h$ is the TLB hit ratio.`,
+        spoken: "Inverted page tables maintain one entry per physical frame. Effective memory access time depends heavily on the TLB hit ratio.",
+        action: null
+      };
+    }
+
+    // 8. TCP Congestion Control
+    if (/(tcp\s*reno|congestion\s*control|slow\s*start|fast\s*recovery)/i.test(lower)) {
+      return {
+        text: `### 🚀 TCP Reno Congestion Control
+- **1. Slow Start**: $cwnd$ starts at 1 MSS and doubles every RTT ($cwnd = cwnd \\times 2$) until $cwnd \\ge ssthresh$.
+- **2. Congestion Avoidance**: Linear additive increase: $cwnd = cwnd + 1$ MSS per RTT.
+- **3. Fast Retransmit & Fast Recovery (on 3 Duplicate ACKs)**:
+  - $ssthresh = \\max(\\lfloor cwnd / 2 \\rfloor, 2 \\times \\text{MSS})$
+  - $cwnd = ssthresh + 3 \\times \\text{MSS}$
+  - Retransmits missing packet without dropping back to 1 MSS!
+- **4. On Timeout**:
+  - $ssthresh = \\lfloor cwnd / 2 \\rfloor$
+  - $cwnd = 1$ MSS (drops back to Slow Start).`,
+        spoken: "TCP Reno uses Slow Start exponential growth, Congestion Avoidance linear growth, and Fast Recovery on 3 duplicate ACKs.",
+        action: null
+      };
+    }
 
     // Tanglish / English Study Planning & Next Action
     if (/(enna\s*padikanum|what\s*(should\s*i|to)\s*study|plan\s*my\s*day|next\s*action)/i.test(lower)) {
@@ -699,8 +941,8 @@
 
     return {
       text: ctx.day === 0 
-        ? `Welcome to Day 0! You can complete your onboarding setup, start your first focus session, or ask me any Computer Science question.`
-        : `I've noted your question regarding "${prompt}". Ask me to start a focus session, explain a CS concept, or test a DSA problem!`,
+        ? `Welcome to Day 0! You can complete your onboarding setup, start your first focus session, or ask me any Computer Science question (e.g. "Explain SCS", "Explain 2PL", "Deadlocks", "Subnetting").`
+        : `I've noted your question regarding "${prompt}". Ask me to explain a CS concept (SCS, 2PL, Deadlocks, B+ Trees), start a focus session, or launch a mock exam!`,
       spoken: ctx.day === 0 ? "Welcome to Day 0. Let's get your preparation started." : "I'm ready to assist with your study plan, concepts, or focus sessions.",
       action: null
     };
@@ -1001,6 +1243,28 @@
   // Connect global setMentorMode
   window.setMentorMode = function(mode) {
     setMode(mode);
+  };
+
+  // Connect Google Gemini API Key Configuration
+  window.openJarvisKeyModal = function() {
+    const currentKey = (typeof localStorage !== 'undefined') ? (localStorage.getItem('gt_gemini_api_key') || '') : '';
+    const promptMsg = currentKey 
+      ? `Google Gemini 1.5 Flash is currently CONNECTED! ✨\n\nEnter new key to update, or leave empty and press OK to clear and use the 100% offline knowledge base:`
+      : `Configure Google Gemini AI Key (Gemini 1.5 Flash):\n\nEnter your personal Gemini API key for live AI answers.\n(Free key from: https://aistudio.google.com)\n\nLeave empty to use built-in offline CS knowledge engine:`;
+    const newKey = prompt(promptMsg, currentKey);
+    if (newKey !== null) {
+      if (newKey.trim()) {
+        localStorage.setItem('gt_gemini_api_key', newKey.trim());
+        if (typeof showToast === 'function') showToast('✨ Google Gemini 1.5 Flash Connected!', 'success');
+        const desc = document.getElementById('jarvis-status-desc');
+        if (desc) desc.textContent = '✨ Gemini 1.5 Flash Active • Ask me anything!';
+      } else {
+        localStorage.removeItem('gt_gemini_api_key');
+        if (typeof showToast === 'function') showToast('🧠 Switched to Local Offline Knowledge Engine', 'info');
+        const desc = document.getElementById('jarvis-status-desc');
+        if (desc) desc.textContent = '🧠 Local Knowledge Engine Active • 100% Offline Ready';
+      }
+    }
   };
 
   // Auto-init when DOM is loaded
